@@ -1,0 +1,128 @@
+{
+  "network": "robinhood-chain-mainnet",
+  "chainId": 4663,
+  "explorer": "https://robinhoodchain.blockscout.com",
+  "rpc": "https://rpc.mainnet.chain.robinhood.com",
+  "compiler": {
+    "version": "0.8.24",
+    "optimizer": true,
+    "optimizerRuns": 200,
+    "evmVersion": "cancun",
+    "bytecodeHash": "none"
+  },
+  "notes": [
+    "Addresses are the canonical on-chain deployments. Deposit state, ownership, balances, and readiness are always live chain reads — never copy a status from this file.",
+    "bytecodeHash values are keccak256 of the on-chain deployed bytecode, re-checked on chain 4663.",
+    "VaultLegalReadinessRegistry is a predecessor deposit gate, SUPERSEDED as the factory's active gate by VaultDepositReadinessRegistry; it remains live on-chain but is no longer consulted.",
+    "VaultDepositReadinessRegistry is the active deposit-readiness gate and ships CLOSED (defaultReady=false, zero vaults marked ready)."
+  ],
+  "contracts": [
+    {
+      "name": "ChunkedInitcodeForwarder",
+      "address": "0x8040827cE112A719ECe8c114e457A9f95856A0Ba",
+      "bytecodeHash": "0x8e7eb197000dc111b64e7615c69c62792bec8f18ee6d4e1b2f66b6482cf25dbb",
+      "sourceVerification": "verified",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x8040827cE112A719ECe8c114e457A9f95856A0Ba"
+    },
+    {
+      "name": "HissOracleAdapter",
+      "address": "0x8461a6137Da8064D7Eb3a13dB674af2eDf05A2c0",
+      "bytecodeHash": "0xe843e31d43e234b16a1d3f1b8032d8bee36047a4bb0219303fe53465a340aca7",
+      "sourceVerification": "verified",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x8461a6137Da8064D7Eb3a13dB674af2eDf05A2c0"
+    },
+    {
+      "name": "VaultAssetRegistry",
+      "address": "0xcf9609B30f565813b87d1998c8b3b2aD073a4cE1",
+      "bytecodeHash": "0x74855c4a26d78d6bf1bb2f4eee32296fe619ef792649d3aefccbf464ea627de4",
+      "sourceVerification": "verified",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xcf9609B30f565813b87d1998c8b3b2aD073a4cE1"
+    },
+    {
+      "name": "VaultFactory",
+      "address": "0x278d237c6890a5f7101296a9021ed9D26c821810",
+      "bytecodeHash": "0x5bd1046c1f822d040c17018679db7d09be6cdcdeaebed0e94c55af1d25ccdb4c",
+      "sourceVerification": "verified",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x278d237c6890a5f7101296a9021ed9D26c821810"
+    },
+    {
+      "name": "HissUsdGVault",
+      "address": "0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10",
+      "bytecodeHash": "0x8cf43c2fa1b9302b3cfde6b435ba249003abf4ee4ac5dd0ecf82c04ac3dd8cb8",
+      "sourceVerification": "verified",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10"
+    },
+    {
+      "name": "VaultFeeDistributor",
+      "address": "0x354686dD8480aF9bBa590dbA8D900C9b8055C71B",
+      "bytecodeHash": "0x71b62c47b93b99aaef62030c995f39b5eb747a319ee39c3a6300ea2dcada213e",
+      "sourceVerification": "verified",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x354686dD8480aF9bBa590dbA8D900C9b8055C71B"
+    },
+    {
+      "name": "VaultReceiptRegistry",
+      "address": "0x379dAaA0B7bb172A67f37a9bC53E42Ec8C9af170",
+      "bytecodeHash": "0x8f010b7a358baca814a9fde5c45b3754128a3cf962b29bd618bfd9795bc4ccfa",
+      "sourceVerification": "verified",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x379dAaA0B7bb172A67f37a9bC53E42Ec8C9af170"
+    },
+    {
+      "name": "VaultAccessPolicy",
+      "address": "0x7e292bCD2C7A3420dA4a7036B99CFf32BcF9B663",
+      "bytecodeHash": "0x8d42f8da7ee27a6823e56f4c33f867744b49561231e351d9dc58ee2b7b5f87af",
+      "sourceVerification": "verified",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x7e292bCD2C7A3420dA4a7036B99CFf32BcF9B663"
+    },
+    {
+      "name": "VaultLegalReadinessRegistry",
+      "address": "0x31E4ECF99C993dfd1887E30dBa07c813BCe23e97",
+      "bytecodeHash": "0x5828f0e347ea4d9e3b39e921c5eead00e6fa0cf53ab91529fde1a72ecb71d740",
+      "sourceVerification": "verified",
+      "status": "superseded",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x31E4ECF99C993dfd1887E30dBa07c813BCe23e97"
+    },
+    {
+      "name": "VaultDepositReadinessRegistry",
+      "address": "0x2Bb41af03d2080896f0F6e5fb85136f7d7a34BFb",
+      "bytecodeHash": "0xc229e8d8a8ad94a7895c814d71fc768c950db3951a1d27b8b94f4d498393f6fb",
+      "sourceVerification": "verified",
+      "deploymentTx": "0x8e85738fae73e52969c52eeccaf30c51a2cd75a1c47c90be09e3839885635f80",
+      "block": 7102296,
+      "status": "active-deposit-gate",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x2Bb41af03d2080896f0F6e5fb85136f7d7a34BFb"
+    },
+    {
+      "name": "HISS Vault (flagship)",
+      "symbol": "hVAULT",
+      "address": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+      "kind": "HissUsdGVault instance",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x6d962604df1c6c5ef4b59d88863600fe71bb63e6"
+    },
+    {
+      "name": "Rebalance adapter (UniswapV4RebalanceAdapter)",
+      "address": "0xd9a097d2e119FDcd7A22E6F4b85C26E437419A15",
+      "status": "deployed, registry-approved",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xd9a097d2e119FDcd7A22E6F4b85C26E437419A15"
+    },
+    {
+      "name": "XHissVault",
+      "address": "0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be",
+      "kind": "single-asset $HISS staking vault; xHISS share token",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be"
+    },
+    {
+      "name": "$HISS token",
+      "address": "0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3",
+      "symbol": "HISS",
+      "decimals": 18,
+      "sourceVerification": "verified",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3"
+    },
+    {
+      "name": "HISS Treasury Safe (2-of-3)",
+      "address": "0xF100Fc28dd1721C698046Dbd60408c523b69e36c",
+      "kind": "Safe v1.4.1 proxy; protocol admin / treasury",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xF100Fc28dd1721C698046Dbd60408c523b69e36c"
+    }
+  ]
+}
