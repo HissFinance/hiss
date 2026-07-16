@@ -1,0 +1,35 @@
+HISS Finance — Open SDK, Contracts, and Documentation
+Copyright 2026 HissFinance
+
+This product includes software developed by HissFinance and the HISS Finance
+open-source contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+these files except in compliance with the License. A copy of the License is
+included in the LICENSE file at the root of this repository and is also
+available at http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+Attribution and scope
+--------------------------------------------------------------------------------
+
+HISS Finance is compilation and verification software. It prepares, simulates,
+scores, and records financial primitives. It does not take custody of assets,
+does not hold user keys, does not place brokerage orders, and does not guarantee
+any financial outcome.
+
+HISS Finance is not affiliated with, endorsed by, or sponsored by Robinhood
+Markets, Inc., Bankr, Doppler, Chainlink Labs, Uniswap Labs, or any other third
+party referenced in this repository. All product names, logos, and trademarks
+are the property of their respective owners and are used for identification and
+interoperability purposes only.
+
+--------------------------------------------------------------------------------
+Third-party components
+--------------------------------------------------------------------------------
+
+This repository incorporates or interoperates with third-party open-source
+components. Their license texts and attributions are listed in
+THIRD_PARTY_LICENSES.md. Where third-party Solidity source (for example,
+OpenZeppelin Contracts) is vendored or referenced, the original copyright and
+MIT license notices are preserved in the corresponding source files.

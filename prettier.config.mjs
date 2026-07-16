@@ -1,0 +1,15 @@
+// Prettier configuration for the HISS Finance public monorepo.
+// SPDX-License-Identifier: Apache-2.0
+
+/** @type {import("prettier").Config} */
+export default {
+  printWidth: 100,
+  tabWidth: 2,
+  useTabs: false,
+  semi: true,
+  singleQuote: false,
+  trailingComma: "all",
+  bracketSpacing: true,
+  arrowParens: "always",
+  endOfLine: "lf",
+};
