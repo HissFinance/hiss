@@ -44,14 +44,14 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^16.0.0",
-    "@types/node": "^20.11.0",
+    "@types/node": "^26.1.1",
     "@types/react": "^18.2.0",
-    "jsdom": "^24.0.0",
+    "jsdom": "^29.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "typescript": "^5.4.0",
-    "vitest": "^3.2.0",
-    "vite": "^6.0.0"
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10",
+    "vite": "^8.1.5"
   },
   "keywords": [
     "hiss",
