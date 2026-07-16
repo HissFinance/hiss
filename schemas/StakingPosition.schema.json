@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/StakingPosition.schema.json",
+  "title": "StakingPosition",
+  "version": "1.0.0",
+  "description": "A public read of an account's xHISS staking position. Staking mints xHISS (18-decimal share token) over $HISS; fee-funded injections raise the HISS-per-xHISS share value. Exits require a 72-hour cooldown then a 2-day redeem window. All amounts are base-unit decimal strings; the underlying-HISS value is a live chain read, never a forecast.",
+  "type": "object",
+  "required": ["account", "chainId", "xHissShares", "underlyingHiss", "cooldown"],
+  "additionalProperties": false,
+  "properties": {
+    "account": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$" },
+    "chainId": { "type": "integer", "const": 4663 },
+    "xHissShares": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "xHISS share balance, 18-decimal base units."
+    },
+    "underlyingHiss": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "HISS value of the shares at the current share rate, base units (live read)."
+    },
+    "cooldown": {
+      "type": "object",
+      "required": ["state"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "type": "string", "enum": ["none", "cooling_down", "redeemable", "expired"] },
+        "sharesInCooldown": { "type": "string", "pattern": "^\\d+$" },
+        "cooldownEndsAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the 72-hour cooldown ends and the 2-day redeem window opens."
+        },
+        "redeemWindowEndsAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "observedAt": { "type": "string", "format": "date-time" }
+  },
+  "examples": [
+    {
+      "account": "0x1111111111111111111111111111111111111111",
+      "chainId": 4663,
+      "xHissShares": "1000000000000000000",
+      "underlyingHiss": "1000000000000000000",
+      "cooldown": { "state": "none" },
+      "observedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ]
+}

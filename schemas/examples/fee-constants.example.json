@@ -1,0 +1,20 @@
+{
+  "swapFeeBps": 70,
+  "creatorSharePct": 95,
+  "dopplerSharePct": 5,
+  "hissFeeSplit": {
+    "stakersPct": 50,
+    "depositorVestingPct": 30,
+    "providerRewardsPct": 10,
+    "treasuryPct": 10
+  },
+  "claimedWethTreasuryPct": 100,
+  "providerRewardsPolicyV1": {
+    "providersPct": 30,
+    "treasuryPct": 70,
+    "wethPct": 0
+  },
+  "creatorPremintPct": 15,
+  "premintVestYears": 2,
+  "premintCliffDays": 30
+}

@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/FuseSet.schema.json",
+  "title": "FuseSet",
+  "version": "1.0.0",
+  "description": "A collection of typed risk fuses carried by a Coil. Each fuse bounds an instruction or defines a hard stop. Each fuse kind may appear at most once; execution capsules require minimum coverage (maxPositionWeight, maxSingleOrderNotional, maxDailyTurnover, noOptions, noMargin).",
+  "type": "array",
+  "items": { "$ref": "#/$defs/fuse" },
+  "$defs": {
+    "fuse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "maxBps"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "maxPositionWeight" },
+            "maxBps": { "type": "integer", "exclusiveMinimum": 0, "maximum": 10000 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "maxUsd"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "maxSingleOrderNotional" },
+            "maxUsd": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "maxBps"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "maxDailyTurnover" },
+            "maxBps": { "type": "integer", "exclusiveMinimum": 0, "maximum": 10000 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "alertPct"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "maxDrawdownAlert" }, "alertPct": { "type": "number" } }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "symbols"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "restrictedSymbols" },
+            "symbols": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9.]{0,9}$" } }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "marketHoursOnly" } }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "daysBefore", "daysAfter"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "earningsBlackout" },
+            "daysBefore": { "type": "integer", "minimum": 0 },
+            "daysAfter": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "thresholdUsd"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "manualConfirmAboveNotional" },
+            "thresholdUsd": { "type": "number", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "noOptions" } }
+        },
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "noMargin" } }
+        },
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "stopIfOracleUnhealthy" } }
+        },
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "stopIfReceiptMismatch" } }
+        }
+      ]
+    }
+  },
+  "examples": [
+    [
+      { "kind": "maxPositionWeight", "maxBps": 4000 },
+      { "kind": "maxSingleOrderNotional", "maxUsd": 500 },
+      { "kind": "maxDailyTurnover", "maxBps": 2000 },
+      { "kind": "noOptions" },
+      { "kind": "noMargin" },
+      { "kind": "stopIfOracleUnhealthy" }
+    ]
+  ]
+}

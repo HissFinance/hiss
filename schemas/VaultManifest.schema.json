@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/VaultManifest.schema.json",
+  "title": "VaultManifest",
+  "version": "1.0.0",
+  "description": "The authored definition of a HISS USDG Creator Vault. Vaults live on Robinhood Chain ONLY (4663 mainnet / 46630 testnet); Base is never a vault chain. The base asset is always USDG (6 decimals). Robinhood MCP is never a pooled-vault execution rail.",
+  "type": "object",
+  "required": [
+    "manifestVersion",
+    "slug",
+    "name",
+    "description",
+    "chainId",
+    "baseAsset",
+    "baseAssetAddress",
+    "allowedAssetSymbols",
+    "feeConfig",
+    "creatorPolicy",
+    "depositorPolicy",
+    "strategyDescriptionHash",
+    "strategyVersion",
+    "robinhoodMcpUsedForVaultExecution",
+    "createdAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "manifestVersion": { "const": "vault-manifest-1.0.0" },
+    "slug": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "chainId": { "type": "integer", "enum": [4663, 46630], "description": "Robinhood Chain only." },
+    "baseAsset": { "const": "USDG" },
+    "baseAssetAddress": { "type": "string", "const": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168" },
+    "allowedAssetSymbols": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "feeConfig": { "$ref": "https://hiss.finance/schemas/FeeSchedule.schema.json" },
+    "creatorPolicy": {
+      "type": "object",
+      "required": [
+        "creatorWalletAddress",
+        "minCreatorSkinBps",
+        "strategyNoticePeriodSeconds",
+        "creatorAddressPublic",
+        "feeRecipientPublic"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "creatorWalletAddress": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$" },
+        "minCreatorSkinBps": {
+          "type": "integer",
+          "minimum": 500,
+          "maximum": 10000,
+          "description": "Minimum creator TVL share while public deposits are open (>= 5%)."
+        },
+        "strategyNoticePeriodSeconds": { "type": "integer", "minimum": 0 },
+        "creatorAddressPublic": { "const": true },
+        "feeRecipientPublic": { "const": true }
+      }
+    },
+    "depositorPolicy": {
+      "type": "object",
+      "required": [
+        "lockupSeconds",
+        "riskAckRequired",
+        "depositorsShareProfitsAndLosses",
+        "noGuaranteedYield",
+        "notFdicInsured"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "lockupSeconds": { "type": "integer", "minimum": 0 },
+        "riskAckRequired": { "const": true },
+        "depositorsShareProfitsAndLosses": { "const": true },
+        "noGuaranteedYield": { "const": true },
+        "notFdicInsured": { "const": true }
+      }
+    },
+    "strategyDescriptionHash": { "type": "string", "minLength": 1 },
+    "strategyVersion": { "type": "integer", "minimum": 1 },
+    "robinhoodMcpUsedForVaultExecution": { "const": false },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "examples": [
+    {
+      "manifestVersion": "vault-manifest-1.0.0",
+      "slug": "blue-chip-usdg",
+      "name": "Blue Chip USDG",
+      "description": "A conservative USDG vault.",
+      "chainId": 4663,
+      "baseAsset": "USDG",
+      "baseAssetAddress": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "allowedAssetSymbols": ["USDG", "SPY"],
+      "feeConfig": {
+        "performanceFeeBps": 1000,
+        "protocolShareBps": 1000,
+        "routingFeeTenthBps": 0,
+        "creatorFeeRecipient": "0x1111111111111111111111111111111111111111"
+      },
+      "creatorPolicy": {
+        "creatorWalletAddress": "0x1111111111111111111111111111111111111111",
+        "minCreatorSkinBps": 500,
+        "strategyNoticePeriodSeconds": 604800,
+        "creatorAddressPublic": true,
+        "feeRecipientPublic": true
+      },
+      "depositorPolicy": {
+        "lockupSeconds": 0,
+        "riskAckRequired": true,
+        "depositorsShareProfitsAndLosses": true,
+        "noGuaranteedYield": true,
+        "notFdicInsured": true
+      },
+      "strategyDescriptionHash": "0f1e2d…",
+      "strategyVersion": 1,
+      "robinhoodMcpUsedForVaultExecution": false,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ]
+}

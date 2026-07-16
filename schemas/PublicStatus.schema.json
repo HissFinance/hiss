@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/PublicStatus.schema.json",
+  "title": "PublicStatus",
+  "version": "1.0.0",
+  "description": "A status claim with the evidence backing it. Evidence precedence is strict: a positive claim ('live') requires a fresh chain read or a committed artifact; a negative claim ('not_deployed') requires affirmative absence evidence (a no-bytecode read). A failed read collapses to 'unknown'. A 'degraded' status surfaces the last verified level, labeled.",
+  "type": "object",
+  "required": ["subject", "level", "evidence"],
+  "additionalProperties": false,
+  "properties": {
+    "subject": { "type": "string" },
+    "level": {
+      "type": "string",
+      "enum": ["live", "deployment_pending", "not_deployed", "degraded", "unknown"]
+    },
+    "evidence": {
+      "type": "string",
+      "enum": ["fresh_chain_read", "committed_artifact", "no_bytecode_read", "typed_constant", "none"]
+    },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "lastVerifiedLevel": {
+      "type": "string",
+      "enum": ["live", "deployment_pending", "not_deployed", "degraded", "unknown"],
+      "description": "For 'degraded': the last verified level being surfaced."
+    },
+    "detail": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "level": { "const": "live" } } },
+      "then": { "properties": { "evidence": { "enum": ["fresh_chain_read", "committed_artifact"] } } }
+    },
+    {
+      "if": { "properties": { "level": { "const": "not_deployed" } } },
+      "then": { "properties": { "evidence": { "const": "no_bytecode_read" } } }
+    }
+  ],
+  "examples": [
+    {
+      "subject": "xHissVault",
+      "level": "live",
+      "evidence": "fresh_chain_read",
+      "observedAt": "2026-01-01T00:00:00.000Z"
+    },
+    { "subject": "depositorVestingDistributor", "level": "unknown", "evidence": "none" }
+  ]
+}

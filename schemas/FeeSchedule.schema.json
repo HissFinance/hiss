@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/FeeSchedule.schema.json",
+  "title": "FeeSchedule",
+  "version": "1.0.0",
+  "description": "Vault fee configuration and the launch fee schedule. Saving a candidate is free; publishing a public vault costs 50 USDG. The creator performance fee (bps of profit above the high-water mark, launch cap 10%) carries a HISS protocol share (bps OF THE CREATOR FEE, max 20%). Routing fee is in tenths of a basis point. All fees are disclosed.",
+  "type": "object",
+  "required": ["performanceFeeBps", "protocolShareBps", "routingFeeTenthBps", "creatorFeeRecipient"],
+  "additionalProperties": false,
+  "properties": {
+    "performanceFeeBps": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000,
+      "description": "Creator performance fee, bps of profit above the high-water mark. Launch cap 1000 (10%); verified creators up to 2000 (20%)."
+    },
+    "protocolShareBps": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000,
+      "description": "HISS protocol share, bps OF THE CREATOR FEE (never of principal). Launch 1000, max 2000."
+    },
+    "routingFeeTenthBps": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 20,
+      "description": "Routing fee in tenths of a basis point of rebalance notional. 0 while routing is disabled; 5 (0.5 bps) default; 20 (2 bps) advanced maximum."
+    },
+    "creatorFeeRecipient": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$",
+      "description": "Public creator fee recipient."
+    }
+  },
+  "examples": [
+    {
+      "performanceFeeBps": 1000,
+      "protocolShareBps": 1000,
+      "routingFeeTenthBps": 0,
+      "creatorFeeRecipient": "0x1111111111111111111111111111111111111111"
+    }
+  ]
+}

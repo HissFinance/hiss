@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/fee-constants.schema.json",
+  "title": "HISS Fee Constants",
+  "description": "Canonical, public fee-model parameters for HISS Finance. Basis points and integer percentage legs only — no addresses or secrets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "swapFeeBps",
+    "creatorSharePct",
+    "dopplerSharePct",
+    "hissFeeSplit",
+    "claimedWethTreasuryPct",
+    "providerRewardsPolicyV1",
+    "creatorPremintPct",
+    "premintVestYears",
+    "premintCliffDays"
+  ],
+  "properties": {
+    "swapFeeBps": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000,
+      "description": "Uniswap V4 pool swap fee in basis points."
+    },
+    "creatorSharePct": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "dopplerSharePct": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "hissFeeSplit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stakersPct", "depositorVestingPct", "providerRewardsPct", "treasuryPct"],
+      "properties": {
+        "stakersPct": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "depositorVestingPct": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "providerRewardsPct": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "treasuryPct": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "claimedWethTreasuryPct": { "type": "integer", "const": 100 },
+    "providerRewardsPolicyV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providersPct", "treasuryPct", "wethPct"],
+      "properties": {
+        "providersPct": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "treasuryPct": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "wethPct": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "creatorPremintPct": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "premintVestYears": { "type": "integer", "minimum": 0 },
+    "premintCliffDays": { "type": "integer", "minimum": 0 }
+  }
+}

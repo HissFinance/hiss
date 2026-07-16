@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/ContractRegistry.schema.json",
+  "title": "ContractRegistry",
+  "version": "1.0.0",
+  "description": "Canonical public contract registry for HISS Finance on Robinhood Chain mainnet (4663). Addresses are stored in EIP-55 checksummed form. Nothing here is secret.",
+  "type": "object",
+  "required": ["chainId", "contracts"],
+  "additionalProperties": false,
+  "properties": {
+    "chainId": { "type": "integer", "enum": [4663], "description": "Robinhood Chain mainnet." },
+    "contracts": {
+      "type": "object",
+      "description": "Map of contract key to its registry entry.",
+      "additionalProperties": { "$ref": "#/$defs/contractEntry" }
+    }
+  },
+  "$defs": {
+    "contractEntry": {
+      "type": "object",
+      "required": ["key", "address", "chainId", "label", "category"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "address": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$" },
+        "chainId": { "type": "integer", "enum": [4663, 46630] },
+        "label": { "type": "string" },
+        "category": {
+          "type": "string",
+          "enum": ["token", "governance", "staking", "vault-core", "vault-registry", "adapter"]
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "chainId": 4663,
+      "contracts": {
+        "hissToken": {
+          "key": "hissToken",
+          "address": "0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3",
+          "chainId": 4663,
+          "label": "$HISS token (ERC-20)",
+          "category": "token"
+        },
+        "treasurySafe": {
+          "key": "treasurySafe",
+          "address": "0xF100Fc28dd1721C698046Dbd60408c523b69e36c",
+          "chainId": 4663,
+          "label": "HISS Treasury Safe (2-of-3)",
+          "category": "governance"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/ExecutionReceipt.schema.json",
+  "title": "ExecutionReceipt",
+  "version": "1.0.0",
+  "description": "A deterministic, content-addressed record of an observed outcome. It is the ONLY place a 'confirmed' state exists. The status ladder is strict: a broadcast that is not yet confirmed is 'submitted', never 'onchain_confirmed'; a failed read is 'unknown', never a positive or negative claim. 'onchain_confirmed' requires a txHash and blockNumber. paper/preview/unknown receipts must not carry a txHash.",
+  "type": "object",
+  "required": ["receiptVersion", "receiptId", "planHash", "chainId", "status", "observedAt"],
+  "additionalProperties": false,
+  "properties": {
+    "receiptVersion": { "const": "execution-receipt-1.0.0" },
+    "receiptId": { "type": "string" },
+    "planHash": { "type": "string", "minLength": 1 },
+    "chainId": { "type": "integer", "enum": [4663, 46630] },
+    "status": {
+      "type": "string",
+      "enum": ["paper", "preview", "submitted", "onchain_confirmed", "failed", "unknown"]
+    },
+    "txHash": { "type": "string", "pattern": "^0x[0-9a-fA-F]+$" },
+    "blockNumber": { "type": "integer", "minimum": 0 },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "receiptHash": {
+      "type": "string",
+      "description": "Content hash of the receipt payload (excluding this field)."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "onchain_confirmed" } } },
+      "then": { "required": ["txHash", "blockNumber"] }
+    },
+    {
+      "if": { "properties": { "status": { "enum": ["paper", "preview", "unknown"] } } },
+      "then": { "not": { "required": ["txHash"] } }
+    }
+  ],
+  "examples": [
+    {
+      "receiptVersion": "execution-receipt-1.0.0",
+      "receiptId": "rcpt-1",
+      "planHash": "9ab3…",
+      "chainId": 4663,
+      "status": "onchain_confirmed",
+      "txHash": "0xabc123",
+      "blockNumber": 1048576,
+      "observedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ]
+}

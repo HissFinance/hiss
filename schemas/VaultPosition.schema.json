@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/VaultPosition.schema.json",
+  "title": "VaultPosition",
+  "version": "1.0.0",
+  "description": "A public read of an account's position in a HISS USDG Creator Vault. Depositors share profits and losses; there is no guaranteed yield and no FDIC insurance. Share value and USDG value are live chain reads, never forecasts. Amounts are base-unit decimal strings (USDG is 6 decimals).",
+  "type": "object",
+  "required": ["account", "vaultAddress", "chainId", "shares", "usdgValue"],
+  "additionalProperties": false,
+  "properties": {
+    "account": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$" },
+    "vaultAddress": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$" },
+    "chainId": { "type": "integer", "enum": [4663, 46630] },
+    "shares": { "type": "string", "pattern": "^\\d+$", "description": "Vault share balance, base units." },
+    "usdgValue": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "USDG value of the shares (6-decimal base units), live read."
+    },
+    "costBasisUsdg": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "Disclosed cost basis in USDG base units, if tracked."
+    },
+    "lockupEndsAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Disclosed lockup expiry, if any."
+    },
+    "observedAt": { "type": "string", "format": "date-time" }
+  },
+  "examples": [
+    {
+      "account": "0x1111111111111111111111111111111111111111",
+      "vaultAddress": "0x6D962604dF1c6C5ef4B59d88863600Fe71Bb63E6",
+      "chainId": 4663,
+      "shares": "1000000",
+      "usdgValue": "1000000",
+      "observedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ]
+}

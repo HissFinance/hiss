@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/ActionPlan.schema.json",
+  "title": "ActionPlan",
+  "version": "1.0.0",
+  "description": "A compiled, reviewable set of would-be steps derived from a Coil or a vault rebalance intent. An ActionPlan is ALWAYS a plan — it has no 'sent' or 'executed' state; those belong to an ExecutionReceipt recorded after observing an on-chain result. Every step is a preview bounded by fuse checks.",
+  "type": "object",
+  "required": [
+    "planVersion",
+    "planId",
+    "sourceManifestHash",
+    "chainId",
+    "executionMode",
+    "steps",
+    "createdAt"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "planVersion": { "const": "action-plan-1.0.0" },
+    "planId": { "type": "string" },
+    "sourceManifestHash": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Content hash of the Coil or vault manifest this plan compiled from."
+    },
+    "chainId": { "type": "integer", "enum": [4663, 46630] },
+    "executionMode": {
+      "type": "string",
+      "enum": ["paper_only", "preview_only", "human_confirm", "agentic_mcp_enabled"]
+    },
+    "steps": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/step" } },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "planHash": {
+      "type": "string",
+      "description": "Content hash of the plan payload (excluding this field)."
+    }
+  },
+  "$defs": {
+    "step": {
+      "type": "object",
+      "required": ["kind", "instrument", "side", "fuseChecks", "abortConditions", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["order_preview", "rebalance_leg", "deposit_intent", "withdraw_intent"]
+        },
+        "instrument": { "type": "string", "description": "A plain ticker OR a 0x token address." },
+        "side": { "type": "string", "enum": ["buy", "sell"] },
+        "amount": { "type": "string" },
+        "unit": { "type": "string", "enum": ["usd", "usdg_base_units", "token_base_units"] },
+        "fuseChecks": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "abortConditions": { "type": "array", "items": { "type": "string" } },
+        "reason": { "type": "string" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "planVersion": "action-plan-1.0.0",
+      "planId": "plan-1",
+      "sourceManifestHash": "6c1e…",
+      "chainId": 4663,
+      "executionMode": "preview_only",
+      "steps": [
+        {
+          "kind": "order_preview",
+          "instrument": "NVDA",
+          "side": "buy",
+          "amount": "250",
+          "unit": "usd",
+          "fuseChecks": ["maxPositionWeight", "maxSingleOrderNotional"],
+          "abortConditions": ["stopIfOracleUnhealthy"],
+          "reason": "drift rebalance back to target weight"
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ]
+}

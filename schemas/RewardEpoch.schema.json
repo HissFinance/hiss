@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/RewardEpoch.schema.json",
+  "title": "RewardEpoch",
+  "version": "1.0.0",
+  "description": "A reward epoch's public lifecycle descriptor. State chain, always: planned != funded != claimable. Legal transitions: provisional->final->challenge->funded->vesting->claimable->claimed, plus challenge->final (recomputation) and funded/vesting/claimable->rolled_over. A score is data; a challenge window must close and the Safe must authorize funding before any vested amount is claimable.",
+  "type": "object",
+  "required": ["epochId", "state", "window"],
+  "additionalProperties": false,
+  "properties": {
+    "epochId": { "type": "integer", "minimum": 0 },
+    "state": {
+      "type": "string",
+      "enum": [
+        "provisional",
+        "final",
+        "challenge",
+        "funded",
+        "vesting",
+        "claimable",
+        "claimed",
+        "rolled_over"
+      ]
+    },
+    "window": {
+      "type": "object",
+      "required": ["startTime", "endTime"],
+      "additionalProperties": false,
+      "properties": {
+        "startTime": { "type": "integer", "description": "Unix seconds (inclusive)." },
+        "endTime": { "type": "integer", "description": "Unix seconds (exclusive)." },
+        "startBlock": { "type": "integer", "minimum": 0 },
+        "endBlock": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "scoreHash": {
+      "type": "string",
+      "description": "Deterministic content hash of the finalized score (present once final or later)."
+    },
+    "publication": {
+      "type": "object",
+      "required": ["challengeWindowStart", "challengeWindowEnd"],
+      "additionalProperties": false,
+      "properties": {
+        "challengeWindowStart": { "type": "string", "format": "date-time" },
+        "challengeWindowEnd": { "type": "string", "format": "date-time" },
+        "publishedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "epochId": 1,
+      "state": "challenge",
+      "window": { "startTime": 1767225600, "endTime": 1769904000 },
+      "scoreHash": "0xabc…",
+      "publication": {
+        "challengeWindowStart": "2026-02-01T00:00:00.000Z",
+        "challengeWindowEnd": "2026-02-08T00:00:00.000Z"
+      }
+    }
+  ]
+}
