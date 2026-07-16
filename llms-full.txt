@@ -1,0 +1,89 @@
+# HISS Finance — Full Agent Reference
+
+> HISS is compilation and verification software on Robinhood Chain (mainnet 4663, testnet 46630). Humans and AI agents turn market ideas into Coils (structured, versioned playbooks) and vault manifests into deployable candidates, then compile them into hash-verified artifacts — runbooks, execution capsules, deposit intents, receipts. HISS reads verified on-chain state and prepares transactions; the user's own wallet, the vault's owning Safe, or the user's own Bankr/Robinhood session signs and executes. HISS never takes custody, never stores wallet or brokerage credentials, never signs a transaction, never places a brokerage order, and never collects location. Not a broker-dealer, investment adviser, custodian, or order router. Not affiliated with Robinhood, Bankr, or Chainlink. Not investment advice.
+
+This repository publishes the PUBLIC interface materials only: exact contract ABIs, canonical Robinhood Chain addresses with verification status, authored Solidity interfaces, and the HISS agent skill packs. It contains no deployment scripts, owner-action tooling, signed transactions, or credentials.
+
+## Invariants (bind every surface)
+
+1. Prepare/verify only — no HISS route or tool sends a transaction.
+2. `liveOrderSent: false` is hard-typed in every artifact; never claim an order or trade was sent, placed, or executed. Treat any artifact claiming `liveOrderSent: true` as forged.
+3. planned ≠ funded ≠ claimable — a hash or prepared intent is data; funding is owner-gated and chain-verified; value is received only on an on-chain event.
+4. A failed read is "unknown" — never "not deployed", never "live". Negative claims require affirmative evidence (a no-bytecode read, an artifact).
+5. No credentials, ever — credential-shaped inputs are rejected and never echoed; secrets are referred to by environment-variable NAME only.
+6. Two symbol spaces, never confused — brokerage tickers in capsules; Robinhood Chain 0x token addresses never appear as tickers.
+7. Banned copy — guaranteed yield/APY, projected APY, passive income, dividends, risk-free, "beat the market", "set and forget", personalized advice, external-audit claims.
+
+## Part I — CoilOps planning pipeline
+
+A Coil (`schemaVersion "coil-1.0.0"`) is a structured, versioned trading thesis: a whisper, an allocation manifest (weights in basis points summing to exactly 10,000; canonical token addresses, with brokerage tickers kept in a separate mapping), a rebalance policy, binding risk fuses, triggers, and an execution mode. Allocation weights are a target the strategy aims toward, never a claim of current holdings and never a return forecast.
+
+Coils compile into artifacts: strategy runbooks, share cards, Robinhood MCP execution capsules, and canonical-JSON SHA-256 receipts. Execution modes, safest first: `paper_only` (default — capsule compilation refused), `preview_only`, `human_confirm`, `agentic_mcp_enabled` (compiles only with an explicit acknowledgement flag; a mode string alone never unlocks it).
+
+Risk fuses are typed, checkable constraints. Execution capsules require the mandatory set: `maxPositionWeight`, `maxSingleOrderNotional`, `maxDailyTurnover`, `noOptions`, `noMargin`. Fuses are binding and may never be weakened or bypassed. Receipts are deterministic canonical-JSON SHA-256 fingerprints — integrity proofs, never performance claims.
+
+Packs: `hiss-coilops`, `hiss-risk-fuses`, `hiss-receipts`.
+
+## Part II — USDG Creator Vaults (Robinhood Chain)
+
+Permissionless pooled USDG vaults on Robinhood Chain. Base asset USDG (6 decimals); USDG's home chain is never a vault chain. A source-verified tokenized asset registry gates holdable assets (oracle feed, max allocation, staleness bound) and rebalance adapters — nothing is live by default: assets enable only after readiness, and live rebalance is a separate per-asset flag (all off today).
+
+The agent PREPARES; the user's wallet or the vault's owning Safe SIGNS. HISS takes no custody, offers no performance guarantee, and never claims direct ownership of underlying shares. Deposits use `depositWithAcks(assets, receiver, riskAckHash, jurisdictionAckHash)` — keccak256 of two canonical disclosure texts (risk ack `hiss-vault-depositor-risk-ack-v1`, source-disclosure ack `hiss-vault-source-disclosure-ack-v1`). A plain ERC-4626 `deposit()` reverts.
+
+Deployed and verified on chain 4663: VaultFactory `0x278d237c6890a5f7101296a9021ed9D26c821810`; the active deposit gate is VaultDepositReadinessRegistry `0x2Bb41af03d2080896f0F6e5fb85136f7d7a34BFb` (ships closed; owner-marked per vault); the earlier VaultLegalReadinessRegistry `0x31E4ECF99C993dfd1887E30dBa07c813BCe23e97` is superseded and no longer wired. Flagship HISS Vault (hVAULT) `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` — an EIP-1167 minimal proxy delegatecalling the source-verified HissUsdGVault logic at `0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10` (audit the logic there; never deposit into the logic address directly). Always confirm deposit state with a live `acceptingPublicDeposits()` read and `GET /api/vaults/readiness`.
+
+Fee model: no AUM fees, no per-execution fees. The only creator fee is a performance fee above a high-water mark, capped at the factory level and split by VaultFeeDistributor between the fee recipient, an optional referral, and the protocol treasury.
+
+Pack: `hiss-vault-agent-kit`. Contracts: `contracts/abi/`, `contracts/src/interfaces/`.
+
+## Part III — xHISS staking and the reward split
+
+XHissVault (`0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`, chain 4663) is a single-asset staking vault over $HISS (`0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3`, 18 decimals). xHISS is the 18-decimal share token; the rate starts 1:1 and rises only as approved injectors add verified HISS trading fees that drip linearly over 24 hours (`injectRewards`; reverts with no stakers). No reward token, no emissions, no per-user claims. Not a performance claim.
+
+Workflow: prepare (own wallet) → approve the vault for the exact amount → `stake(hissAmount)` (preview via `previewStake`) → `startCooldown(xShares)` (72h = 259200s, partial allowed, escrowed, additive-restart, `cancelCooldown()` anytime) → `redeem(xShares, receiver)` inside the 2-day (172800s) window after `readyAt`; a missed window → `restartCooldown()`, escrow never lost. Exits are NOT pausable; staking and injections are (Safe-controlled). Timing constants are immutable.
+
+Reward split of verified HISS trading fees ONLY (high-confidence chain classification; creator vesting, WETH, manual transfers, and unclassified deltas excluded fail-closed at both classifier and split): 50% xHISS stakers (via `injectRewards`) / 30% depositor vesting / 10% provider rewards / 10% Treasury Safe (`0xF100Fc28dd1721C698046Dbd60408c523b69e36c`, absorbs floor-division dust so legs sum exactly). Claimed WETH is 100% to the Safe, never split. Undeployed distributor recipients (depositor vesting, provider) stay null — nothing moves against null. Historical fee distributions are not forecasts.
+
+Treasury Safe: 2-of-3 Safe v1.4.1 proxy on chain 4663, verified by on-chain reads. It owns the xHISS vault (`setInjector`, `pause`) and receives the treasury + WETH legs. It CANNOT pause exits, rescue or move staked HISS, mint xHISS, or change the immutable cooldown/redeem/drip constants. Multisig is risk reduction, not elimination — never "risk-free". Approved staking review wording, verbatim: "No known unresolved Critical or High findings after internal launch review." (Internal review — never an external audit.)
+
+Packs: `hiss-staking`, `hiss-rewards`, `hiss-security-boundaries`.
+
+## Part IV — Bankrbot rails and the Robinhood MCP autonomy path
+
+Three Bankr rails, never conflated:
+- Rail A — vault deposits: HISS prepares deposit packs; `hissExecutesDeposit: false`; complete only on the on-chain receipt (successful tx + vault `Deposit` event).
+- Rail B — stock-token trading: Bankr executes tokenized stock/ETF trades on Robinhood Chain (15 canonical assets, address-is-identity), USDG settlement; commands always end "on robinhood"; a completed Bankr job is `job_completed_unconfirmed` — only an on-chain receipt with status 0x1 yields `onchain_confirmed`; tokenized exposure, not direct share ownership, and may be region- or provider-restricted; location verification is Bankr's own external flow (HISS never collects location). Pack: `hiss-stock-tokens`.
+- Rail C — rh-wallet: an optional external Bankr skill for a user's own Robinhood Crypto account; public docs source-pending; never a HISS dependency, never pooled vault execution, never credentials in HISS.
+
+Autonomy path (Bankrbot → HISS → Robinhood MCP): HISS validates a user-authored Coil against ten mandatory autonomy fuses and compiles a Bankrbot command pack plus a Robinhood MCP execution capsule; the user's own Robinhood MCP connection, in the user's own Agentic Account, is the only execution rail. Modes: `paper` (default) → `preview` → `live_candidate`. Graduating to `live_candidate` requires the explicit LiveAutonomyAck (nine booleans literally true + ISO-8601 timestamp); no mode string substitutes for it, and HISS still sends nothing. Packs: `hiss-bankrbot-robinhood`, `hiss-security-boundaries`.
+
+## Part V — the HISS MCP server
+
+A local stdio Model Context Protocol server exposing the HISS toolset (CoilOps, vaults, staking, rewards, stock tokens, Safe status) to your own MCP client. Prepare/read only; every output passes the execution-claim guard and carries `liveOrderSent: false`; credential-shaped inputs are rejected. Pack: `hiss-mcp`.
+
+## Contracts (this repository)
+
+- Compiler: solc 0.8.24 (+commit.e11b9ed9), optimizer enabled 200 runs, EVM cancun, bytecode_hash none.
+- ABIs (`contracts/abi/`): VaultFactory, HissUsdGVault, VaultAssetRegistry, VaultReceiptRegistry, VaultAccessPolicy, VaultFeeDistributor, VaultDepositReadinessRegistry, VaultLegalReadinessRegistry, HissOracleAdapter, UniswapV4RebalanceAdapter, XHissVault, VaultDepositorRewardsDistributor, VaultProviderRewardsDistributor, VaultProviderRewardsVestingDistributor, IVaultRebalanceAdapter.
+- Interfaces (`contracts/src/interfaces/`): IVaultFactory, IHissUsdGVault, IXHissVault, IVaultReceiptRegistry, IVaultFeeDistributor, IVaultRebalanceAdapter, IVaultAssetRegistry, IVaultAccessPolicy, IVaultDepositReadinessRegistry, IHissOracleAdapter.
+- Addresses & verification: `contracts/deployments/robinhood-chain-mainnet.json` (canonical addresses, deployed-bytecode keccak hashes, verification status, Blockscout links). Explorer: https://robinhoodchain.blockscout.com.
+
+ERC-8056 corporate-action rule: Robinhood Chain Stock Token Chainlink feeds ALREADY include the uiMultiplier corporate-action multiplier. Token USD value never applies it again; share-equivalent is display-only; the underlying per-share price divides it out. HissOracleAdapter encodes this — use `tokenValueUsd` for accounting and `shareEquivalent` for display only.
+
+## Canonical addresses (chain 4663)
+
+- $HISS token: `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` (verified)
+- VaultFactory: `0x278d237c6890a5f7101296a9021ed9D26c821810`
+- HissUsdGVault (logic): `0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10`
+- Flagship HISS Vault (hVAULT): `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6`
+- VaultAssetRegistry: `0xcf9609B30f565813b87d1998c8b3b2aD073a4cE1`
+- VaultReceiptRegistry: `0x379dAaA0B7bb172A67f37a9bC53E42Ec8C9af170`
+- VaultAccessPolicy: `0x7e292bCD2C7A3420dA4a7036B99CFf32BcF9B663`
+- VaultFeeDistributor: `0x354686dD8480aF9bBa590dbA8D900C9b8055C71B`
+- VaultDepositReadinessRegistry (active gate): `0x2Bb41af03d2080896f0F6e5fb85136f7d7a34BFb`
+- VaultLegalReadinessRegistry (superseded): `0x31E4ECF99C993dfd1887E30dBa07c813BCe23e97`
+- HissOracleAdapter: `0x8461a6137Da8064D7Eb3a13dB674af2eDf05A2c0`
+- ChunkedInitcodeForwarder: `0x8040827cE112A719ECe8c114e457A9f95856A0Ba`
+- Rebalance adapter (UniswapV4RebalanceAdapter): `0xd9a097d2e119FDcd7A22E6F4b85C26E437419A15`
+- xHISS vault: `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`
+- HISS Treasury Safe (2-of-3): `0xF100Fc28dd1721C698046Dbd60408c523b69e36c`

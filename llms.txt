@@ -1,0 +1,37 @@
+# HISS Finance
+
+> HISS is compilation and verification software on Robinhood Chain (mainnet 4663, testnet 46630). It turns market ideas and vault manifests into structured, hash-verified artifacts and reads verified on-chain state. It never takes custody, never stores wallet or brokerage credentials, never signs a transaction, and never places a brokerage order. Not affiliated with Robinhood, Bankr, or Chainlink. Not investment advice.
+
+What HISS never does: stores brokerage or wallet credentials; sends orders (`liveOrderSent` is hard-typed `false` in every artifact); takes custody; collects location; or claims affiliation with Robinhood, Bankr, or Chainlink.
+
+State discipline everywhere: planned ≠ funded ≠ claimable. A hash or prepared intent is data; funding is owner-gated and chain-verified; value is received only on an on-chain event. A failed read is "unknown" — never "not deployed", never "live".
+
+This repository publishes the PUBLIC interface materials: exact contract ABIs, canonical Robinhood Chain addresses with verification status, Solidity interfaces, and the HISS agent skill packs. It contains no deployment scripts, owner-action tooling, or credentials.
+
+## Skills
+
+- [hiss-coilops](skills/hiss-coilops/SKILL.md): Coil a market thesis into a versioned, bounded playbook; validate, score, compile, receipt. Never executes trades.
+- [hiss-risk-fuses](skills/hiss-risk-fuses/SKILL.md): The typed, binding constraints (position/notional/turnover caps, no-options/no-margin, oracle and receipt stops) that bound any compiled artifact.
+- [hiss-receipts](skills/hiss-receipts/SKILL.md): Canonical-JSON SHA-256 workflow-integrity proofs and verification.
+- [hiss-bankrbot-robinhood](skills/hiss-bankrbot-robinhood/SKILL.md): The Bankrbot → HISS → Robinhood MCP autonomy path — paper-first, ack-gated, audited.
+- [hiss-vault-agent-kit](skills/hiss-vault-agent-kit/SKILL.md): Discover, read, create, and prepare USDG deposits into HISS Creator Vaults; the agent prepares, the wallet or Safe signs.
+- [hiss-staking](skills/hiss-staking/SKILL.md): Stake $HISS for xHISS; exact-amount approvals, 72-hour cooldown, 2-day redeem window, fee-funded 24-hour injections.
+- [hiss-rewards](skills/hiss-rewards/SKILL.md): The 50/30/10/10 verified-HISS-trading-fee split and the 2-of-3 Treasury Safe.
+- [hiss-stock-tokens](skills/hiss-stock-tokens/SKILL.md): Prepare and reconcile Bankr trades of Robinhood Chain tokenized stocks (Rail B), USDG settlement; tokenized exposure, not direct ownership.
+- [hiss-mcp](skills/hiss-mcp/SKILL.md): Use the local HISS stdio MCP server and its tool families.
+- [hiss-security-boundaries](skills/hiss-security-boundaries/SKILL.md): Custody, credential, consent, and the three-rail Bankr boundaries in depth.
+
+## Contracts
+
+- [Contracts README](contracts/README.md): What's public, verification/explorer links, compiler settings, the ERC-8056 corporate-action rule.
+- [Deployment addresses (chain 4663)](contracts/deployments/robinhood-chain-mainnet.json): Canonical addresses, deployed-bytecode keccak hashes, verification status, Blockscout links.
+- ABIs: `contracts/abi/*.json` — VaultFactory, HissUsdGVault, VaultAssetRegistry, VaultReceiptRegistry, VaultAccessPolicy, VaultFeeDistributor, VaultDepositReadinessRegistry, VaultLegalReadinessRegistry, HissOracleAdapter, UniswapV4RebalanceAdapter, XHissVault, and the reward distributors.
+- Interfaces: `contracts/src/interfaces/*.sol` — IVaultFactory, IHissUsdGVault, IXHissVault, IVaultReceiptRegistry, IVaultFeeDistributor, IVaultRebalanceAdapter, IVaultAssetRegistry, IVaultAccessPolicy, IVaultDepositReadinessRegistry, IHissOracleAdapter.
+
+## Key facts
+
+- Base URL: https://www.hiss.finance · Explorer: https://robinhoodchain.blockscout.com
+- VaultFactory `0x278d237c6890a5f7101296a9021ed9D26c821810` · flagship HISS Vault `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` · xHISS vault `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`.
+- $HISS token `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` (18 decimals, verified) · Treasury Safe (2-of-3) `0xF100Fc28dd1721C698046Dbd60408c523b69e36c`.
+- Compiler: solc 0.8.24, optimizer 200 runs, EVM cancun, bytecode_hash none.
+- Reward split of verified HISS trading fees only: 50% xHISS stakers / 30% depositor vesting / 10% provider rewards / 10% Treasury Safe; claimed WETH 100% to the Safe. Undeployed distributor recipients stay null.

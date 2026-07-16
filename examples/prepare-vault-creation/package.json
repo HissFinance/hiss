@@ -1,0 +1,17 @@
+{
+  "name": "@hiss-finance/example-prepare-vault-creation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "@hiss-finance/react": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  },
+  "license": "Apache-2.0"
+}
