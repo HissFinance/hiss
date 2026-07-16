@@ -33,7 +33,7 @@
   "dependencies": {
     "@hiss-finance/core": "workspace:*",
     "@hiss-finance/sdk": "workspace:*",
-    "commander": "^12.1.0"
+    "commander": "^15.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
