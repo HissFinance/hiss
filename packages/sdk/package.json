@@ -1,0 +1,50 @@
+{
+  "name": "@hiss-finance/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for HISS Finance on Robinhood Chain: public chain reads via viem, and typed, unsigned ActionPlans for vault deposits/withdrawals, vault creation, $HISS staking, and xHISS exits. Prepares and verifies — never signs, never submits, never takes custody.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hiss-finance/core": "workspace:*",
+    "@hiss-finance/vault-kit": "workspace:*"
+  },
+  "peerDependencies": {
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "viem": "^2.21.0",
+    "vitest": "^3.0.5"
+  },
+  "keywords": [
+    "hiss",
+    "hiss-finance",
+    "robinhood-chain",
+    "usdg",
+    "vault",
+    "staking",
+    "viem",
+    "defi",
+    "sdk"
+  ]
+}

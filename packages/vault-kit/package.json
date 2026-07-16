@@ -1,0 +1,48 @@
+{
+  "name": "@hiss-finance/vault-kit",
+  "version": "0.1.0",
+  "description": "Local-first toolkit for building, validating, and hashing HISS USDG Creator Vault candidates — allocation math, risk fuses, fee examples, deployment-readiness, and receipt verification. No database, API key, or private key required.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./schema": {
+      "types": "./src/schema.ts",
+      "import": "./src/schema.ts",
+      "default": "./src/schema.ts"
+    }
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hiss-finance/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  },
+  "keywords": [
+    "hiss",
+    "hiss-finance",
+    "robinhood-chain",
+    "usdg",
+    "vault",
+    "defi",
+    "allocation"
+  ]
+}
