@@ -1,0 +1,46 @@
+name: Release (dry run)
+
+# Manual dispatch ONLY. This workflow never publishes to npm and never creates
+# GitHub releases — it verifies that packages BUILD and PACK cleanly.
+# Publishing is not authorized; do not add `npm publish` or release steps here.
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why are you running the release dry run?"
+        required: false
+        default: "verify packability"
+
+permissions:
+  contents: read
+
+jobs:
+  pack-dry-run:
+    name: Build & pack (dry run)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm -r build
+
+      - name: Pack (dry run, no publish)
+        run: pnpm -r --if-present exec npm pack --dry-run
+
+      - name: Reminder
+        run: echo "Dry run only. Publishing to npm and GitHub Releases is NOT authorized and is intentionally not performed here."

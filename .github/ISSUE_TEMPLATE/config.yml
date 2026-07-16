@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/HissFinance/hiss-finance/security/advisories/new
+    about: Report a vulnerability privately via GitHub Security Advisories. Do not open a public issue for security problems.
+  - name: Discussions & questions
+    url: https://github.com/HissFinance/hiss-finance/discussions
+    about: Ask questions and discuss ideas with the community.

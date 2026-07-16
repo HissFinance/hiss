@@ -1,0 +1,33 @@
+name: Documentation issue
+description: Report a problem with the docs (unclear, incorrect, broken link, or drift).
+title: "[docs]: "
+labels: ["documentation", "triage"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of documentation issue
+      options:
+        - Incorrect or outdated information
+        - Unclear or confusing
+        - Broken link
+        - Missing documentation
+        - Fee/number drift from canonical constants
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      description: Path or URL of the affected doc.
+      placeholder: docs/fees/fee-model.md
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What is wrong, and what would be correct?
+    validations:
+      required: true

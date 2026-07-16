@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-verify:
+    name: Build & verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Build examples
+        run: pnpm examples:build
+
+      - name: Validate schemas
+        run: pnpm schemas:validate
+
+      - name: Check doc links
+        run: pnpm docs:check
+
+      - name: Private-boundary guard
+        run: pnpm check:private-boundary
+
+      - name: Execution-claims guard
+        run: pnpm check:execution-claims
+
+      - name: Fee-docs guard
+        run: pnpm check:fee-docs
+
+      - name: Secret scan
+        run: pnpm check:secrets
+
+      - name: License check
+        run: pnpm licenses:check

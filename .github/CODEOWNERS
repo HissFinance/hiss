@@ -1,0 +1,18 @@
+# Code owners for HISS Finance (public).
+# Every change requests review from the HISS Finance maintainers.
+# See https://docs.github.com/articles/about-code-owners
+
+*                       @HissFinance/maintainers
+
+# Workspace glue, CI, and security guards.
+/package.json           @HissFinance/maintainers
+/pnpm-workspace.yaml     @HissFinance/maintainers
+/.github/                @HissFinance/maintainers
+/scripts/                @HissFinance/maintainers
+
+# Public contract ABIs.
+/contracts/              @HissFinance/maintainers
+
+# Schemas and documentation.
+/schemas/                @HissFinance/maintainers
+/docs/                   @HissFinance/maintainers
