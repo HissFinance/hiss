@@ -1,0 +1,169 @@
+/*
+ * @hiss-finance/react — optional base styles.
+ *
+ * Every value is driven by a CSS variable so you can theme the components
+ * without overriding rules. Import this file for sensible defaults, or skip it
+ * and style the `.hiss-*` classes yourself. Defaults adapt to the viewer's
+ * light/dark preference; override any `--hiss-*` variable on a wrapping
+ * element to re-theme a subtree.
+ */
+
+:root {
+  --hiss-font: inherit;
+  --hiss-fg: #14151a;
+  --hiss-fg-muted: #5b6270;
+  --hiss-bg: #ffffff;
+  --hiss-surface: #f6f7f9;
+  --hiss-border: #e2e5ea;
+  --hiss-accent: #4b7bec;
+  --hiss-radius: 10px;
+  --hiss-gap: 12px;
+
+  --hiss-status-live: #1f9d55;
+  --hiss-status-degraded: #c98a00;
+  --hiss-status-unknown: #8a8f9a;
+
+  --hiss-bar-track: #e2e5ea;
+  --hiss-bar-fill: var(--hiss-accent);
+  --hiss-chart-stroke: var(--hiss-accent);
+  --hiss-chart-fill: rgba(75, 123, 236, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --hiss-fg: #eceef2;
+    --hiss-fg-muted: #9aa1ad;
+    --hiss-bg: #14161b;
+    --hiss-surface: #1c1f26;
+    --hiss-border: #2b2f39;
+    --hiss-bar-track: #2b2f39;
+    --hiss-chart-fill: rgba(75, 123, 236, 0.22);
+  }
+}
+
+.hiss-card {
+  font-family: var(--hiss-font);
+  color: var(--hiss-fg);
+  background: var(--hiss-bg);
+  border: 1px solid var(--hiss-border);
+  border-radius: var(--hiss-radius);
+  padding: var(--hiss-gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hiss-gap);
+}
+
+.hiss-muted {
+  color: var(--hiss-fg-muted);
+}
+.hiss-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hiss-mono {
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.hiss-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--hiss-border);
+}
+.hiss-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.hiss-badge--live {
+  color: var(--hiss-status-live);
+}
+.hiss-badge--degraded {
+  color: var(--hiss-status-degraded);
+}
+.hiss-badge--unknown {
+  color: var(--hiss-status-unknown);
+}
+
+.hiss-address-link {
+  color: var(--hiss-accent);
+  text-decoration: none;
+}
+.hiss-address-link:hover {
+  text-decoration: underline;
+}
+
+.hiss-alloc__row {
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) 2fr auto;
+  align-items: center;
+  gap: 8px;
+}
+.hiss-alloc__track {
+  background: var(--hiss-bar-track);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+.hiss-alloc__fill {
+  background: var(--hiss-bar-fill);
+  height: 100%;
+}
+
+.hiss-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hiss-chart__empty {
+  color: var(--hiss-fg-muted);
+  font-style: italic;
+}
+
+.hiss-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hiss-timeline__step {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+.hiss-timeline__node {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  margin-top: 5px;
+  background: var(--hiss-border);
+}
+.hiss-timeline__node--active {
+  background: var(--hiss-accent);
+}
+.hiss-timeline__node--done {
+  background: var(--hiss-status-live);
+}
+
+.hiss-plan__step {
+  border: 1px dashed var(--hiss-border);
+  border-radius: var(--hiss-radius);
+  padding: 8px;
+}
+.hiss-plan__note {
+  font-size: 0.8125rem;
+  color: var(--hiss-fg-muted);
+}
+.hiss-plan__flag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--hiss-status-degraded);
+}

@@ -1,0 +1,66 @@
+{
+  "name": "@hiss-finance/react",
+  "version": "0.1.0",
+  "description": "Headless, unopinionated React hooks and composable components for the HISS Finance protocol on Robinhood Chain.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./styles.css": "./src/components/styles.css"
+  },
+  "main": "./src/index.ts",
+  "module": "./dist/index.js",
+  "types": "./src/index.ts",
+  "files": [
+    "dist",
+    "src/components/styles.css",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": false
+    }
+  },
+  "dependencies": {
+    "@hiss-finance/core": "workspace:*",
+    "@hiss-finance/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/react": "^16.0.0",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.0",
+    "jsdom": "^24.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.4.0",
+    "vitest": "^3.2.0",
+    "vite": "^6.0.0"
+  },
+  "keywords": [
+    "hiss",
+    "hiss-finance",
+    "react",
+    "hooks",
+    "robinhood-chain",
+    "defi",
+    "vaults",
+    "headless"
+  ]
+}

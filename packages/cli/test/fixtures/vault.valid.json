@@ -1,0 +1,16 @@
+{
+  "schema": "vault-manifest-1.0.0",
+  "chainId": 4663,
+  "name": "Example USDG Vault",
+  "slug": "example-usdg",
+  "baseAsset": "USDG",
+  "allowedAssets": ["USDG", "AAPL", "TSLA"],
+  "fees": { "managementBps": 100, "performanceBps": 1000, "routingBps": 20 },
+  "creator": {
+    "address": "0x1111111111111111111111111111111111111111",
+    "skinInGameUsdg": 5000
+  },
+  "rebalance": {
+    "fuses": { "maxAssetWeightBps": 4000, "maxSlippageBps": 50, "maxDailyTurnoverBps": 2000 }
+  }
+}

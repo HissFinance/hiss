@@ -1,0 +1,9 @@
+{
+  "schema": "vault-manifest-1.0.0",
+  "chainId": 8453,
+  "name": "Base Vault (not allowed)",
+  "baseAsset": "USDC",
+  "allowedAssets": [],
+  "fees": { "managementBps": 9000 },
+  "creator": { "address": "0xnope" }
+}

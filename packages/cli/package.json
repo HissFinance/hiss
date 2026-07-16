@@ -1,0 +1,43 @@
+{
+  "name": "@hiss-finance/cli",
+  "version": "0.1.0",
+  "description": "Read-and-prepare command-line interface for HISS Finance — inspect protocol state and build unsigned transactions. Never signs, submits, or holds keys.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "hiss": "dist/bin/hiss.js"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@hiss-finance/core": "workspace:*",
+    "@hiss-finance/sdk": "workspace:*",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}
