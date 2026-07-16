@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+.turbo/
+pnpm-lock.yaml
+contracts/abi/
+contracts/out/
+*.min.js
