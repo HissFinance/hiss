@@ -51,7 +51,7 @@ describes the chain; it never overrides it.
 - **`@hiss-finance/react`** — headless hooks/components over the SDK. Bring your own
   wallet connector.
 - **`@hiss-finance/cli`** — terminal client for reads, validation, and preparation.
-- **`@hiss-finance/mcp-server`** — a local MCP server exposing 45 read/prepare/score
+- **`@hiss-finance/mcp-server`** — a local MCP server exposing 22 read/prepare
   [tools](./mcp.md).
 
 ## Contracts

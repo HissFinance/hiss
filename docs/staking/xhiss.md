@@ -87,8 +87,8 @@ const s = await hiss.staking.read();
 // exchange rate, total staked $HISS, xHISS supply, injection schedule, pause state
 ```
 
-MCP: `hiss_get_xhiss_status`, `hiss_get_staking_position`,
-`hiss_get_reward_injection_history`.
+MCP: `hiss_get_staking_status` (read), `hiss_prepare_hiss_stake`,
+`hiss_prepare_xhiss_cooldown`, `hiss_prepare_xhiss_redeem` (prepare).
 
 ## Honesty rules
 

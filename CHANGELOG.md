@@ -33,7 +33,7 @@ documentation.
 - **CLI (`@hiss-finance/cli`)** — status reads, manifest validation, and
   transaction preparation from the terminal.
 - **MCP server (`@hiss-finance/mcp-server`)** — a local Model Context Protocol
-  server exposing 45 read/prepare/score tools; agents never execute or move funds.
+  server exposing 22 read/prepare tools; agents never execute or move funds.
 - **Contract interfaces & ABIs** — `contracts/` interfaces and ABIs for the vault
   factory, flagship vault, xHISS staking vault, registries, reward distributors,
   and rebalance adapter.
@@ -55,5 +55,5 @@ documentation.
   user keys; no custody; no brokerage execution.
 - Reward and deployment flows are fail-closed by design.
 
-[Unreleased]: https://github.com/hiss-finance/hiss-finance/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/hiss-finance/hiss-finance/releases/tag/v0.1.0
+[Unreleased]: https://github.com/HissFinance/hiss/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/HissFinance/hiss/releases/tag/v0.1.0

@@ -65,7 +65,8 @@ console.log(vault.sharePriceUsdg, vault.highWaterMarkUsdg, vault.totalShares);
 ```
 
 You can also preview fee math with `calculatePerformanceFee` / `splitPerformanceFee`
-from `@hiss-finance/core`, or the MCP tool `hiss_calculate_vault_fees`.
+from `@hiss-finance/core`, or read the schedule with the MCP tool
+`hiss_get_fee_schedule`.
 
 ## Honesty rules
 

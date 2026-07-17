@@ -17,17 +17,43 @@ supporting references) describing:
 - **The output** — the artifact or unsigned transaction it produces for a human/wallet
   to sign.
 
-## Representative packs
+## The packs
 
-| Skill          | What it helps an agent do                                                         |
-| -------------- | --------------------------------------------------------------------------------- |
-| Vault creation | Compose and validate a manifest, preview fees, and prepare a publish transaction. |
-| xHISS staking  | Read staking status and prepare stake / cooldown / redeem transactions.           |
-| Reward split   | Explain and read the 50/30/10/10 split and epoch lifecycle honestly.              |
-| Safe admin     | Describe and prepare 2-of-3 Treasury Safe actions (authorization only).           |
-| CoilOps        | Compile, validate, score, and audit rebalance policies.                           |
+Ten packs ship under [`skills/`](../skills). The filesystem is always the source of
+truth — `npx skills add HissFinance/hiss --list` prints the live set.
 
-The exact set installed in a repository is the source of truth — browse `skills/`.
+| Skill                                                                   | What it helps an agent do                                                                |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [hiss-vault-agent-kit](../skills/hiss-vault-agent-kit/SKILL.md)         | Discover/read vaults, create a candidate, prepare deposits/withdrawals, verify receipts. |
+| [hiss-coilops](../skills/hiss-coilops/SKILL.md)                         | Turn a thesis into a bounded, versioned Coil — generate, validate, score, compile.       |
+| [hiss-staking](../skills/hiss-staking/SKILL.md)                         | Read xHISS status and prepare stake / cooldown / redeem transactions.                    |
+| [hiss-rewards](../skills/hiss-rewards/SKILL.md)                         | Explain and verify the 50/30/10/10 split; planned ≠ funded ≠ claimable.                  |
+| [hiss-receipts](../skills/hiss-receipts/SKILL.md)                       | Write and verify canonical-JSON receipts; reject forged execution claims.                |
+| [hiss-risk-fuses](../skills/hiss-risk-fuses/SKILL.md)                   | Audit the binding risk fuses and explain compile failures.                               |
+| [hiss-stock-tokens](../skills/hiss-stock-tokens/SKILL.md)               | Prepare/validate/reconcile Bankr trades of the 15 canonical stock tokens.                |
+| [hiss-bankrbot-robinhood](../skills/hiss-bankrbot-robinhood/SKILL.md)   | Compile a Coil for the Bankrbot → Robinhood MCP path (paper-first, gated).               |
+| [hiss-mcp](../skills/hiss-mcp/SKILL.md)                                 | Drive the HISS tools over the local MCP server rather than raw HTTP.                     |
+| [hiss-security-boundaries](../skills/hiss-security-boundaries/SKILL.md) | The trust/custody/consent guardrail the other packs are checked against.                 |
+
+## Installing packs
+
+Install with the [`skills`](https://github.com/vercel-labs/skills) CLI (supports Claude
+Code, Codex, Cursor, and more). See the README's
+[Install HISS Agent Skills](../README.md#-install-hiss-agent-skills) section for
+per-client details.
+
+```bash
+npx skills add HissFinance/hiss --list                                  # list
+npx skills add HissFinance/hiss --skill hiss-vault-agent-kit            # one skill
+npx skills add HissFinance/hiss --all                                   # every skill, every agent
+npx skills add HissFinance/hiss --skill hiss-vault-agent-kit -a codex   # a specific client
+```
+
+Or install by hand — every pack is a plain directory:
+
+```bash
+mkdir -p .claude/skills && cp -R skills/hiss-vault-agent-kit .claude/skills/
+```
 
 ## Universal guardrails (every pack enforces)
 

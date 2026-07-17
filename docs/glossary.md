@@ -56,7 +56,7 @@ crystallized. No fee below it; no fee until it is recovered.
 **Manifest hash** — the integrity hash of a manifest; any change alters it.
 
 **MCP (Model Context Protocol)** — the agent-integration protocol; HISS ships a local MCP
-server with 45 read/prepare/score tools. See [MCP](./mcp.md).
+server with 22 read/prepare tools. See [MCP](./mcp.md).
 
 **Planned ≠ funded ≠ vesting ≠ claimable** — the reward state chain. Plans are data;
 funding is Safe-gated and on-chain; only vested, past-challenge, funded amounts are

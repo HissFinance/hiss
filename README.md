@@ -1,14 +1,21 @@
 <div align="center">
 
-# HISS Finance
+# 🐍 HISS Finance
 
-### Mint your market thesis. Publish it as a vault. Keep signing control.
+### Build vaults, apps, and agents on HISS Finance.
 
-**Open SDK, smart-contract interfaces, and agent rails for creator-run vaults on Robinhood Chain.**
+**The open SDK, contract interfaces, agent skills, and MCP tooling for creator-run
+USDG vaults on Robinhood Chain — prepare and verify, keep signing control.**
 
-[Website](https://www.hiss.finance) · [Documentation](./docs/getting-started.md) · [Contracts](./docs/contracts.md) · [SDK](./docs/sdk.md) · [Security](./SECURITY.md)
+[Website](https://www.hiss.finance) ·
+[Docs](./docs/getting-started.md) ·
+[Skills](#-install-hiss-agent-skills) ·
+[MCP](./docs/mcp.md) ·
+[Contracts](./docs/contracts.md) ·
+[Security](./SECURITY.md) ·
+[X](https://x.com/HissFinance)
 
-**$HISS token** · `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` · [Robinhood Chain](./docs/robinhood-chain.md) (chain 4663)
+**$HISS** `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` · [**Robinhood Chain**](./docs/robinhood-chain.md) `4663`
 
 </div>
 
@@ -49,25 +56,39 @@ Protocol-level actions are governed by a 2-of-3 [Treasury Safe](./docs/trust-bou
   vault, manage cooldown and redeem windows.
 - **Read live protocol state** — deployments, fees, vault readiness, staking and
   reward status, straight from chain reads.
-- **Ship agent tooling** — an [MCP server](./docs/mcp.md) exposing 45 tools, plus
-  [x402](./docs/x402.md) paid endpoints and [Bankr](./docs/bankrbot.md) command
-  rails, so agents can prepare (never execute) financial actions.
+- **Ship agent tooling** — an [MCP server](./docs/mcp.md) exposing 22 read/prepare
+  tools, plus [agent skills](#-install-hiss-agent-skills), [x402](./docs/x402.md)
+  paid endpoints, and [Bankr](./docs/bankrbot.md) command rails, so agents can
+  prepare (never execute) financial actions.
 - **Score and audit** — run the [CoilOps](./docs/coilops.md) compile-and-verify
   workbench over rebalance policies and produce post-run audits.
 
+## Choose your builder path
+
+| I want to…                      | Start here                                                             | Docs                                                              |
+| ------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **Build & publish a vault**     | [Create a vault manifest](#example-create-a-vault-manifest)            | [Create a vault](./docs/vaults/create-a-vault.md)                 |
+| **Integrate HISS into an app**  | [Prepare a deposit](#example-prepare-a-deposit) with the SDK + React   | [SDK](./docs/sdk.md) · [React](./docs/react.md)                   |
+| **Equip an AI agent**           | [Install HISS Agent Skills](#-install-hiss-agent-skills)               | [Agent skills](./docs/agent-skills.md)                            |
+| **Run the MCP server**          | [Agent / MCP integration](#example-agent--mcp-integration)             | [MCP](./docs/mcp.md)                                              |
+| **Use the CLI**                 | [Quickstart](#5-minute-quickstart) → `hiss status`                     | [CLI](./docs/cli.md)                                              |
+| **Verify contracts & receipts** | [Contracts & addresses](#current-public-contract-addresses-chain-4663) | [Contracts](./docs/contracts.md) · [Receipts](./docs/receipts.md) |
+
 ## 5-minute quickstart
 
-> The packages are **not yet published to npm**. Build them from source with
-> `pnpm`. Node.js 20+ and `pnpm` 9+ are required; the Solidity contracts use
-> [Foundry](https://book.getfoundry.sh/).
+> The packages are **not yet published to npm** — build them from source with
+> `pnpm`. **Node.js 20+** and **pnpm 10+** are required (the repo pins
+> `pnpm@10.28.1`). The TypeScript packages run directly from source via
+> [`tsx`](https://tsx.is); the Solidity contracts use [Foundry](https://book.getfoundry.sh/).
+> No private credentials are required — reads use a public RPC you supply.
 
 ```bash
 # 1. Clone
-git clone https://github.com/hiss-finance/hiss-finance.git
-cd hiss-finance
+git clone https://github.com/HissFinance/hiss.git
+cd hiss
 
 # 2. Install workspace dependencies
-pnpm install
+pnpm install --frozen-lockfile
 
 # 3. Build every package
 pnpm build
@@ -76,16 +97,139 @@ pnpm build
 pnpm test
 ```
 
-Once built, import the workspace packages into your own app, or run the CLI:
+Once installed, import the workspace packages into your own app, or run the CLI:
 
 ```bash
-# Read live protocol status from Robinhood Chain
-pnpm --filter @hiss-finance/cli start status --network mainnet
+# Read live protocol status from Robinhood Chain (supply a public RPC)
+pnpm --filter @hiss-finance/cli start status \
+  --rpc-url https://rpc.mainnet.chain.robinhood.com
 ```
 
 When the packages are published, this section will switch to a single
 `pnpm add @hiss-finance/sdk`. Until then, consume them via the workspace or a
 local `file:` / `link:` reference.
+
+## 🧠 Install HISS Agent Skills
+
+HISS ships **10 agent skills** — self-contained `SKILL.md` instruction packs that
+teach a compatible coding agent how to work with HISS vaults, staking, rewards,
+receipts, Bankr rails, Stock Tokens, the MCP server, and the HISS security
+boundaries. They are installed with the open-source [`skills`](https://github.com/vercel-labs/skills)
+CLI (`npx skills`), which supports Claude Code, Codex, Cursor, and other clients.
+
+> Skills are **instructions for an agent** — review a `SKILL.md` before installing
+> it. HISS skills only **prepare and verify**: they never ask for a private key,
+> never sign for you, and never claim a transaction happened without an on-chain
+> receipt. See the [safety note](#safety-boundary) below.
+
+### List available skills
+
+```bash
+npx skills add HissFinance/hiss --list
+```
+
+### Install one skill
+
+```bash
+npx skills add HissFinance/hiss --skill hiss-vault-agent-kit
+```
+
+### Install every HISS skill
+
+```bash
+# --all == --skill '*' --agent '*' -y (all skills, every detected agent)
+npx skills add HissFinance/hiss --all
+```
+
+### Install for a specific client
+
+```bash
+# Claude Code
+npx skills add HissFinance/hiss --skill hiss-vault-agent-kit -a claude-code
+
+# Codex
+npx skills add HissFinance/hiss --skill hiss-vault-agent-kit -a codex
+
+# every HISS skill, Claude Code only
+npx skills add HissFinance/hiss --skill '*' -a claude-code
+```
+
+Add `-g` to install at the **user level** (global) instead of project-local, and
+`-y` to skip prompts (for CI). Installs are **project-local by default** when run
+inside a project.
+
+<details>
+<summary><b>Manual / project-local installation</b> (no installer)</summary>
+
+Every skill is a plain directory under [`skills/`](./skills). To install one by
+hand, copy it into your agent's skills directory:
+
+```bash
+# Claude Code (project-local)
+mkdir -p .claude/skills
+cp -R skills/hiss-vault-agent-kit .claude/skills/
+
+# Codex (project-local)
+mkdir -p .agents/skills
+cp -R skills/hiss-vault-agent-kit .agents/skills/
+```
+
+For an agent with no native skill support, open the raw `SKILL.md` and paste it in
+as project instructions/context:
+`https://github.com/HissFinance/hiss/blob/main/skills/hiss-vault-agent-kit/SKILL.md`
+
+</details>
+
+### Use a skill without installing, update, or remove
+
+```bash
+# Print a one-shot prompt for a single skill without installing it
+npx skills use HissFinance/hiss@hiss-vault-agent-kit
+
+# Update installed skills to the latest version
+npx skills update
+
+# Remove a skill
+npx skills remove hiss-vault-agent-kit
+```
+
+### Skill catalog
+
+Each skill preserves the **prepare-never-execute** boundary: the agent reads,
+scores, and prepares; **your wallet or Safe signs**; only an on-chain receipt
+proves completion.
+
+| Skill                                                                      | Use it when you want an agent to…                                                                                                                 | It produces                                                                               |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [**hiss-vault-agent-kit**](./skills/hiss-vault-agent-kit/SKILL.md)         | Discover vaults, read manifests/fees, create a vault **candidate**, prepare deposits/withdrawals, preview rebalances under fuses, verify receipts | Manifests + `manifestHash`, deposit/withdraw intents + ack hashes, readiness/risk reports |
+| [**hiss-coilops**](./skills/hiss-coilops/SKILL.md)                         | Turn a market thesis into a bounded, versioned trading **Coil** — generate, validate, score, compile                                              | CoilManifest, Coil Health score, runbook, share card, receipts                            |
+| [**hiss-staking**](./skills/hiss-staking/SKILL.md)                         | Guide xHISS staking — read state, prepare stake, start the 72h cooldown, redeem in the window                                                     | Prepared stake/cooldown/redeem intents; status & injection reads                          |
+| [**hiss-rewards**](./skills/hiss-rewards/SKILL.md)                         | Explain & verify the 50/30/10/10 split; distinguish planned ≠ funded ≠ claimable                                                                  | Deterministic split plans with a `planHash`; state explanations                           |
+| [**hiss-receipts**](./skills/hiss-receipts/SKILL.md)                       | Write and verify canonical-JSON SHA-256 receipts; reject any forged execution claim                                                               | Receipts and `{ok, mismatches[]}` verification verdicts                                   |
+| [**hiss-risk-fuses**](./skills/hiss-risk-fuses/SKILL.md)                   | Audit the binding risk fuses on a Coil and explain why a capsule will/won't compile                                                               | Per-fuse descriptions, bound-check issues, a `risk_fuse` receipt                          |
+| [**hiss-stock-tokens**](./skills/hiss-stock-tokens/SKILL.md)               | Prepare, validate, and reconcile Bankr trades of the 15 canonical Robinhood Chain stock tokens                                                    | Order plan + exact Bankr command; a settlement receipt from an on-chain tx                |
+| [**hiss-bankrbot-robinhood**](./skills/hiss-bankrbot-robinhood/SKILL.md)   | Compile a Coil for the Bankrbot → Robinhood MCP path — paper-first, live-readiness gated                                                          | Bankrbot command pack, Robinhood MCP capsule, paper runbook, audit                        |
+| [**hiss-mcp**](./skills/hiss-mcp/SKILL.md)                                 | Drive the HISS tools over the local MCP server rather than raw HTTP                                                                               | Prepared artifacts and verified state reads via MCP tools                                 |
+| [**hiss-security-boundaries**](./skills/hiss-security-boundaries/SKILL.md) | Enforce the trust boundaries — no custody, no credentials, no execution claims, autonomy consent gates                                            | The guardrail reference the other skills are checked against                              |
+
+### How skills work
+
+```mermaid
+flowchart LR
+  A[Skill instructions] --> B[HISS MCP / SDK / public APIs]
+  B --> C[Typed plan or artifact]
+  C --> D[User reviews]
+  D --> E[User wallet or Safe signs]
+  E --> F[Verified receipt]
+```
+
+### Safety boundary
+
+Agents **prepare and verify**. They do **not** receive private keys, sign for you,
+or prove execution without an on-chain receipt. Never paste seed phrases, private
+keys, session cookies, or API secrets into an agent — HISS skills never need them,
+and every HISS tool rejects credential-shaped input. Agent output is **not** proof
+of execution: only a verified receipt proves a transaction happened.
 
 ## Repository packages
 
@@ -96,12 +240,28 @@ local `file:` / `link:` reference.
 | [`@hiss-finance/vault-kit`](./docs/vaults/index.md) | Vault authoring helpers: compose allocations, validate risk fuses, compute fee previews, and hash a manifest.                                                        |
 | [`@hiss-finance/react`](./docs/react.md)            | React hooks and headless components for vault, staking, and reward surfaces. Bring your own wallet connector.                                                        |
 | [`@hiss-finance/cli`](./docs/cli.md)                | A terminal client for status reads, manifest validation, and transaction preparation.                                                                                |
-| [`@hiss-finance/mcp-server`](./docs/mcp.md)         | A local Model Context Protocol server exposing 45 read/prepare/score tools to any MCP-compatible agent.                                                              |
+| [`@hiss-finance/mcp-server`](./docs/mcp.md)         | A local Model Context Protocol server exposing 22 read/prepare tools to any MCP-compatible agent. Read and prepare only — never executes.                            |
 
 Smart-contract interfaces and ABIs live under [`contracts/`](./docs/contracts.md);
 JSON schemas under `schemas/`; runnable examples under
 [`examples/`](./docs/getting-started.md#examples); agent skill packs under
 [`skills/`](./docs/agent-skills.md).
+
+## Architecture
+
+Everything in this repo sits on the **prepare** side of the signing boundary. It
+reads public state and builds unsigned artifacts; **you** (or a Safe) sign, and
+the chain is the source of truth.
+
+```mermaid
+flowchart TD
+  A[Your app / AI agent] --> B[SDK · CLI · MCP · React · Skills]
+  B --> C[Public HISS APIs & contract interfaces]
+  C --> D[User wallet or 2-of-3 Treasury Safe]
+  D -->|signs| E[Robinhood Chain 4663]
+  E --> F[On-chain receipt]
+  F -->|verify| B
+```
 
 ## Live product links
 
@@ -235,9 +395,10 @@ pnpm --filter @hiss-finance/mcp-server start
 }
 ```
 
-Representative tools: `hiss_create_vault_manifest`, `hiss_calculate_vault_fees`,
-`hiss_generate_vault_deposit_intent`, `hiss_get_xhiss_status`,
-`hiss_get_hiss_reward_split`, `hiss_score_vault_risk`. Full list in
+The server registers **22 tools** (12 read, 10 prepare). Representative tools:
+`hiss_get_protocol_status`, `hiss_get_fee_schedule`, `hiss_get_staking_status`,
+`hiss_create_vault_candidate`, `hiss_prepare_vault_deposit`,
+`hiss_prepare_hiss_stake`, `hiss_verify_receipt`. Full list in
 [MCP tools](./docs/mcp.md). Agents can also call [x402 paid endpoints](./docs/x402.md)
 and prepare [Bankr commands](./docs/bankrbot.md).
 

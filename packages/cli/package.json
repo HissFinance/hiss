@@ -27,6 +27,7 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -w -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "start": "tsx src/bin/hiss.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
