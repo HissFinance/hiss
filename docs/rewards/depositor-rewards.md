@@ -52,7 +52,8 @@ const dep = await hiss.rewards.readDepositorStatus({ epochId });
 // pool, your share-seconds, allocation, vested, claimable (0 until funded & past challenge)
 ```
 
-MCP: `hiss_get_depositor_reward_status`.
+MCP: `hiss_get_reward_status` (reports the depositor leg among the reward-split
+state). Depositor-specific detail beyond that is HTTP-only.
 
 ## Honesty rules
 

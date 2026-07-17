@@ -35,11 +35,12 @@ intent ──▶ compile ──▶ validate ──▶ score ──▶ (human/wal
 
 Via the [MCP server](./mcp.md):
 
-- `hiss_generate_coil`, `hiss_validate_coil`, `hiss_score_coil`
-- `hiss_compile_vault_rebalance_policy`, `hiss_compile_robinhood_capsule`,
-  `hiss_compile_bankrbot_robinhood_path`
-- `hiss_drift_check`, `hiss_risk_audit`, `hiss_post_run_audit`,
-  `hiss_post_vault_rebalance_audit`
+- `hiss_validate_coil`, `hiss_compile_coil`
+
+Coil generation, scoring, drift checks, risk audits, and the Robinhood/Bankrbot
+compile paths are **HTTP API only** (`POST /api/tools/*`, `POST /api/bankrbot/*`)
+— they are not MCP tools. See [MCP tools](./mcp.md) and the
+[tool-name migration](./mcp/tool-name-migration.md).
 
 Via [x402](./x402.md): `hiss-coil-compiler`, `compile-coil-for-robinhood`,
 `compile-vault-rebalance-policy`, `simulate-vault-rebalance`, `post-run-audit`,

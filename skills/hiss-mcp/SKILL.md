@@ -4,6 +4,13 @@ description: Use the HISS local MCP server — a stdio Model Context Protocol se
 tags: [mcp, model-context-protocol, hiss-tools, agents, coilops]
 version: 1
 visibility: public
+required_mcp_tools:
+  - hiss_get_protocol_status
+  - hiss_get_staking_status
+  - hiss_get_reward_status
+  - hiss_prepare_vault_deposit
+  - hiss_validate_coil
+  - hiss_verify_receipt
 metadata:
   clawdbot:
     emoji: "🐍"
@@ -35,44 +42,31 @@ required to run it; it calls only public HISS surfaces and public chain
 reads. Never pass wallet keys, recovery phrases, or API credentials to any
 tool — credential-shaped inputs are rejected and never echoed.
 
-## Tool families
+## Tools
 
-**CoilOps** — `hiss_generate_coil`, `hiss_validate_coil`, `hiss_score_coil`,
-`hiss_risk_audit`, `hiss_create_receipt`, `hiss_verify_receipt`,
-`hiss_export_share_card`, `hiss_explain_oracle_policy`. (See `hiss-coilops`,
-`hiss-risk-fuses`, `hiss-receipts`.)
+The server registers **22 tools** — 12 read, 10 prepare. This list mirrors the
+MCP server source (`packages/mcp-server/src/tools.ts`); the server's own
+`list_tools` response is always authoritative.
 
-**Robinhood MCP / Bankrbot path** —
-`hiss_compile_robinhood_capsule`,
-`hiss_compile_bankrbot_robinhood_path`, `hiss_validate_autonomy_fuses`,
-`hiss_generate_bankrbot_command_pack`,
-`hiss_generate_robinhood_mcp_instructions`, `hiss_post_run_audit`. (See
-`hiss-bankrbot-robinhood`, `hiss-security-boundaries`.)
+**Read (12)** — `hiss_get_protocol_status`, `hiss_get_contract_registry`,
+`hiss_get_fee_schedule`, `hiss_get_supported_assets`, `hiss_get_vaults`,
+`hiss_get_vault`, `hiss_get_vault_holdings`, `hiss_get_vault_performance`,
+`hiss_get_staking_status`, `hiss_get_reward_status`, `hiss_get_receipt`,
+`hiss_verify_receipt`.
 
-**USDG Creator Vaults** — `hiss_validate_usdg_vault`,
-`hiss_create_vault_manifest`, `hiss_compile_vault_rebalance_policy`,
-`hiss_generate_vault_deposit_intent`, `hiss_generate_vault_receipt`,
-`hiss_post_vault_rebalance_audit`, `hiss_calculate_vault_fees`,
-`hiss_score_vault_risk`, `hiss_compare_vaults_without_recommendation`. (See
-`hiss-vault-agent-kit`.)
+**Prepare (10)** — `hiss_create_vault_candidate`, `hiss_validate_vault_candidate`,
+`hiss_prepare_vault_creation`, `hiss_prepare_vault_deposit`,
+`hiss_prepare_vault_withdrawal`, `hiss_prepare_hiss_stake`,
+`hiss_prepare_xhiss_cooldown`, `hiss_prepare_xhiss_redeem`, `hiss_validate_coil`,
+`hiss_compile_coil`.
 
-**xHISS staking** — `hiss_get_xhiss_status`, `hiss_prepare_hiss_stake`,
-`hiss_prepare_xhiss_cooldown`, `hiss_prepare_xhiss_redeem`,
-`hiss_get_staking_position`, `hiss_get_reward_injection_history`. (See
-`hiss-staking`.)
-
-**Rewards & treasury** — `hiss_get_hiss_reward_split`,
-`hiss_get_hiss_safe_status`. (See `hiss-rewards`,
-`hiss-security-boundaries`.)
-
-**Stock tokens (Bankr Rail B)** —
-`hiss_prepare_bankr_stock_token_trade`,
-`hiss_generate_bankr_stock_token_command`,
-`hiss_submit_bankr_stock_token_intent` (gated),
-`hiss_reconcile_bankr_stock_token_job`. (See `hiss-stock-tokens`.)
-
-Tool names and counts evolve; treat the server's own tool list as
-authoritative and this list as a map of the families.
+**Not MCP tools — HTTP API only.** CoilOps generation/scoring, receipts and share
+cards, the Bankrbot → Robinhood path, autonomy-fuse validation, and Bankr
+stock-token trading are **HTTP endpoints** on `https://www.hiss.finance` (e.g.
+`POST /api/tools/generate-coil`, `POST /api/bankrbot/compile-robinhood-path`,
+`POST /api/stocks/prepare-bankr-command`) — they are **not** MCP tools. See
+`hiss-coilops`, `hiss-bankrbot-robinhood`, and `hiss-stock-tokens` for those
+routes. Tool names and counts can change; the server's own list is authoritative.
 
 ## Hard rules for tool use
 
@@ -91,6 +85,6 @@ authoritative and this list as a map of the families.
 ## Example prompts
 
 - "Using the HISS MCP tools, validate this Coil and write a receipt."
-- "Call hiss_get_xhiss_status and tell me if staking is live."
+- "Call hiss_get_staking_status and tell me if staking is live."
 - "Prepare a USDG vault deposit intent for the flagship vault."
 - "Reconcile this Bankr stock-token trade by tx hash."

@@ -64,6 +64,9 @@ jobs:
       - name: Execution-claims guard
         run: pnpm check:execution-claims
 
+      - name: Skill tool-reference guard
+        run: pnpm check:skill-tool-refs
+
       - name: Fee-docs guard
         run: pnpm check:fee-docs
 

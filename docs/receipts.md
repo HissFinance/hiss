@@ -39,8 +39,8 @@ const receipt = await hiss.receipts.create({ vault, action: "deposit", txHash })
 const ok = await hiss.receipts.verify(receipt);
 ```
 
-MCP tools: `hiss_generate_vault_receipt`, `hiss_create_receipt`, `hiss_verify_receipt`.
-x402: `generate-vault-receipt`, `hiss-receipt-verify`.
+MCP tools: `hiss_get_receipt`, `hiss_verify_receipt`. (Receipt creation is HTTP-only:
+`POST /api/tools/receipt`.) x402: `generate-vault-receipt`, `hiss-receipt-verify`.
 
 ## Receipts and honesty
 

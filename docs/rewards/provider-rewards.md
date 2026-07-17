@@ -75,7 +75,8 @@ const prov = await hiss.rewards.readProviderStatus({ epochId });
 // eligibility reasons, components, cap applied, allocation, vested, claimable
 ```
 
-MCP: `hiss_get_provider_reward_status`, `hiss_plan_provider_rewards` (plan data only).
+MCP: `hiss_get_reward_status` (reports the provider leg among the reward-split
+state). Provider-epoch planning is HTTP-only (data only, never a payout).
 
 ## Honesty rules
 

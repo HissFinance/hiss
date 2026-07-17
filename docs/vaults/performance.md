@@ -73,5 +73,5 @@ from `@hiss-finance/core`, or read the schedule with the MCP tool
 - Historical or hypothetical performance is **not a forecast and not a performance
   claim**.
 - No "guaranteed yield", "APY", "passive income", or "risk-free" framing anywhere.
-- Comparisons between vaults are facts-only and carry **no recommendation**
-  (`hiss_compare_vaults_without_recommendation`).
+- Comparisons between vaults are facts-only and carry **no recommendation**; read
+  vault facts with `hiss_get_vaults` / `hiss_get_vault` and compare them yourself.
