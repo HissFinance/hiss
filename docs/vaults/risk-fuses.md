@@ -42,9 +42,9 @@ const issues = validateRiskFuses(manifest.rebalancePolicy);
 if (issues.length) throw new Error(JSON.stringify(issues));
 ```
 
-Validation is also exposed as MCP tools (`hiss_validate_usdg_vault`,
-`hiss_validate_autonomy_fuses`) and x402 endpoints (`validate-usdg-vault-fuses`,
-`validate-autonomy-fuses`).
+Validation is also exposed as the MCP tool `hiss_validate_vault_candidate` and
+x402 endpoint `validate-usdg-vault-fuses`. (Autonomy-fuse validation is HTTP-only:
+`POST /api/bankrbot/validate-autonomy`.)
 
 ## Enforcement at rebalance time
 

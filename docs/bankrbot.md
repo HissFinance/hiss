@@ -16,16 +16,17 @@ the protocol.
   agent/wallet does.
 - **Completion = on-chain receipt.** A prepared or submitted command is not a completed
   deposit until the receipt exists.
-- Tools: `hiss_generate_bankrbot_deposit_command`, `hiss_prepare_bankrbot_vault_deposit`,
-  `hiss_reconcile_bankrbot_deposit_receipt`.
+- Interface: **HTTP API only** (`POST /api/bankrbot/*`) — the Bankr rails are not
+  MCP tools. See [tool-name migration](./mcp/tool-name-migration.md).
 
 ### Rail B — stock-token trading
 
 - Prepare **stock-token** commands (commands end with "on robinhood").
 - A returned `job_completed_unconfirmed` state is **not settled** — only an
   `onchain_confirmed` result counts.
-- Tools: `hiss_generate_bankr_stock_token_command`, `hiss_prepare_bankr_stock_token_trade`,
-  `hiss_submit_bankr_stock_token_intent`, `hiss_reconcile_bankr_stock_token_job`.
+- Interface: **HTTP API only** (`POST /api/stocks/*`) — the stock-token lane is not
+  an MCP tool set. The MCP tool `hiss_get_supported_assets` lists the canonical
+  tradable assets. See [tool-name migration](./mcp/tool-name-migration.md).
 - Stock Tokens are **economic exposure only** — see [Stock Tokens](./stock-tokens.md).
 
 ### Rail C — rh-wallet

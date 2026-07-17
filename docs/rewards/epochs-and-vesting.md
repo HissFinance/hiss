@@ -75,7 +75,8 @@ const epoch = await hiss.rewards.readEpochStatus({ epochId });
 // state, window, challenge window start/end, pools, vesting windows, claimable
 ```
 
-MCP: `hiss_get_reward_epoch_status`.
+MCP: `hiss_get_reward_status` (reports epoch/lifecycle state among the
+reward-split status). Per-epoch detail beyond that is HTTP-only.
 
 ## Honesty rules
 

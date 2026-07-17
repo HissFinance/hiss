@@ -4,6 +4,8 @@ description: Prepare, validate, and reconcile Bankr trades of Robinhood Chain to
 tags: [bankr, stock-tokens, robinhood-chain, usdg, tokenized-etf, receipts]
 version: 1
 visibility: public
+required_mcp_tools:
+  - hiss_get_supported_assets
 metadata:
   clawdbot:
     emoji: "🐍"
@@ -83,13 +85,13 @@ API key (referenced by env NAME only, never by value) — otherwise an honest
 intents are refused here (`VAULT_REBALANCE_NOT_ALLOWED_HERE`). 256 KB cap ·
 30 req / 5 min · credential fields rejected.
 
-## MCP tools (local HISS MCP server, see `hiss-mcp`)
+## Interfaces
 
-`hiss_prepare_bankr_stock_token_trade` ·
-`hiss_generate_bankr_stock_token_command` ·
-`hiss_submit_bankr_stock_token_intent` (gated, refuses without the env
-gates) · `hiss_reconcile_bankr_stock_token_job` — same semantics and the
-same output guards.
+The Bankr stock-token lane (Rail B) is exposed through the **HTTP API only** (the
+`POST /api/stocks/*` routes above) — it has **no dedicated MCP tools**. The MCP
+server's `hiss_get_supported_assets` (see `hiss-mcp`) lists the canonical
+tradable assets; everything else on this lane goes through the HTTP routes, and
+every output carries the same execution-claim and settlement guards.
 
 ## Example prompts
 

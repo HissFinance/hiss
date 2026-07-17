@@ -4,6 +4,7 @@ description: State the HISS trust, custody, and consent boundaries truthfully â€
 tags: [security, boundaries, custody, consent, credentials, rails, autonomy]
 version: 1
 visibility: public
+required_mcp_tools: []
 metadata:
   clawdbot:
     emoji: "ğŸ"

@@ -4,6 +4,9 @@ description: Explain and verify the HISS 50/30/10/10 reward split — 50% of ver
 tags: [reward-split, fees, hiss-token, xhiss, treasury-safe, robinhood-chain]
 version: 1
 visibility: public
+required_mcp_tools:
+  - hiss_get_reward_status
+  - hiss_get_protocol_status
 metadata:
   clawdbot:
     emoji: "🐍"
@@ -82,7 +85,8 @@ literal-typed; the split cannot drift silently.
 
 - Docs: `/docs/reward-split` · `/docs/hiss-reward-flywheel` ·
   `/docs/hiss-fee-routing` · `/docs/provider-rewards`
-- MCP tools (see `hiss-mcp`): `hiss_get_hiss_reward_split` ·
-  `hiss_get_reward_injection_history` · `hiss_get_hiss_safe_status`
+- MCP tools (see `hiss-mcp`): `hiss_get_reward_status` ·
+  `hiss_get_protocol_status` (includes the Treasury Safe). Reward-injection
+  history is HTTP-only.
 - Related packs: `hiss-staking` (the staker leg surface),
   `hiss-security-boundaries`.

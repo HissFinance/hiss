@@ -70,6 +70,14 @@ Example client config (stdio):
 > on-chain confirmation counts. See [Bankrbot](./bankrbot.md) and
 > [Stock Tokens](./stock-tokens.md).
 
+## Tool-name migration
+
+Older drafts referenced tool names that were never registered, or mixed HTTP/SDK
+names into the MCP namespace. See [tool-name migration](./mcp/tool-name-migration.md)
+for the legacy → canonical mapping and the per-interface (MCP / SDK / CLI / HTTP)
+equivalents. `pnpm check:skill-tool-refs` enforces this against the generated
+registry.
+
 ## Building your own agent flows
 
 Combine tools into read → prepare pipelines. Example: `hiss_get_staking_status`

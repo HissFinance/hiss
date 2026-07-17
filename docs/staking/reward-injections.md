@@ -33,8 +33,8 @@ const history = await hiss.staking.readInjections();
 // each entry: amount, start, end (start + 24h), and how much has dripped in
 ```
 
-MCP: `hiss_get_reward_injection_history`. The status API surfaces the current drip
-schedule and the resulting exchange rate.
+MCP: `hiss_get_staking_status` surfaces the current drip schedule and exchange
+rate. Full reward-injection history is HTTP-only (`GET /api/stake/reward-injections`).
 
 ## What an injection is not
 
