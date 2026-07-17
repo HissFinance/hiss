@@ -15,36 +15,43 @@ pnpm --filter @hiss-finance/cli start <command> [options]
 
 Common global options:
 
-- `--network mainnet|testnet` (chain 4663 / 46630)
-- `--rpc-url <url>` to override the default RPC
-- `--json` for machine-readable output
+- `--rpc-url <url>` — the Robinhood Chain JSON-RPC endpoint to read from
+- `--chain-id <id>` — chain id (default `4663`; testnet is `46630`)
+- `--json` for machine-readable output, `--quiet` for a one-line summary
+
+Reads that hit the chain need `--rpc-url` (mainnet:
+`https://rpc.mainnet.chain.robinhood.com`). Local commands (validation, hashing,
+coil compile, receipt verify) work offline.
 
 ## Commands
 
-### status
+### status / contracts
 
-Read deployments, readiness, staking, and reward state from chain.
+Read protocol state and the deployed contract registry from chain.
 
 ```bash
-pnpm --filter @hiss-finance/cli start status --network mainnet
-pnpm --filter @hiss-finance/cli start status --json
+pnpm --filter @hiss-finance/cli start status --rpc-url https://rpc.mainnet.chain.robinhood.com
+pnpm --filter @hiss-finance/cli start contracts --json
 ```
 
 ### vault
 
 ```bash
-# Read a vault (live share price, TVL, readiness)
-pnpm --filter @hiss-finance/cli start vault read 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+# List vaults / inspect one (live share price, readiness)
+pnpm --filter @hiss-finance/cli start vault list
+pnpm --filter @hiss-finance/cli start vault inspect 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
 
-# Validate a manifest file and print its hash
+# Read live holdings and historical performance (not a forecast)
+pnpm --filter @hiss-finance/cli start vault holdings 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+pnpm --filter @hiss-finance/cli start vault performance 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+
+# Validate a manifest file and print its hash (offline)
 pnpm --filter @hiss-finance/cli start vault validate ./my-vault.manifest.json
 
-# Preview fees for a manifest (performance-fee and protocol-share math)
-pnpm --filter @hiss-finance/cli start vault fees ./my-vault.manifest.json
-
-# Prepare an approve + deposit (prints unsigned transactions)
-pnpm --filter @hiss-finance/cli start vault prepare-deposit \
-  --vault 0x6d96...63e6 --depositor 0xYou --amount-usdg 1000
+# Prepare unsigned transactions (creation / deposit / withdrawal)
+pnpm --filter @hiss-finance/cli start vault prepare-create ./my-vault.manifest.json
+pnpm --filter @hiss-finance/cli start vault prepare-deposit 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6 1000
+pnpm --filter @hiss-finance/cli start vault prepare-withdraw 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6 250
 ```
 
 ### stake
@@ -53,17 +60,28 @@ pnpm --filter @hiss-finance/cli start vault prepare-deposit \
 # Read xHISS staking state
 pnpm --filter @hiss-finance/cli start stake status
 
-# Prepare a stake / cooldown / redeem (unsigned)
-pnpm --filter @hiss-finance/cli start stake prepare --staker 0xYou --amount-hiss 500
-pnpm --filter @hiss-finance/cli start stake cooldown --staker 0xYou --x-shares 250
-pnpm --filter @hiss-finance/cli start stake redeem --staker 0xYou --x-shares 250 --receiver 0xYou
+# Prepare a stake / cooldown / redeem (unsigned; amounts are positional)
+pnpm --filter @hiss-finance/cli start stake prepare 500
+pnpm --filter @hiss-finance/cli start stake cooldown 250
+pnpm --filter @hiss-finance/cli start stake redeem
 ```
 
-### rewards
+### rewards / coil / receipt / skill
 
 ```bash
-# Show the current 50/30/10/10 split plan (planned != funded != claimable)
-pnpm --filter @hiss-finance/cli start rewards split
+# Read reward status (planned != funded != claimable)
+pnpm --filter @hiss-finance/cli start rewards status
+
+# Validate / compile a CoilOps playbook (local, deterministic)
+pnpm --filter @hiss-finance/cli start coil validate ./my-coil.json
+pnpm --filter @hiss-finance/cli start coil compile ./my-coil.json
+
+# Verify a receipt's integrity hash (path or inline JSON)
+pnpm --filter @hiss-finance/cli start receipt verify ./receipt.json
+
+# List and print the bundled agent skill packs
+pnpm --filter @hiss-finance/cli start skill list
+pnpm --filter @hiss-finance/cli start skill print hiss-vault-agent-kit
 ```
 
 ## Output and signing

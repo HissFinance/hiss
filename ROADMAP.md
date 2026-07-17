@@ -14,7 +14,7 @@ Legend: **Shipped** · **In progress** · **Planned** · **Exploring**
 - Deterministic fee, reward-split, share-seconds, and vesting math in
   `@hiss-finance/core`.
 - Read + prepare flows for vault deposit/withdraw, staking, cooldown, and redeem.
-- Local MCP server with 45 read/prepare/score tools.
+- Local MCP server with 22 read/prepare tools.
 - Stamped generated snapshots for deployments, fees, and status.
 
 ## Near term — In progress / Planned

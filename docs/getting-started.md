@@ -11,7 +11,7 @@ guide gets you from clone to first read/prepare.
 
 ## Prerequisites
 
-- **Node.js 20+** and **pnpm 9+**
+- **Node.js 20+** and **pnpm 10+** (the repo pins `pnpm@10.28.1`)
 - **Foundry** for the Solidity contracts (`forge`, `cast`)
 - A wallet you control for signing (HISS never holds your keys)
 
@@ -20,9 +20,9 @@ guide gets you from clone to first read/prepare.
 Packages are **not yet published to npm**. Build from source:
 
 ```bash
-git clone https://github.com/hiss-finance/hiss-finance.git
-cd hiss-finance
-pnpm install
+git clone https://github.com/HissFinance/hiss.git
+cd hiss
+pnpm install --frozen-lockfile
 pnpm build
 ```
 
@@ -67,7 +67,7 @@ console.log(status.staking.xhiss.address); // 0x6998...67Be
 Or from the terminal:
 
 ```bash
-pnpm --filter @hiss-finance/cli start status --network mainnet
+pnpm --filter @hiss-finance/cli start status --rpc-url https://rpc.mainnet.chain.robinhood.com
 ```
 
 ## Your first prepare

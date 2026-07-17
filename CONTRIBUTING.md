@@ -27,13 +27,13 @@ HISS is safety-critical financial software. A few principles are non-negotiable:
 
 ## Getting set up
 
-Requirements: **Node.js 20+**, **pnpm 9+**, and (for contracts)
-[Foundry](https://book.getfoundry.sh/).
+Requirements: **Node.js 20+**, **pnpm 10+** (the repo pins `pnpm@10.28.1`), and
+(for contracts) [Foundry](https://book.getfoundry.sh/).
 
 ```bash
-git clone https://github.com/hiss-finance/hiss-finance.git
-cd hiss-finance
-pnpm install
+git clone https://github.com/HissFinance/hiss.git
+cd hiss
+pnpm install --frozen-lockfile
 pnpm build
 pnpm test
 ```
