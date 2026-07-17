@@ -45,5 +45,8 @@ jobs:
       - name: Check doc links
         run: pnpm docs:check
 
+      - name: Skill tool-reference guard
+        run: pnpm check:skill-tool-refs
+
       - name: Fee-docs guard
         run: pnpm check:fee-docs

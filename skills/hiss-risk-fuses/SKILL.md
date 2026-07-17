@@ -4,6 +4,9 @@ description: Audit and explain HISS risk fuses — typed, binding constraints (m
 tags: [risk-fuses, risk-management, coilops, audit]
 version: 1
 visibility: public
+required_mcp_tools:
+  - hiss_validate_coil
+  - hiss_compile_coil
 metadata:
   clawdbot:
     emoji: "🐍"
@@ -57,7 +60,8 @@ Capsules cannot compile without the mandatory set: `maxPositionWeight`,
 
 ## Tool / API references
 
-- MCP (local HISS MCP server): `hiss_risk_audit`, `hiss_validate_coil`.
+- MCP (local HISS MCP server): `hiss_validate_coil`, `hiss_compile_coil`.
+  (The risk audit and drift check are HTTP-only.)
 - HTTP (base `https://www.hiss.finance`): `POST /api/tools/risk-audit`
   (alias `POST /api/coil/risk-audit`); drift with proposals:
   `POST /api/tools/drift-check` (alias `POST /api/coil/drift-check`).

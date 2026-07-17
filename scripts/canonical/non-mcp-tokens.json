@@ -1,0 +1,41 @@
+{
+  "$comment": "Classification of hiss_* identifiers that are NOT canonical MCP tools. The canonical set is generated from packages/mcp-server/src/tools.ts by mcp-registry.ts. Used by check:skill-tool-refs for messages + allow rules, and by docs/mcp/tool-name-migration.md. documentationLabels are permitted in skill prose; legacyAliases / httpApi / privateInternal must NOT appear as tool references in skills.",
+  "documentationLabels": {
+    "hiss_trading_fee": "Source-classification tag for a fee delta (used by the reward split), not a tool."
+  },
+  "legacyAliases": {
+    "hiss_get_xhiss_status": "hiss_get_staking_status",
+    "hiss_get_staking_position": "hiss_get_staking_status",
+    "hiss_get_hiss_reward_split": "hiss_get_reward_status",
+    "hiss_get_hiss_safe_status": "hiss_get_protocol_status",
+    "hiss_calculate_vault_fees": "hiss_get_fee_schedule",
+    "hiss_create_vault_manifest": "hiss_create_vault_candidate",
+    "hiss_validate_usdg_vault": "hiss_validate_vault_candidate",
+    "hiss_generate_vault_deposit_intent": "hiss_prepare_vault_deposit"
+  },
+  "httpApi": {
+    "hiss_generate_coil": "POST /api/tools/generate-coil",
+    "hiss_score_coil": "POST /api/tools/score-coil",
+    "hiss_create_receipt": "POST /api/tools/receipt",
+    "hiss_export_share_card": "POST /api/tools/share-card",
+    "hiss_explain_oracle_policy": "(oracle-policy explanation; no dedicated public route)",
+    "hiss_risk_audit": "POST /api/tools/risk-audit",
+    "hiss_compile_robinhood_capsule": "(part of the Bankrbot -> Robinhood path)",
+    "hiss_compile_bankrbot_robinhood_path": "POST /api/bankrbot/compile-robinhood-path",
+    "hiss_validate_autonomy_fuses": "POST /api/bankrbot/validate-autonomy",
+    "hiss_generate_bankrbot_command_pack": "POST /api/bankrbot/generate-command-pack",
+    "hiss_generate_robinhood_mcp_instructions": "(part of the Bankrbot -> Robinhood path)",
+    "hiss_post_run_audit": "POST /api/bankrbot/post-run-audit",
+    "hiss_compile_vault_rebalance_policy": "(vault rebalance preview; preview-only)",
+    "hiss_generate_vault_receipt": "POST /api/tools/receipt",
+    "hiss_post_vault_rebalance_audit": "(vault rebalance audit; no dedicated public route)",
+    "hiss_score_vault_risk": "(structural vault-risk scoring; no dedicated public route)",
+    "hiss_compare_vaults_without_recommendation": "(vault comparison; no dedicated public route)",
+    "hiss_get_reward_injection_history": "GET /api/stake/reward-injections",
+    "hiss_prepare_bankr_stock_token_trade": "POST /api/stocks/prepare-bankr-command",
+    "hiss_generate_bankr_stock_token_command": "POST /api/stocks/prepare-bankr-command",
+    "hiss_submit_bankr_stock_token_intent": "POST /api/stocks/submit-bankr-intent",
+    "hiss_reconcile_bankr_stock_token_job": "POST /api/stocks/reconcile-receipt"
+  },
+  "privateInternal": {}
+}

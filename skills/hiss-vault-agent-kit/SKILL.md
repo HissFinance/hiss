@@ -4,6 +4,19 @@ description: Let your own AI agent discover, read, create, and help operate HISS
 tags: [vaults, usdg, robinhood-chain, creator-vaults, deposits, manifest, receipts, agent-kit]
 version: 1
 visibility: public
+required_mcp_tools:
+  - hiss_get_vaults
+  - hiss_get_vault
+  - hiss_get_vault_holdings
+  - hiss_get_vault_performance
+  - hiss_get_supported_assets
+  - hiss_get_fee_schedule
+  - hiss_create_vault_candidate
+  - hiss_validate_vault_candidate
+  - hiss_prepare_vault_creation
+  - hiss_prepare_vault_deposit
+  - hiss_prepare_vault_withdrawal
+  - hiss_verify_receipt
 metadata:
   clawdbot:
     emoji: "🐍"

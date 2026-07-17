@@ -4,6 +4,11 @@ description: Guide users and agents through xHISS staking on Robinhood Chain —
 tags: [xhiss, staking, hiss-token, robinhood-chain, cooldown, reward-injections]
 version: 1
 visibility: public
+required_mcp_tools:
+  - hiss_get_staking_status
+  - hiss_prepare_hiss_stake
+  - hiss_prepare_xhiss_cooldown
+  - hiss_prepare_xhiss_redeem
 metadata:
   clawdbot:
     emoji: "🐍"
@@ -79,10 +84,10 @@ Vault address: `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`
 
 - UI: `https://www.hiss.finance/app/stake`
 - Status: `GET /api/stake/status` · history: `GET /api/stake/reward-injections`
-- MCP tools (see `hiss-mcp`): `hiss_get_xhiss_status` ·
+- MCP tools (see `hiss-mcp`): `hiss_get_staking_status` ·
   `hiss_prepare_hiss_stake` · `hiss_prepare_xhiss_cooldown` ·
-  `hiss_prepare_xhiss_redeem` · `hiss_get_staking_position` ·
-  `hiss_get_reward_injection_history`
+  `hiss_prepare_xhiss_redeem`. (A staker's specific position and reward-injection
+  history are HTTP-only.)
 - Docs: `/docs/hiss-stake` · `/docs/xhiss` · `/docs/staking-risks`
 - Related packs: `hiss-rewards` (the 50/30/10/10 funding policy),
   `hiss-security-boundaries` (the 2-of-3 Safe powers).

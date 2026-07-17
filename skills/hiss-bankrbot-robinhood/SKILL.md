@@ -4,6 +4,9 @@ description: Drive the Bankrbot → HISS → Robinhood MCP autonomous trading pa
 tags: [bankrbot, robinhood-mcp, autonomous-trading-path, coilops, agents]
 version: 1
 visibility: public
+required_mcp_tools:
+  - hiss_validate_coil
+  - hiss_compile_coil
 metadata:
   clawdbot:
     emoji: "🐍"
@@ -73,12 +76,13 @@ Consent, autonomy modes, and the LiveAutonomyAck live in
 256 KB body cap · 30 req / 5 min · credential-looking fields rejected and
 never echoed · `nowIso` pins the clock for deterministic output.
 
-## MCP tools (local HISS MCP server, see `hiss-mcp`)
+## Interfaces
 
-`hiss_compile_bankrbot_robinhood_path` · `hiss_validate_autonomy_fuses` ·
-`hiss_generate_bankrbot_command_pack` ·
-`hiss_generate_robinhood_mcp_instructions` · `hiss_post_run_audit` — same
-semantics as the HTTP routes; every output passes the execution-claim guard.
+The Bankrbot → Robinhood path is exposed through the **HTTP API only** (the
+`POST /api/bankrbot/*` routes above) — it has **no dedicated MCP tools**. To
+prepare the underlying Coil over MCP, use `hiss_validate_coil` and
+`hiss_compile_coil` (see `hiss-mcp`), then drive the path via the HTTP routes.
+Every output passes the execution-claim guard.
 
 ## Example prompts
 
