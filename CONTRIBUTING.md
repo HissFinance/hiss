@@ -63,6 +63,23 @@ forge test
 6. **Update docs** in the same PR when you change behavior, a fee constant, or a
    public interface.
 
+## Dependency maintenance
+
+Dependency upgrades on this repository are handled **deliberately, by hand** — not
+by a stream of automated version-update pull requests.
+
+- **Routine version bumps are reviewed manually.** We do not run Dependabot
+  version-update PRs; batches of automated bumps create branch noise and rarely
+  carry the compatibility testing safety-critical financial math requires.
+- **Vulnerability-driven security updates remain enabled.** Dependabot alerts, the
+  dependency graph, and Dependabot **security** updates stay on, so advisories are
+  still surfaced and patched.
+- **Major upgrades require compatibility testing.** A major-version bump must pass
+  `pnpm typecheck`, `pnpm test`, and `pnpm build`, plus any affected Foundry tests,
+  before it is merged.
+- **One deliberately reviewed branch at a time.** Group related updates into a
+  single, focused, reviewed branch rather than many concurrent bump branches.
+
 ## Commit and PR conventions
 
 - Use clear, imperative commit subjects. [Conventional Commits](https://www.conventionalcommits.org/)
