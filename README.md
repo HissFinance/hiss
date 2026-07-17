@@ -8,6 +8,8 @@
 
 [Website](https://www.hiss.finance) · [Documentation](./docs/getting-started.md) · [Contracts](./docs/contracts.md) · [SDK](./docs/sdk.md) · [Security](./SECURITY.md)
 
+**$HISS token** · `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` · [Robinhood Chain](./docs/robinhood-chain.md) (chain 4663)
+
 </div>
 
 ---
