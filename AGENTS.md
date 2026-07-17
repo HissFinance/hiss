@@ -21,7 +21,7 @@ internal operations tooling.
   internal operations code, or proprietary components not deliberately approved
   for open-source release.
 - **No autonomous production executor.** Public SDK and agent tooling follow a
-  **prepare / read / simulate / verify** model. They may *prepare* transactions,
+  **prepare / read / simulate / verify** model. They may _prepare_ transactions,
   but must not contain autonomous production-execution credentials or internal
   transaction automation.
 - **No copying from private sources.** Private/internal content may not be copied
