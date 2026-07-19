@@ -1,7 +1,7 @@
-# Provider rewards
+# Vault-provider rewards
 
-The **10%** provider leg of the [reward flywheel](../fees/reward-flywheel.md) rewards
-**eligible provider groups** — the creators/operators who run vaults — using
+The **15%** vault-provider leg of the [reward flywheel](../fees/reward-flywheel.md)
+rewards **eligible provider groups** — the creators/operators who run vaults — using
 **facts-only** scoring. There are **no PnL, APY, return, rank, volatility, or turnover
 inputs anywhere**, enforced by a runtime forbidden-key guard. Rewards recognize
 **operations and participation, never predicted performance.**
@@ -39,7 +39,7 @@ The per-group score is the sum of four component sub-pools of the provider pool:
 | --------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | **Equal**             | **40%** | Split equally among eligible groups.                                                                                               |
 | **External TVL-days** | **30%** | Group external TVL × days, concave (sqrt) curve, optional cap.                                                                     |
-| **Retention**         | **20%** | 50% external-capital cohort retention + 50% median external depositor age.                                                         |
+| **Retention**         | **20%** | 50% external-capital cohort retention + 50% median external contributor age.                                                       |
 | **Operational**       | **10%** | 30% maintenance-on-time + 25% receipt freshness + 20% no provider-fault pause + 15% docs current + 10% oracle/adapter/risk health. |
 
 All inputs are **operational facts**, never performance figures.

@@ -28,11 +28,11 @@
 
 ## Not yet deployed
 
-| Component                               | Status                                                                                               |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Depositor vesting distributor (30% leg) | **Not deployed** — recipient `null` in split plans; nothing moves against it.                        |
-| Provider rewards distributor (10% leg)  | **Not deployed** — recipient `null` in split plans; nothing moves against it.                        |
-| Live rebalance routing                  | **Disabled protocol-wide** — vaults hold base asset until per-asset live-rebalance readiness passes. |
+| Component                                       | Status                                                                                               |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Vault-contributor vesting distributor (15% leg) | **Not deployed** — recipient `null` in split plans; nothing moves against it.                        |
+| Vault-provider rewards distributor (15% leg)    | **Not deployed** — recipient `null` in split plans; nothing moves against it.                        |
+| Live rebalance routing                          | **Disabled protocol-wide** — vaults hold base asset until per-asset live-rebalance readiness passes. |
 
 ## How to verify
 

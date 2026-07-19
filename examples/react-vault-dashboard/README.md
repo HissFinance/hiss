@@ -21,7 +21,9 @@ Then open the printed local URL (default http://localhost:5173).
 - The flagship vault summary with a truncated, explorer-linked address.
 - Allocation bars for AAPL / MSFT / NVDA (illustrative demo weights).
 - A small performance line chart (illustrative demo series).
-- The 50/30/10/10 reward split, with undeployed legs shown as "Not deployed".
+- The 50/15/15/10/10 reward split (xHISS stakers / Vault Providers / Vault
+  Contributors / Treasury / economic burn), with undeployed legs shown as "Not
+  deployed".
 - A stake panel rendering the approved xHISS copy and an **unsigned, not
   executed** stake plan.
 

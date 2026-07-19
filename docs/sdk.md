@@ -40,6 +40,16 @@ const staking = await hiss.staking.read();
 
 // The current reward split plan (planned ≠ funded ≠ claimable).
 const split = await hiss.rewards.readSplit();
+// V2 (`hiss-reward-split-v2`) RewardModel legs, in basis points:
+//   split.xhissStakersBps       // 5000
+//   split.vaultProvidersBps     // 1500 (distributor not deployed → null recipient)
+//   split.vaultContributorsBps  // 1500 (distributor not deployed → null recipient)
+//   split.treasuryBps           // 1000
+//   split.burnBps               // 1000  → split.burnAddress (canonical dead address)
+// The burn leg is an economic burn: HISS leaves circulation but totalSupply is unchanged.
+
+// A Vault Contributor's reward (formerly getDepositorReward).
+const contributorReward = await hiss.rewards.getVaultContributorReward("0xYou");
 ```
 
 Reads reflect on-chain reality at the time of the call. Never cache a balance or a

@@ -40,6 +40,9 @@ You can redeem a specific share amount, or prepare a full exit of your balance.
 - Any **performance fee** is a matter of vault-level crystallization above the
   high-water mark; it is never an extra charge on your principal at exit. See
   [Fees](../fees/vault-fees.md).
+- **No HISS subscription.** Preparing and reading this withdrawal through the HISS
+  website and app tools is free; the only costs are on-chain (gas and any
+  contract-enforced protocol fee), never a HISS charge.
 
 ## Lockups
 

@@ -11,6 +11,49 @@ commit in this repository. Pin to a tag for stability.
 
 Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADMAP.md).
 
+### Changed
+
+- **HISS Reward Method V2 (`HISS_REWARD_METHOD_V2`, split version
+  `hiss-reward-split-v2`).** The verified $HISS trading-fee split moves from the
+  V1 four-leg 50/30/10/10 to a five-leg **50/15/15/10/10**: 50% xHISS stakers /
+  15% Vault Providers / 15% Vault Contributors / 10% Treasury Safe / 10% economic
+  burn. The five legs sum to exactly 10,000 bps; the Treasury leg absorbs
+  floor-division dust. Constants: `XHISS_STAKER_BPS`, `VAULT_PROVIDER_BPS`,
+  `VAULT_CONTRIBUTOR_BPS`, `TREASURY_BPS`, `BURN_BPS`. 100% of claimed WETH still
+  routes to the Treasury Safe, never split. planned ≠ funded ≠ vesting ≠
+  claimable; no guaranteed return.
+- **Vault Contributors terminology.** The former "depositor" reward cohort is now
+  named **Vault Contributors** (`allocateVaultContributorRewards`, CLI
+  `hiss rewards contributor <address>`, client `getVaultContributorReward`). The
+  methodology is unchanged — pro-rata by share-seconds with a 30-day linear vest
+  (`VAULT_CONTRIBUTOR_VEST_SECONDS`). Depositing into a vault, and the deposit
+  ack/consent identifiers, are unchanged (only the reward-cohort name changed);
+  on-chain contract artifacts keep their deployed names.
+
+### Added
+
+- **Economic burn leg (10%).** A `BURN_BPS` leg transfers verified-fee HISS to the
+  canonical dead address `HISS_BURN_ADDRESS`
+  (`0x000000000000000000000000000000000000dEaD`). This is an **economic burn**:
+  the HISS leaves circulation but `HISS.totalSupply` is **not** reduced (not an
+  ERC-20 supply burn). The burn metric is the dead-address balance, a live
+  `HISS.balanceOf(0x…dEaD)` read.
+- **Retroactive economic-burn migration.** A one-time migration recorded a
+  cumulative economic burn of **219,158,426,524,474,729,694,326,935 base units**
+  (~**219.16M HISS**) to the dead address; `HISS.totalSupply` is unchanged. The
+  migration is modelled as a deployer-exclusion + owner-replenishment pair that
+  nets out so reward accounting stays exact.
+
+### Policy
+
+- **Free website / first-party app policy.** The HISS website and first-party app
+  tools are free — no subscriptions, credits, or paywalls; the packages remain
+  open-source (Apache-2.0). Users retain signing control (HISS prepares and
+  verifies; the user's own wallet or Safe signs and submits; HISS never signs,
+  submits, or takes custody). Normal network gas and contract-enforced protocol
+  fees may still apply. `x402` machine-to-machine agent rails, where configured,
+  are separate from the free first-party surfaces.
+
 ## [0.1.0] — 2026-07-16
 
 Initial public release of the HISS Finance open SDK, contract interfaces, and
@@ -22,7 +65,8 @@ documentation.
   (mainnet `4663`, testnet `46630`), the public address book, deterministic vault
   fee math (high-water-mark performance fee, protocol share, routing fee), the
   50/30/10/10 reward split, depositor share-seconds scoring, provider facts-only
-  scoring, and linear vesting math.
+  scoring, and linear vesting math. (The 50/30/10/10 split and depositor cohort
+  are superseded by HISS Reward Method V2 — see [Unreleased].)
 - **SDK (`@hiss-finance/sdk`)** — read vault, staking, and reward state from chain,
   and prepare (build, never sign) deposit, withdraw, stake, cooldown, redeem, and
   manifest-publish transactions.

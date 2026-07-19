@@ -31,9 +31,16 @@ fees.
 **Creator skin-in-game** — the ≥5% of a vault a creator must hold before public deposits
 open. A commitment, not a fee.
 
-**Depositor rewards** — the 30% leg of the split, allocated by
-[share-seconds](./rewards/share-seconds.md), 30-day vest. Distributor **not yet
-deployed** (`null`).
+**Depositor rewards** — historical name for the reward cohort now called **Vault
+Contributors**. Only the reward-cohort name changed; vault _depositors_ (the deposit
+action) are unchanged. See **Vault Contributors**.
+
+**Economic burn** — the 10% burn leg of the reward split: verified $HISS fees are
+transferred to the canonical dead address
+(`0x000000000000000000000000000000000000dEaD`). The HISS leaves circulation (nobody
+holds the key), but this is **not** an ERC-20 supply burn — `HISS.totalSupply` is
+**not** reduced. The "amount burned" is the live dead-address balance
+(`HISS.balanceOf(0x…dEaD)`).
 
 **Distributor** — a contract that pays out a reward leg (merkle-claimable, with vesting).
 
@@ -68,8 +75,9 @@ signs or broadcasts for the user.
 **Provider** — a creator/operator who runs vaults. A provider's vaults count as one
 **group** for rewards.
 
-**Provider rewards** — the 10% leg, facts-only scoring (40/30/20/10), 25% dominance cap,
-90-day vest. Distributor **not yet deployed** (`null`).
+**Provider rewards** — the **Vault Providers** leg (15%), facts-only scoring
+(40/30/20/10), 25% dominance cap, 90-day vest. Distributor **not yet deployed**
+(`null`). See **Vault Providers**.
 
 **Receipt** — a verifiable on-chain record of an action. Completion is a receipt, never a
 pending/unsigned transaction. See [Receipts](./receipts.md).
@@ -84,8 +92,8 @@ redeemed for $HISS.
 **Routing fee** — a fee on HISS-routed rebalance notional; **0** until routing is live,
 then 0.5–2 bps.
 
-**Share-seconds** — Σ(shares × seconds held) over an epoch; the depositor-reward measure.
-No performance inputs. See [Share-seconds](./rewards/share-seconds.md).
+**Share-seconds** — Σ(shares × seconds held) over an epoch; the Vault Contributors
+reward measure. No performance inputs. See [Share-seconds](./rewards/share-seconds.md).
 
 **Stock Token / ETF token** — a tokenized equity/ETF on Robinhood Chain; **economic
 exposure only**, region-restricted. See [Stock Tokens](./stock-tokens.md).
@@ -96,8 +104,20 @@ exposure only**, region-restricted. See [Stock Tokens](./stock-tokens.md).
 **USDG** — the 6-decimal base asset for vaults
 (`0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168`).
 
-**Vesting** — linear release of a reward allocation over time (depositor 30 days,
-provider 90 days).
+**Vault Contributors** — the current name for the reward cohort formerly called
+"depositor rewards": the 15% leg of the [50/15/15/10/10 split](./fees/reward-flywheel.md),
+allocated by [share-seconds](./rewards/share-seconds.md) (Σ shares × seconds held),
+30-day linear vest, no PnL/APY/performance inputs. Distributor **not yet deployed**
+(`null`). The methodology is unchanged from V1; only the cohort name changed. Vault
+_depositors_ (the deposit action) keep that name.
+
+**Vault Providers** — the provider reward cohort: the 15% leg of the
+[50/15/15/10/10 split](./fees/reward-flywheel.md), facts-only quality scoring
+(40/30/20/10), 25% dominance cap, 90-day vest. Distributor **not yet deployed**
+(`null`).
+
+**Vesting** — linear release of a reward allocation over time (Vault Contributors 30
+days, Vault Providers 90 days).
 
 **x402** — an HTTP-native pay-per-call standard; HISS uses it for metered compute
 endpoints. See [x402](./x402.md).

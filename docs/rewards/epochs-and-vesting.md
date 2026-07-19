@@ -35,7 +35,8 @@ provisional → final → challenge → funded → vesting → claimable → cla
 
 - At month end, a deterministic **epoch-score artifact**
   (`hiss-reward-monthly-epoch-score-v1`) is built from source events: it runs the
-  depositor and provider scorers, builds the on-chain-matching **merkle roots**, stamps
+  vault-contributor and vault-provider scorers, builds the on-chain-matching **merkle
+  roots**, stamps
   per-leaf metadata hashes, and computes a content hash. Same events → identical roots
   and hashes (reproducible).
 - The artifact starts in `final` and carries its **challenge window**.
@@ -55,18 +56,18 @@ provisional → final → challenge → funded → vesting → claimable → cla
 
 ## Vesting (linear)
 
-- **Depositor leg:** 30-day linear vest (`DEPOSITOR_VEST_SECONDS`).
-- **Provider leg:** 90-day linear vest (`PROVIDER_VEST_SECONDS`; on-chain provider
+- **Vault-contributor leg:** 30-day linear vest (`VAULT_CONTRIBUTOR_VEST_SECONDS`).
+- **Vault-provider leg:** 90-day linear vest (`PROVIDER_VEST_SECONDS`; on-chain provider
   vesting is modelled pending the distributor delta).
 - **Vested amount:** 0 before `vestStart`, `total` at/after `vestEnd`, linear in between
-  — computed identically off-chain and on-chain for the depositor leg.
+  — computed identically off-chain and on-chain for the vault-contributor leg.
 - **Claimable-now:** `vested − alreadyClaimed`, floored at 0, and **hard-zero** unless
   the epoch is **funded**, the **challenge window is closed**, and the epoch is **open**.
 
 ## Rollover
 
-- **Depositor** unclaimed remainder → **Treasury** after the claim deadline.
-- **Provider** uncapped/unclaimed remainder → the **next provider epoch**.
+- **Vault-contributor** unclaimed remainder → **Treasury** after the claim deadline.
+- **Vault-provider** uncapped/unclaimed remainder → the **next provider epoch**.
 
 ## Reading epoch status
 

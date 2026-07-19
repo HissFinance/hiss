@@ -133,12 +133,18 @@ export function createMockHissClient(overrides: MockHissClientOverrides = {}): H
     },
     async getRewardStatus(): Promise<RewardStatus> {
       return {
-        version: "hiss-reward-split-v1",
+        version: "hiss-reward-split-v2",
         legs: [
           { name: "xHISS stakers", recipient: HISS_ADDRESSES.xhissVault, bps: 5000, state: "planned" },
-          { name: "Depositor vesting", recipient: null, bps: 3000, state: "none" },
-          { name: "Provider rewards", recipient: null, bps: 1000, state: "none" },
+          { name: "Vault providers", recipient: null, bps: 1500, state: "none" },
+          { name: "Vault contributors", recipient: null, bps: 1500, state: "none" },
           { name: "Treasury", recipient: null, bps: 1000, state: "planned" },
+          {
+            name: "Economic burn",
+            recipient: "0x000000000000000000000000000000000000dEaD",
+            bps: 1000,
+            state: "planned",
+          },
         ],
         provenance: { ...provenance, note: "split shape is public; funding state must be read live" },
       };

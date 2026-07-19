@@ -79,6 +79,12 @@ Vault address: `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`
 4. Injection history comes from `GET /api/stake/reward-injections`
    (verified rows only); an unreachable endpoint is "unknown", never "no
    injections happened".
+5. The 50% staker leg is part of HISS Reward Method V2 (50/15/15/10/10),
+   which also includes a 10% economic burn to the canonical dead address
+   `0x000000000000000000000000000000000000dEaD`. The burn metric is the
+   dead-address HISS balance (a live `HISS.balanceOf(0x…dEaD)` read) —
+   `HISS.totalSupply` is NOT reduced. Never present the burn as a reduction
+   of total supply. See `hiss-rewards`.
 
 ## Surfaces
 
@@ -89,5 +95,5 @@ Vault address: `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`
   `hiss_prepare_xhiss_redeem`. (A staker's specific position and reward-injection
   history are HTTP-only.)
 - Docs: `/docs/hiss-stake` · `/docs/xhiss` · `/docs/staking-risks`
-- Related packs: `hiss-rewards` (the 50/30/10/10 funding policy),
-  `hiss-security-boundaries` (the 2-of-3 Safe powers).
+- Related packs: `hiss-rewards` (HISS Reward Method V2, the 50/15/15/10/10
+  funding policy), `hiss-security-boundaries` (the 2-of-3 Safe powers).

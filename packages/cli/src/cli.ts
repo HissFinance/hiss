@@ -27,7 +27,11 @@ import {
   stakeCooldownCommand,
   stakeRedeemCommand,
 } from "./commands/stake.js";
-import { rewardsStatusCommand, rewardsDepositorCommand, rewardsProviderCommand } from "./commands/rewards.js";
+import {
+  rewardsStatusCommand,
+  rewardsContributorCommand,
+  rewardsProviderCommand,
+} from "./commands/rewards.js";
 import { coilValidateCommand, coilCompileCommand } from "./commands/coil.js";
 import { receiptVerifyCommand } from "./commands/receipt.js";
 import { skillListCommand, skillPrintCommand } from "./commands/skill.js";
@@ -190,10 +194,10 @@ export function buildProgram(build: BuildOptions = {}): Command {
       await run(this, rewardsStatusCommand(client(this)));
     });
   rewards
-    .command("depositor <address>")
-    .description("read depositor reward status")
+    .command("contributor <address>")
+    .description("read vault-contributor reward status")
     .action(async function (this: Command, address: string) {
-      await run(this, rewardsDepositorCommand(client(this), address));
+      await run(this, rewardsContributorCommand(client(this), address));
     });
   rewards
     .command("provider <groupId>")

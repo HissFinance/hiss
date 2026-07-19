@@ -1,7 +1,7 @@
 {
   "name": "@hiss-finance/core",
   "version": "0.1.0",
-  "description": "Shared truth layer for HISS Finance: chain config, canonical contract registry, manifest/receipt/reward schemas, and the public HISS_REWARD_METHOD_V1 formulas.",
+  "description": "Shared truth layer for HISS Finance: chain config, canonical contract registry, manifest/receipt/reward schemas, and the public HISS_REWARD_METHOD_V2 formulas.",
   "license": "Apache-2.0",
   "private": false,
   "type": "module",

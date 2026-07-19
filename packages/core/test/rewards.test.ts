@@ -4,21 +4,23 @@ import {
   splitEligibleHiss,
   REWARD_SPLIT_BPS_TOTAL,
   XHISS_STAKER_BPS,
-  DEPOSITOR_VESTING_BPS,
-  PROVIDER_REWARDS_BPS,
+  VAULT_PROVIDER_BPS,
+  VAULT_CONTRIBUTOR_BPS,
   TREASURY_BPS,
+  BURN_BPS,
+  HISS_BURN_ADDRESS,
   HISS_TREASURY_SAFE,
   hissRewardSplitRecipients,
 } from "../src/rewards/split.js";
 import {
-  HISS_REWARD_METHOD_V1,
-  allocateDepositorRewards,
+  HISS_REWARD_METHOD_V2,
+  allocateVaultContributorRewards,
   allocateProviderRewards,
   epochPoolBreakdown,
   linearVested,
   PROVIDER_COMPONENT_BPS,
   PROVIDER_DOMINANCE_CAP_BPS,
-  DEPOSITOR_VEST_SECONDS,
+  VAULT_CONTRIBUTOR_VEST_SECONDS,
   PROVIDER_VEST_SECONDS,
 } from "../src/rewards/method.js";
 import {
@@ -27,30 +29,35 @@ import {
   claimGateOpen,
 } from "../src/rewards/lifecycle.js";
 
-describe("50/30/10/10 split", () => {
+describe("50/15/15/10/10 split", () => {
   it("legs sum to exactly 10,000 bps", () => {
-    expect(XHISS_STAKER_BPS + DEPOSITOR_VESTING_BPS + PROVIDER_REWARDS_BPS + TREASURY_BPS).toBe(10_000);
+    expect(XHISS_STAKER_BPS + VAULT_PROVIDER_BPS + VAULT_CONTRIBUTOR_BPS + TREASURY_BPS + BURN_BPS).toBe(
+      10_000,
+    );
     expect(REWARD_SPLIT_BPS_TOTAL).toBe(10_000);
   });
 
   it("splits an amount exactly, treasury absorbs the dust", () => {
-    // 10001 base units: floor legs 5000/3000/1000, treasury = 1001 (absorbs +1).
+    // 10001 base units: floor legs 5000/1500/1500/1000 (burn), treasury = 1001 (absorbs +1).
     const s = splitEligibleHiss("10001");
     expect(s.xHissStakerAmount).toBe("5000");
-    expect(s.depositorVestingAmount).toBe("3000");
-    expect(s.providerRewardsAmount).toBe("1000");
+    expect(s.vaultProviderAmount).toBe("1500");
+    expect(s.vaultContributorAmount).toBe("1500");
+    expect(s.burnAmount).toBe("1000");
     expect(s.treasuryAmount).toBe("1001");
     const sum =
       BigInt(s.xHissStakerAmount) +
-      BigInt(s.depositorVestingAmount) +
-      BigInt(s.providerRewardsAmount) +
-      BigInt(s.treasuryAmount);
+      BigInt(s.vaultProviderAmount) +
+      BigInt(s.vaultContributorAmount) +
+      BigInt(s.treasuryAmount) +
+      BigInt(s.burnAmount);
     expect(sum).toBe(10001n);
   });
 
   it("handles a round amount with zero dust", () => {
     const s = splitEligibleHiss("10000");
     expect(s.treasuryAmount).toBe("1000");
+    expect(s.burnAmount).toBe("1000");
   });
 
   it("rejects a malformed amount", () => {
@@ -58,62 +65,64 @@ describe("50/30/10/10 split", () => {
     expect(() => splitEligibleHiss("1.5")).toThrow();
   });
 
-  it("pins treasury + WETH recipients to the Safe; distributors default null", () => {
+  it("pins treasury + WETH + burn recipients; distributors default null", () => {
     const r = hissRewardSplitRecipients();
     expect(r.treasury).toBe(HISS_TREASURY_SAFE);
     expect(r.wethRecipient).toBe(HISS_TREASURY_SAFE);
-    expect(r.depositorVestingDistributor).toBeNull();
-    expect(r.providerRewardsDistributor).toBeNull();
+    expect(r.burn).toBe(HISS_BURN_ADDRESS);
+    expect(r.vaultContributorDistributor).toBeNull();
+    expect(r.vaultProviderDistributor).toBeNull();
   });
 });
 
 describe("epoch pool breakdown", () => {
-  it("splits eligible HISS into the four pools", () => {
+  it("splits eligible HISS into the five pools", () => {
     const b = epochPoolBreakdown("10000");
     expect(b.xHissStakerPool).toBe("5000");
-    expect(b.depositorPool).toBe("3000");
-    expect(b.providerPool).toBe("1000");
+    expect(b.vaultProviderPool).toBe("1500");
+    expect(b.vaultContributorPool).toBe("1500");
     expect(b.treasuryPool).toBe("1000");
+    expect(b.burnPool).toBe("1000");
   });
 });
 
-describe("depositor rewards — share-seconds", () => {
+describe("vault-contributor rewards — share-seconds", () => {
   it("allocates pro-rata by shares x seconds held", () => {
     // A: 100 shares for 100s = 10000 ss. B: 100 shares for 300s = 30000 ss.
     // Pool 4000 -> A gets 1000, B gets 3000.
-    const r = allocateDepositorRewards({
+    const r = allocateVaultContributorRewards({
       poolAmount: "4000",
       vestStart: 1_000_000,
       intervals: [
         {
-          depositor: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          contributor: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
           shares: "100",
           startTime: 0,
           endTime: 100,
         },
         {
-          depositor: "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+          contributor: "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
           shares: "100",
           startTime: 0,
           endTime: 300,
         },
       ],
     });
-    const byAddr = Object.fromEntries(r.allocations.map((a) => [a.depositor, a.amount]));
+    const byAddr = Object.fromEntries(r.allocations.map((a) => [a.contributor, a.amount]));
     expect(byAddr["0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]).toBe("1000");
     expect(byAddr["0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"]).toBe("3000");
     expect(r.dust).toBe("0");
-    expect(r.allocations[0]!.vestEnd - r.allocations[0]!.vestStart).toBe(DEPOSITOR_VEST_SECONDS);
+    expect(r.allocations[0]!.vestEnd - r.allocations[0]!.vestStart).toBe(VAULT_CONTRIBUTOR_VEST_SECONDS);
   });
 
   it("leaves floor-division remainder as dust", () => {
-    const r = allocateDepositorRewards({
+    const r = allocateVaultContributorRewards({
       poolAmount: "10",
       vestStart: 0,
       intervals: [
-        { depositor: "0x1111111111111111111111111111111111111111", shares: "1", startTime: 0, endTime: 1 },
-        { depositor: "0x2222222222222222222222222222222222222222", shares: "1", startTime: 0, endTime: 1 },
-        { depositor: "0x3333333333333333333333333333333333333333", shares: "1", startTime: 0, endTime: 1 },
+        { contributor: "0x1111111111111111111111111111111111111111", shares: "1", startTime: 0, endTime: 1 },
+        { contributor: "0x2222222222222222222222222222222222222222", shares: "1", startTime: 0, endTime: 1 },
+        { contributor: "0x3333333333333333333333333333333333333333", shares: "1", startTime: 0, endTime: 1 },
       ],
     });
     const distributed = r.allocations.reduce((s, a) => s + BigInt(a.amount), 0n);
@@ -186,10 +195,12 @@ describe("linear vesting", () => {
 });
 
 describe("methodology bundle + lifecycle", () => {
-  it("exposes the canonical split and cap", () => {
-    expect(HISS_REWARD_METHOD_V1.split.xHissStakerBps).toBe(5000);
-    expect(HISS_REWARD_METHOD_V1.provider.dominanceCapBps).toBe(2500);
-    expect(HISS_REWARD_METHOD_V1.depositor.vestSeconds).toBe(DEPOSITOR_VEST_SECONDS);
+  it("exposes the canonical split, burn, and cap", () => {
+    expect(HISS_REWARD_METHOD_V2.split.xHissStakerBps).toBe(5000);
+    expect(HISS_REWARD_METHOD_V2.split.burnBps).toBe(1000);
+    expect(HISS_REWARD_METHOD_V2.burn.reducesTotalSupply).toBe(false);
+    expect(HISS_REWARD_METHOD_V2.vaultProvider.dominanceCapBps).toBe(2500);
+    expect(HISS_REWARD_METHOD_V2.vaultContributor.vestSeconds).toBe(VAULT_CONTRIBUTOR_VEST_SECONDS);
   });
 
   it("permits only legal epoch state transitions", () => {

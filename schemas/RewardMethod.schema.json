@@ -2,25 +2,26 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://hiss.finance/schemas/RewardMethod.schema.json",
   "title": "RewardMethod",
-  "version": "1.0.0",
-  "description": "HISS_REWARD_METHOD_V1 — the public reward methodology. Verified $HISS trading fees split 50/30/10/10 (xHISS stakers / depositor vesting / provider rewards / treasury; legs sum to 10,000 bps, treasury absorbs floor-division dust). Depositor rewards are allocated by share-seconds and vest linearly over 30 days. Provider rewards are quality-weighted (40% equal / 30% external-TVL-days / 20% retention / 10% operational), dominance-capped at 25% of the pool, and vest over 90 days. No performance (PnL/APY/rank/volatility) inputs anywhere.",
+  "version": "2.0.0",
+  "description": "HISS_REWARD_METHOD_V2 — the public reward methodology. Verified $HISS trading fees split 50/15/15/10/10 (xHISS stakers / vault providers / vault contributors / treasury / economic burn; legs sum to 10,000 bps, treasury absorbs floor-division dust). 'Vault contributors' is the current name for the former depositor cohort; rewards are allocated by share-seconds and vest linearly over 30 days. Vault-provider rewards are quality-weighted (40% equal / 30% external-TVL-days / 20% retention / 10% operational), dominance-capped at 25% of the pool, and vest over 90 days. The burn leg is an ECONOMIC burn to the canonical dead address (0x…dEaD) that does NOT reduce HISS.totalSupply. No performance (PnL/APY/rank/volatility) inputs anywhere. V1 (50/30/10/10, no burn) is historical.",
   "type": "object",
-  "required": ["version", "split", "depositor", "provider", "authorization"],
+  "required": ["version", "split", "vaultContributor", "vaultProvider", "burn", "authorization"],
   "additionalProperties": false,
   "properties": {
-    "version": { "const": "HISS_REWARD_METHOD_V1" },
+    "version": { "const": "HISS_REWARD_METHOD_V2" },
     "split": {
       "type": "object",
-      "required": ["xHissStakerBps", "depositorBps", "providerBps", "treasuryBps"],
+      "required": ["xHissStakerBps", "vaultProviderBps", "vaultContributorBps", "treasuryBps", "burnBps"],
       "additionalProperties": false,
       "properties": {
         "xHissStakerBps": { "const": 5000 },
-        "depositorBps": { "const": 3000 },
-        "providerBps": { "const": 1000 },
-        "treasuryBps": { "const": 1000 }
+        "vaultProviderBps": { "const": 1500 },
+        "vaultContributorBps": { "const": 1500 },
+        "treasuryBps": { "const": 1000 },
+        "burnBps": { "const": 1000 }
       }
     },
-    "depositor": {
+    "vaultContributor": {
       "type": "object",
       "required": ["basis", "vestSeconds", "dustPolicy"],
       "additionalProperties": false,
@@ -30,7 +31,7 @@
         "dustPolicy": { "type": "string" }
       }
     },
-    "provider": {
+    "vaultProvider": {
       "type": "object",
       "required": [
         "components",
@@ -61,6 +62,19 @@
         "performanceInputsForbidden": { "const": true }
       }
     },
+    "burn": {
+      "type": "object",
+      "required": ["kind", "sink", "reducesTotalSupply"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "economic_burn" },
+        "sink": {
+          "const": "0x000000000000000000000000000000000000dEaD",
+          "description": "Canonical dead address; HISS routed here leaves circulation but totalSupply is unchanged."
+        },
+        "reducesTotalSupply": { "const": false }
+      }
+    },
     "authorization": {
       "type": "object",
       "required": ["finalizationRequiresSafe", "safeThreshold"],
@@ -73,14 +87,20 @@
   },
   "examples": [
     {
-      "version": "HISS_REWARD_METHOD_V1",
-      "split": { "xHissStakerBps": 5000, "depositorBps": 3000, "providerBps": 1000, "treasuryBps": 1000 },
-      "depositor": {
+      "version": "HISS_REWARD_METHOD_V2",
+      "split": {
+        "xHissStakerBps": 5000,
+        "vaultProviderBps": 1500,
+        "vaultContributorBps": 1500,
+        "treasuryBps": 1000,
+        "burnBps": 1000
+      },
+      "vaultContributor": {
         "basis": "share_seconds",
         "vestSeconds": 2592000,
         "dustPolicy": "unallocated_rolls_to_treasury_after_deadline"
       },
-      "provider": {
+      "vaultProvider": {
         "components": {
           "equalBps": 4000,
           "externalTvlBps": 3000,
@@ -91,6 +111,11 @@
         "vestSeconds": 7776000,
         "dustPolicy": "rollover_to_next_epoch",
         "performanceInputsForbidden": true
+      },
+      "burn": {
+        "kind": "economic_burn",
+        "sink": "0x000000000000000000000000000000000000dEaD",
+        "reducesTotalSupply": false
       },
       "authorization": { "finalizationRequiresSafe": true, "safeThreshold": 2 }
     }

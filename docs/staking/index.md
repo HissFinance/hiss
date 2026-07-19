@@ -39,6 +39,11 @@ product.
 3. The exchange rate rises → each xHISS is redeemable for more $HISS over time.
 4. To exit, you **start a 72h cooldown**, then **redeem** within the 2-day window.
 
+The staker leg is 50% of the five-leg **HISS Reward Method V2** split (token
+**50/15/15/10/10**), which also routes a **10% economic burn** to the canonical dead
+address. That burn leaves circulation but does **not** reduce `HISS.totalSupply`; the
+amount burned is a live read of the dead-address balance (`HISS.balanceOf(0x…dEaD)`).
+
 Nothing is guaranteed: injections depend on trading activity HISS does not control,
 and there is no promised rate of return.
 

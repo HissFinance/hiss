@@ -81,6 +81,21 @@ Other former names — `hiss_compile_robinhood_capsule`,
 MCP tool. They have been removed from the MCP surface; use the HTTP routes above
 where a public equivalent exists.
 
+## Reward-cohort rename (V1 → V2)
+
+Reward Method **V2** renamed the reward cohort formerly called "depositor" to
+**Vault Contributors** (and standardized "provider" as **Vault Providers**). The
+methodology is unchanged — only the names moved. The on-chain **contract artifacts
+keep their deployed names** (e.g. the `VaultDepositorRewardsDistributor` ABI); only
+the client-facing SDK/CLI identifiers changed.
+
+| Task                        | SDK (was → now)                                              | CLI (`hiss …`) (was → now)                                      |
+| --------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------- |
+| Read a contributor's reward | `getDepositorReward(...)` → `getVaultContributorReward(...)` | `rewards depositor <address>` → `rewards contributor <address>` |
+
+The vault **deposit action** (`prepareVaultDeposit`, `vault prepare-deposit`) is
+unchanged — only the reward-cohort name changed.
+
 ## Not a tool
 
 `hiss_trading_fee` is a **source-classification label** (the fee-delta class used

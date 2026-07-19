@@ -35,7 +35,7 @@ export function mockClient(): HissClient {
     getStakingStatus: () =>
       Promise.resolve({ vaultAddress: "0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be", stakingAsset: "HISS" }),
     getRewardStatus: () => Promise.resolve({ split: { xHissStakerBps: 5000 } }),
-    getDepositorReward: () => Promise.resolve({ status: "not_yet_scored" }),
+    getVaultContributorReward: () => Promise.resolve({ status: "not_yet_scored" }),
     getProviderReward: () => Promise.resolve({ status: "not_yet_scored" }),
     getReceipt: (id) => Promise.resolve({ id, kind: "state_read" }),
     getSupportedAssets: () => Promise.resolve([{ symbol: "USDG" }, { symbol: "AAPL" }]),

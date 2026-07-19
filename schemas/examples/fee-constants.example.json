@@ -4,11 +4,13 @@
   "dopplerSharePct": 5,
   "hissFeeSplit": {
     "stakersPct": 50,
-    "depositorVestingPct": 30,
-    "providerRewardsPct": 10,
-    "treasuryPct": 10
+    "vaultProvidersPct": 15,
+    "vaultContributorsPct": 15,
+    "treasuryPct": 10,
+    "burnPct": 10
   },
   "claimedWethTreasuryPct": 100,
+  "burnAddress": "0x000000000000000000000000000000000000dEaD",
   "providerRewardsPolicyV1": {
     "providersPct": 30,
     "treasuryPct": 70,

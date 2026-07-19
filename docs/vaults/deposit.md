@@ -58,6 +58,9 @@ holdings. See [Performance](./performance.md).
   the high-water mark, at crystallization — never on your way in.
 - **Chain gas** is yours to pay; **slippage/liquidity costs** (if any, once routing is
   live) are disclosed separately — no hidden spread. See [Fees](../fees/vault-fees.md).
+- **No HISS subscription.** The website and app tools that prepare this deposit are free
+  (no subscription, credits, or paywall). The only costs are on-chain: network gas and
+  any contract-enforced protocol fee — never a HISS charge.
 
 ## Completion = on-chain receipt
 

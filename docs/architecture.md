@@ -41,9 +41,10 @@ describes the chain; it never overrides it.
 
 ## Packages
 
-- **`@hiss-finance/core`** — deterministic, I/O-free. Fee math, the 50/30/10/10
-  split, depositor share-seconds, provider facts-only scoring, linear vesting, chain
-  config, address book, manifest schema. Everything else depends on it.
+- **`@hiss-finance/core`** — deterministic, I/O-free. Fee math, the 50/15/15/10/10
+  split (five legs, incl. the economic burn), vault-contributor share-seconds,
+  provider facts-only scoring, linear vesting, chain config, address book, manifest
+  schema. Everything else depends on it.
 - **`@hiss-finance/vault-kit`** — vault authoring: compose allocations, validate
   [risk fuses](./vaults/risk-fuses.md), preview fees, hash a manifest.
 - **`@hiss-finance/sdk`** — the client: typed chain reads and transaction
@@ -74,8 +75,12 @@ authority is the 2-of-3 **Treasury Safe**. See [Contracts](./contracts.md).
 ## Data flow: rewards
 
 Verified $HISS trading fees are **classified** (fail-closed), **planned** into the
-50/30/10/10 split (data with a plan hash), **funded** by the Treasury Safe after a
-7-day challenge window, then **vest** before becoming claimable. See the
+50/15/15/10/10 split — xHISS stakers / Vault Providers / Vault Contributors /
+Treasury / economic burn (data with a plan hash) — **funded** by the Treasury Safe
+after a 7-day challenge window, then **vest** before becoming claimable. The 10%
+economic-burn leg transfers HISS to the canonical dead address
+(`0x000000000000000000000000000000000000dEaD`); it leaves circulation but does
+**not** reduce `HISS.totalSupply`. See the
 [reward flywheel](./fees/reward-flywheel.md) and [epochs & vesting](./rewards/epochs-and-vesting.md).
 
 ## Design invariants

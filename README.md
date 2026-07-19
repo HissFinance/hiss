@@ -204,7 +204,7 @@ proves completion.
 | [**hiss-vault-agent-kit**](./skills/hiss-vault-agent-kit/SKILL.md)         | Discover vaults, read manifests/fees, create a vault **candidate**, prepare deposits/withdrawals, preview rebalances under fuses, verify receipts | Manifests + `manifestHash`, deposit/withdraw intents + ack hashes, readiness/risk reports |
 | [**hiss-coilops**](./skills/hiss-coilops/SKILL.md)                         | Turn a market thesis into a bounded, versioned trading **Coil** — generate, validate, score, compile                                              | CoilManifest, Coil Health score, runbook, share card, receipts                            |
 | [**hiss-staking**](./skills/hiss-staking/SKILL.md)                         | Guide xHISS staking — read state, prepare stake, start the 72h cooldown, redeem in the window                                                     | Prepared stake/cooldown/redeem intents; status & injection reads                          |
-| [**hiss-rewards**](./skills/hiss-rewards/SKILL.md)                         | Explain & verify the 50/30/10/10 split; distinguish planned ≠ funded ≠ claimable                                                                  | Deterministic split plans with a `planHash`; state explanations                           |
+| [**hiss-rewards**](./skills/hiss-rewards/SKILL.md)                         | Explain & verify the 50/15/15/10/10 split (incl. economic burn); distinguish planned ≠ funded ≠ claimable                                         | Deterministic split plans with a `planHash`; state explanations                           |
 | [**hiss-receipts**](./skills/hiss-receipts/SKILL.md)                       | Write and verify canonical-JSON SHA-256 receipts; reject any forged execution claim                                                               | Receipts and `{ok, mismatches[]}` verification verdicts                                   |
 | [**hiss-risk-fuses**](./skills/hiss-risk-fuses/SKILL.md)                   | Audit the binding risk fuses on a Coil and explain why a capsule will/won't compile                                                               | Per-fuse descriptions, bound-check issues, a `risk_fuse` receipt                          |
 | [**hiss-stock-tokens**](./skills/hiss-stock-tokens/SKILL.md)               | Prepare, validate, and reconcile Bankr trades of the 15 canonical Robinhood Chain stock tokens                                                    | Order plan + exact Bankr command; a settlement receipt from an on-chain tx                |
@@ -404,6 +404,13 @@ and prepare [Bankr commands](./docs/bankrbot.md).
 
 ## How fees work
 
+The HISS **website and first-party app tools are free** — no subscriptions, no
+credits, no paywalls — and the packages here are open-source (Apache-2.0). You
+keep signing control; HISS only prepares and verifies. What you may still pay are
+**normal network gas** and **contract-enforced protocol fees** (shown below) — these
+are on-chain costs, not HISS charges. [x402](./docs/x402.md) services are separate,
+opt-in machine-to-machine (agent) rails where configured.
+
 Every fee is disclosed; there are no hidden spreads. Current launch values:
 
 | Fee                      | Value                        | Notes                                                                                                               |
@@ -421,12 +428,21 @@ The full, worked-through fee guide — including $HISS token trading fees — is
 ## The HISS flywheel
 
 Verified **$HISS token trading fees** (from the Bankr/Doppler launch pool) are, on
-the HISS side, split **50 / 30 / 10 / 10**:
+the HISS side, split **50 / 15 / 15 / 10 / 10** (**HISS Reward Method V2**):
 
 - **50%** → [xHISS](./docs/staking/xhiss.md) stakers (an ERC-4626 reward injection)
-- **30%** → eligible [depositors](./docs/rewards/depositor-rewards.md) (by share-seconds, 30-day vesting)
-- **10%** → eligible [providers](./docs/rewards/provider-rewards.md) (facts-only scoring, 90-day vesting)
+- **15%** → eligible [vault providers](./docs/rewards/provider-rewards.md) (facts-only scoring, 90-day vesting)
+- **15%** → eligible [vault contributors](./docs/rewards/depositor-rewards.md) (by share-seconds, 30-day vesting)
 - **10%** → the Treasury Safe (absorbs rounding dust; legs sum exactly)
+- **10%** → **economic burn** to the canonical dead address `0x000000000000000000000000000000000000dEaD`
+
+**Vault contributors** is the current name for the former **depositor** reward
+cohort (methodology unchanged); **V1** (50/30/10/10, no burn) is historical. The
+burn leg is an **economic burn** — $HISS is transferred to the dead address and
+leaves circulation, but the transfer does **not reduce `HISS.totalSupply`** (the
+burn metric is the dead-address balance). The retroactive V2 migration executed a
+cumulative economic burn of **~219.16M HISS** to the dead address, with
+`totalSupply` unchanged.
 
 Claimed **WETH** fees are **100%** to the Treasury Safe — never split. State is
 always chained: **planned ≠ funded ≠ vesting ≠ claimable**. Read the full
@@ -474,17 +490,17 @@ deposit, and driving the MCP server.
 
 ## Documentation map
 
-| Area              | Start here                                                                                                                                                                                         |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Orientation       | [Getting started](./docs/getting-started.md) · [Architecture](./docs/architecture.md) · [Glossary](./docs/glossary.md) · [FAQ](./docs/faq.md)                                                      |
-| Chain & contracts | [Robinhood Chain](./docs/robinhood-chain.md) · [Contracts](./docs/contracts.md)                                                                                                                    |
-| Packages          | [SDK](./docs/sdk.md) · [CLI](./docs/cli.md) · [React](./docs/react.md) · [MCP](./docs/mcp.md)                                                                                                      |
-| Vaults            | [Overview](./docs/vaults/index.md) · [Create](./docs/vaults/create-a-vault.md) · [Manifest](./docs/vaults/vault-manifest.md) · [Risk fuses](./docs/vaults/risk-fuses.md)                           |
-| Fees              | [Overview](./docs/fees/index.md) · [Vault fees](./docs/fees/vault-fees.md) · [$HISS token fees](./docs/fees/hiss-token-fees.md) · [Reward flywheel](./docs/fees/reward-flywheel.md)                |
-| Staking           | [Overview](./docs/staking/index.md) · [xHISS](./docs/staking/xhiss.md) · [Cooldown & redeem](./docs/staking/cooldown-and-redeem.md)                                                                |
-| Rewards           | [Overview](./docs/rewards/index.md) · [Depositor](./docs/rewards/depositor-rewards.md) · [Provider](./docs/rewards/provider-rewards.md) · [Epochs & vesting](./docs/rewards/epochs-and-vesting.md) |
-| Agents            | [Agent skills](./docs/agent-skills.md) · [Bankrbot](./docs/bankrbot.md) · [x402](./docs/x402.md) · [CoilOps](./docs/coilops.md)                                                                    |
-| Safety            | [Security](./docs/security.md) · [Trust boundaries](./docs/trust-boundaries.md) · [Receipts](./docs/receipts.md) · [Data freshness](./docs/status-and-data-freshness.md)                           |
+| Area              | Start here                                                                                                                                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Orientation       | [Getting started](./docs/getting-started.md) · [Architecture](./docs/architecture.md) · [Glossary](./docs/glossary.md) · [FAQ](./docs/faq.md)                                                                      |
+| Chain & contracts | [Robinhood Chain](./docs/robinhood-chain.md) · [Contracts](./docs/contracts.md)                                                                                                                                    |
+| Packages          | [SDK](./docs/sdk.md) · [CLI](./docs/cli.md) · [React](./docs/react.md) · [MCP](./docs/mcp.md)                                                                                                                      |
+| Vaults            | [Overview](./docs/vaults/index.md) · [Create](./docs/vaults/create-a-vault.md) · [Manifest](./docs/vaults/vault-manifest.md) · [Risk fuses](./docs/vaults/risk-fuses.md)                                           |
+| Fees              | [Overview](./docs/fees/index.md) · [Vault fees](./docs/fees/vault-fees.md) · [$HISS token fees](./docs/fees/hiss-token-fees.md) · [Reward flywheel](./docs/fees/reward-flywheel.md)                                |
+| Staking           | [Overview](./docs/staking/index.md) · [xHISS](./docs/staking/xhiss.md) · [Cooldown & redeem](./docs/staking/cooldown-and-redeem.md)                                                                                |
+| Rewards           | [Overview](./docs/rewards/index.md) · [Vault contributors](./docs/rewards/depositor-rewards.md) · [Vault providers](./docs/rewards/provider-rewards.md) · [Epochs & vesting](./docs/rewards/epochs-and-vesting.md) |
+| Agents            | [Agent skills](./docs/agent-skills.md) · [Bankrbot](./docs/bankrbot.md) · [x402](./docs/x402.md) · [CoilOps](./docs/coilops.md)                                                                                    |
+| Safety            | [Security](./docs/security.md) · [Trust boundaries](./docs/trust-boundaries.md) · [Receipts](./docs/receipts.md) · [Data freshness](./docs/status-and-data-freshness.md)                                           |
 
 ## Contributing
 

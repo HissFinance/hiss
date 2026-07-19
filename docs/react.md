@@ -39,6 +39,27 @@ function VaultCard() {
 Read hooks return live chain data and honest loading/error states. A failed read is
 **unknown** — render it as such, never as "live" or "not deployed".
 
+`useRewardSplit` exposes the current V2 (`hiss-reward-split-v2`) legs of the
+50/15/15/10/10 split as basis points, plus the burn address:
+
+```tsx
+import { useRewardSplit } from "@hiss-finance/react";
+
+function RewardSplit() {
+  const { data: split } = useRewardSplit();
+  if (!split) return <p>Loading…</p>;
+  const { xhissStakersBps, vaultProvidersBps, vaultContributorsBps, treasuryBps, burnBps, burnAddress } =
+    split;
+  // 5000 / 1500 / 1500 / 1000 / 1000; burnAddress is the canonical dead address.
+  // vaultProviders and vaultContributors distributors are not deployed → nothing is claimable.
+  return (
+    <p>
+      Burn leg: {burnBps} bps → {burnAddress} (economic burn; totalSupply unchanged)
+    </p>
+  );
+}
+```
+
 ## Prepare hooks
 
 Prepare hooks return unsigned transactions and a disclosure; you send them with your

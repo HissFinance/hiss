@@ -29,7 +29,16 @@ output.
 - **Depositing is not direct share ownership.** Vaults are compilation/settlement
   software; they do not confer ownership of underlying securities.
 - **No guaranteed rewards.** Reward legs may be planned, funded, or not
-  deployed. Nothing implies yield, APY, or income.
+  deployed. Nothing implies yield, APY, or income. The current split is HISS
+  Reward Method V2 (50/15/15/10/10: xHISS stakers / Vault Providers / Vault
+  Contributors / Treasury / economic burn to the dead address `0x…dEaD`, which
+  leaves circulation without reducing `HISS.totalSupply`).
+- **The HISS website and first-party app tools are free.** No subscriptions, no
+  credits, no paywalls; these packages are open-source (Apache-2.0). You keep
+  signing control — HISS prepares and verifies, your own wallet or Safe signs
+  and submits. Normal network gas and contract-enforced protocol fees may still
+  apply (they are on-chain, not HISS subscriptions). x402 services, where
+  configured, are separate machine-to-machine agent rails.
 
 ## Running
 

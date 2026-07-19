@@ -34,21 +34,23 @@
 
 ## Rewards
 
-- The **50/30/10/10** split is defined and reproducible.
-- **xHISS leg (50%)** and **Treasury leg (10%)** have deployed recipients.
-- **Depositor leg (30%)** and **provider leg (10%)** route to distributors that are
-  **not yet deployed** — recipients are `null`; **nothing moves against them**.
+- The **50/15/15/10/10** split (HISS Reward Method V2) is defined and reproducible.
+  V1 (50/30/10/10) is historical.
+- **xHISS leg (50%)**, **Treasury leg (10%)**, and the **economic-burn leg (10%,** dead
+  address `0x…dEaD`, `totalSupply` unchanged**)** have live recipients.
+- **Vault-provider leg (15%)** and **vault-contributor leg (15%)** route to distributors
+  that are **not yet deployed** — recipients are `null`; **nothing moves against them**.
 - Reward epochs follow weekly provisional → monthly final → **7-day challenge** →
   funded → vesting → claimable. No epoch is claimable during its challenge window.
 
 ## What is NOT live
 
-| Item                          | State                             |
-| ----------------------------- | --------------------------------- |
-| Depositor vesting distributor | not deployed (`null` recipient)   |
-| Provider rewards distributor  | not deployed (`null` recipient)   |
-| Live rebalance routing        | disabled protocol-wide            |
-| Packages on npm               | not published (build from source) |
+| Item                                  | State                             |
+| ------------------------------------- | --------------------------------- |
+| Vault-contributor vesting distributor | not deployed (`null` recipient)   |
+| Vault-provider rewards distributor    | not deployed (`null` recipient)   |
+| Live rebalance routing                | disabled protocol-wide            |
+| Packages on npm                       | not published (build from source) |
 
 ## How to check anything here
 

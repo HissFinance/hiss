@@ -31,6 +31,10 @@ strategy updates (7-day notice) ──▶ performance fees at high-water mark
   the asset registry.
 - **Fees are disclosed.** Zero deposit/withdraw fee; performance fee only above the
   [high-water mark](./performance.md); see [Fees](../fees/vault-fees.md).
+- **The website and app are free.** The HISS website and first-party app tools carry no
+  subscription, credits, or paywall (packages are open-source, Apache-2.0). Only normal
+  network gas and contract-enforced protocol fees apply — those are on-chain, not HISS
+  charges. You keep signing control; HISS never signs, submits, or takes custody.
 - **Change notice.** Strategy changes require a disclosed **7-day** notice.
 - **Routing disabled today.** Protocol-wide, live routing is off; a vault holds its
   base asset until per-asset live-rebalance readiness passes.

@@ -1,13 +1,16 @@
 # Share-seconds
 
-**Share-seconds** is the measure of depositor participation used to allocate the
-[30% depositor leg](./depositor-rewards.md). It is the integral of a depositor's vault
-**share balance over time** — a purely factual measure of how much, and how long, you
-participated. It has **nothing to do with performance, PnL, or APY.**
+**Share-seconds** is the measure of vault-contributor participation used to allocate the
+[15% vault-contributor leg](./depositor-rewards.md). It is the integral of a
+contributor's vault **share balance over time** — a purely factual measure of how much,
+and how long, you participated. It has **nothing to do with performance, PnL, or APY.**
+
+> **Vault contributors** is the current name for the former **depositor** reward cohort;
+> the measure below is unchanged.
 
 ## Definition
 
-For each depositor, over an epoch window `[epochStart, epochEnd)`:
+For each contributor, over an epoch window `[epochStart, epochEnd)`:
 
 ```
 shareSeconds = Σ over intervals ( shares_held × seconds_held )
@@ -19,7 +22,7 @@ count.
 
 ## Worked example
 
-A depositor holds:
+A contributor holds:
 
 - 100 shares from `t0` to `t0 + 2 days`
 - 300 shares from `t0 + 2 days` to `t0 + 7 days` (epoch end)
@@ -31,15 +34,15 @@ shareSeconds = 100 × 172,800 + 300 × 432,000
              = 146,880,000  (share-seconds)
 ```
 
-Their allocation of the 30% pool = `theirShareSeconds ÷ totalShareSeconds`, floor
+Their allocation of the 15% pool = `theirShareSeconds ÷ totalShareSeconds`, floor
 divided. Depositing **more** and **earlier** increases share-seconds; withdrawing
 reduces it going forward.
 
 ## Properties
 
 - **Deterministic.** Same events → same share-seconds. Results are ordered by address
-  ascending; floor division is used per depositor.
-- **Zero-participation → no leaf.** A depositor with zero share-seconds gets no
+  ascending; floor division is used per contributor.
+- **Zero-participation → no leaf.** A contributor with zero share-seconds gets no
   allocation.
 - **Exact accounting.** The sum of allocations plus floor-division dust equals the pool
   exactly.
@@ -55,10 +58,11 @@ sustained participation worth proportionally more.
 
 ## Computing it
 
-`@hiss-finance/core` exposes `scoreDepositorShareDays(intervals, epochStart, epochEnd)`
-and `allocateDepositorRewards(...)`. The indexer builds intervals from chain events; the
-allocation is reproducible from those events.
+`@hiss-finance/core` exposes `allocateVaultContributorRewards(...)`, which allocates a
+pool pro-rata by share-seconds over the supplied intervals. The indexer builds intervals
+from chain events; the allocation is reproducible from those events.
 
 ## Related
 
-- [Depositor rewards](./depositor-rewards.md) · [Epochs and vesting](./epochs-and-vesting.md)
+- [Vault-contributor rewards](./depositor-rewards.md) ·
+  [Epochs and vesting](./epochs-and-vesting.md)

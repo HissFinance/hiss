@@ -16,7 +16,7 @@ This repository publishes the PUBLIC interface materials: exact contract ABIs, c
 - [hiss-bankrbot-robinhood](skills/hiss-bankrbot-robinhood/SKILL.md): The Bankrbot → HISS → Robinhood MCP autonomy path — paper-first, ack-gated, audited.
 - [hiss-vault-agent-kit](skills/hiss-vault-agent-kit/SKILL.md): Discover, read, create, and prepare USDG deposits into HISS Creator Vaults; the agent prepares, the wallet or Safe signs.
 - [hiss-staking](skills/hiss-staking/SKILL.md): Stake $HISS for xHISS; exact-amount approvals, 72-hour cooldown, 2-day redeem window, fee-funded 24-hour injections.
-- [hiss-rewards](skills/hiss-rewards/SKILL.md): The 50/30/10/10 verified-HISS-trading-fee split and the 2-of-3 Treasury Safe.
+- [hiss-rewards](skills/hiss-rewards/SKILL.md): The 50/15/15/10/10 verified-HISS-trading-fee split (HISS Reward Method V2, incl. economic burn to the dead address) and the 2-of-3 Treasury Safe.
 - [hiss-stock-tokens](skills/hiss-stock-tokens/SKILL.md): Prepare and reconcile Bankr trades of Robinhood Chain tokenized stocks (Rail B), USDG settlement; tokenized exposure, not direct ownership.
 - [hiss-mcp](skills/hiss-mcp/SKILL.md): Use the local HISS stdio MCP server and its tool families.
 - [hiss-security-boundaries](skills/hiss-security-boundaries/SKILL.md): Custody, credential, consent, and the three-rail Bankr boundaries in depth.
@@ -34,4 +34,4 @@ This repository publishes the PUBLIC interface materials: exact contract ABIs, c
 - VaultFactory `0x278d237c6890a5f7101296a9021ed9D26c821810` · flagship HISS Vault `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` · xHISS vault `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`.
 - $HISS token `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` (18 decimals, verified) · Treasury Safe (2-of-3) `0xF100Fc28dd1721C698046Dbd60408c523b69e36c`.
 - Compiler: solc 0.8.24, optimizer 200 runs, EVM cancun, bytecode_hash none.
-- Reward split of verified HISS trading fees only: 50% xHISS stakers / 30% depositor vesting / 10% provider rewards / 10% Treasury Safe; claimed WETH 100% to the Safe. Undeployed distributor recipients stay null.
+- Reward split of verified HISS trading fees only (HISS Reward Method V2, 50/15/15/10/10): 50% xHISS stakers / 15% vault providers / 15% vault contributors (former depositor cohort; share-seconds unchanged) / 10% Treasury Safe / 10% economic burn to the dead address 0x000000000000000000000000000000000000dEaD (leaves circulation but does NOT reduce HISS.totalSupply); claimed WETH 100% to the Safe. Undeployed distributor recipients stay null. V1 50/30/10/10 is historical. The website + first-party app tools are free (packages open-source).

@@ -9,6 +9,13 @@ guide gets you from clone to first read/prepare.
 > [www.hiss.finance](https://www.hiss.finance). Build against the same primitives
 > here.
 
+> **Free to use.** The HISS website and first-party app tools are free — no
+> subscriptions, no credits, no paywalls — and these packages are open-source
+> (Apache-2.0). You keep signing control; HISS prepares and verifies while your own
+> wallet or Safe signs and submits. Normal network gas and contract-enforced protocol
+> fees still apply (on-chain, not HISS charges). [x402](./x402.md) services are separate
+> machine-to-machine agent rails, distinct from the free first-party surfaces.
+
 ## Prerequisites
 
 - **Node.js 20+** and **pnpm 10+** (the repo pins `pnpm@10.28.1`)
@@ -43,7 +50,8 @@ cd contracts && forge build && forge test
 - **Prepare, not execute** — the SDK builds transactions **you** sign. It never
   broadcasts for you, never holds keys, never takes custody.
 - **$HISS + xHISS** — the protocol token and its single-asset [staking vault](./staking/xhiss.md).
-- **Rewards** — verified $HISS trading fees split [50/30/10/10](./fees/reward-flywheel.md).
+- **Rewards** — verified $HISS trading fees split [50/15/15/10/10](./fees/reward-flywheel.md):
+  xHISS stakers / Vault Providers / Vault Contributors / Treasury / economic burn.
 - **Agents** — an [MCP server](./mcp.md), [x402](./x402.md) endpoints, and
   [Bankr](./bankrbot.md) rails that prepare (never execute) actions.
 
