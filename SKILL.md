@@ -1,8 +1,8 @@
 ---
 name: hiss-finance
-description: Public agent guide to HISS Finance — compilation and verification software for Robinhood Chain. Covers the CoilOps planning pipeline (Coils, risk fuses, receipts), USDG Creator Vaults, xHISS staking and the 50/30/10/10 reward split, the Bankrbot → Robinhood MCP autonomy path, and tokenized stock-token trading — all under one rule set: HISS prepares and verifies; users' wallets, Safes, and their own broker/agent sessions sign and execute. HISS never takes custody, never stores credentials, and never places orders. Not affiliated with Robinhood, Bankr, or Chainlink. Not investment advice.
+description: Public agent guide to HISS Finance — compilation and verification software for Robinhood Chain. Covers the CoilOps planning pipeline (Coils, risk fuses, receipts), USDG Creator Vaults, xHISS staking and the HISS Reward Method V2 50/15/15/10/10 reward split (xHISS stakers / vault providers / vault contributors / treasury / economic burn to the dead address; V1's 50/30/10/10 is historical), the Bankrbot → Robinhood MCP autonomy path, and tokenized stock-token trading — all under one rule set: HISS prepares and verifies; users' wallets, Safes, and their own broker/agent sessions sign and execute. The website and first-party app tools are free (packages open-source); HISS never takes custody, never stores credentials, and never places orders. Not affiliated with Robinhood, Bankr, or Chainlink. Not investment advice.
 tags: [hiss, coilops, usdg-vaults, xhiss, staking, reward-split, bankrbot, robinhood-mcp, stock-tokens, robinhood-chain, agents]
-version: 1
+version: 2
 visibility: public
 metadata:
   clawdbot:
@@ -42,18 +42,18 @@ Base URL for public APIs: `https://www.hiss.finance`.
 
 ## Skill packs (in `skills/`)
 
-| Pack                       | What it covers                                                                                |
-| -------------------------- | --------------------------------------------------------------------------------------------- |
-| `hiss-coilops`             | Coil the market thesis into a versioned, bounded playbook; validate, score, compile, receipt. |
-| `hiss-risk-fuses`          | The typed, binding constraints that bound any compiled artifact.                              |
-| `hiss-receipts`            | Canonical-JSON SHA-256 workflow-integrity proofs and verification.                            |
-| `hiss-bankrbot-robinhood`  | The Bankrbot → HISS → Robinhood MCP autonomy path (paper-first, ack-gated).                   |
-| `hiss-vault-agent-kit`     | Discover, read, create, and prepare deposits into USDG Creator Vaults.                        |
-| `hiss-staking`             | Stake $HISS for xHISS; cooldown, redeem window, fee-funded injections.                        |
-| `hiss-rewards`             | The 50/30/10/10 verified-fee split and the 2-of-3 Treasury Safe.                              |
-| `hiss-stock-tokens`        | Prepare and reconcile Bankr trades of Robinhood Chain tokenized stocks (Rail B).              |
-| `hiss-mcp`                 | Use the local HISS stdio MCP server and its tool families.                                    |
-| `hiss-security-boundaries` | Custody, credential, consent, and rail boundaries — the invariants above, in depth.           |
+| Pack                       | What it covers                                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `hiss-coilops`             | Coil the market thesis into a versioned, bounded playbook; validate, score, compile, receipt.                 |
+| `hiss-risk-fuses`          | The typed, binding constraints that bound any compiled artifact.                                              |
+| `hiss-receipts`            | Canonical-JSON SHA-256 workflow-integrity proofs and verification.                                            |
+| `hiss-bankrbot-robinhood`  | The Bankrbot → HISS → Robinhood MCP autonomy path (paper-first, ack-gated).                                   |
+| `hiss-vault-agent-kit`     | Discover, read, create, and prepare deposits into USDG Creator Vaults.                                        |
+| `hiss-staking`             | Stake $HISS for xHISS; cooldown, redeem window, fee-funded injections.                                        |
+| `hiss-rewards`             | The 50/15/15/10/10 verified-fee split (incl. economic burn to the dead address) and the 2-of-3 Treasury Safe. |
+| `hiss-stock-tokens`        | Prepare and reconcile Bankr trades of Robinhood Chain tokenized stocks (Rail B).                              |
+| `hiss-mcp`                 | Use the local HISS stdio MCP server and its tool families.                                                    |
+| `hiss-security-boundaries` | Custody, credential, consent, and rail boundaries — the invariants above, in depth.                           |
 
 ## Public contract materials (in `contracts/`)
 

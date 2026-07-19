@@ -33,11 +33,15 @@ Legend: **Shipped** · **In progress** · **Planned** · **Exploring**
 
 ## Contracts and rewards — Planned
 
-- **Depositor and provider reward distributors.** Reward-split plans currently carry
-  `null` recipients for the depositor-vesting and provider distributors until those
-  contracts are deployed and verified. When deployed, the SDK and docs will move
-  them from "planned" to "funded/claimable" — with affirmative on-chain evidence,
-  never before.
+- **Vault Contributor and Vault Provider reward distributors.** Under HISS Reward
+  Method V2 (the 50/15/15/10/10 split — 50% xHISS stakers, 15% Vault Providers,
+  15% Vault Contributors, 10% Treasury Safe, 10% economic burn), reward-split plans
+  currently carry `null` recipients for the Vault Contributor vesting and Vault
+  Provider distributors until those contracts are deployed and verified. When
+  deployed, the SDK and docs will move them from "planned" to "funded/claimable" —
+  with affirmative on-chain evidence, never before. The 10% economic-burn leg
+  transfers HISS to the canonical dead address (dead-address balance is the burn
+  metric; `HISS.totalSupply` is not reduced).
 - **Live rebalance routing.** Routing is disabled protocol-wide today; when HISS
   routing infrastructure is live and verified, routing-fee behavior (0.5–2 bps) and
   per-asset readiness gating will be documented end to end.
@@ -58,6 +62,11 @@ Legend: **Shipped** · **In progress** · **Planned** · **Exploring**
 
 - **Prepare, never execute.** The SDK and agents build transactions the user signs.
 - **No custody, no key handling, no brokerage execution.**
+- **Free first-party surfaces.** The HISS website and first-party app tools stay
+  free — no subscriptions, credits, or paywalls — and the packages stay
+  open-source (Apache-2.0). Users retain signing control. Normal network gas and
+  contract-enforced protocol fees may still apply; any `x402` machine-to-machine
+  agent rails are separate from the free first-party surfaces.
 - **Honest status and copy.** No guaranteed yield, APY, passive income, or
   external-audit claims. Unknown is unknown; live requires proof.
 - **Fail closed.** Missing artifacts, low-confidence classification, or missing

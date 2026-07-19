@@ -26,17 +26,17 @@ mechanism. Trading that pool generates protocol fees.
 The launch includes a **15% creator premint** of $HISS that **vests over 2 years with
 a 30-day cliff**. This premint is **always excluded from reward flows** — it is never
 part of any split, never counted as a "trading fee", and never routed to stakers,
-depositors, or providers. Excluding it is enforced upstream and re-checked at the
-split.
+vault contributors, or vault providers. Excluding it is enforced upstream and
+re-checked at the split.
 
 ## HISS-side vs WETH-side
 
 The two accrual currencies are treated differently:
 
-| Side                                                       | Policy                                                                                       |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **$HISS-side** (the creator's share of $HISS trading fees) | The **verified** portion is split by the reward flywheel **50 / 30 / 10 / 10**.              |
-| **WETH-side** (claimed WETH fees)                          | **100% to the Treasury Safe.** Never split, never sent to stakers, depositors, or providers. |
+| Side                                                       | Policy                                                                                         |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **$HISS-side** (the creator's share of $HISS trading fees) | The **verified** portion is split by the reward flywheel **50 / 15 / 15 / 10 / 10**.           |
+| **WETH-side** (claimed WETH fees)                          | **100% to the Treasury Safe.** Never split, never sent to stakers, contributors, or providers. |
 
 ## "Verified" is doing real work
 
@@ -60,7 +60,7 @@ unclassified deltas. If the classifier is not confident, nothing is split.
    event).
 3. **Classify.** Each claim is classified; only the high-confidence, positive $HISS
    trading-fee portion is _eligible_.
-4. **Plan.** The eligible $HISS is split 50/30/10/10 into a **plan** (data, with a
+4. **Plan.** The eligible $HISS is split 50/15/15/10/10 into a **plan** (data, with a
    plan hash). WETH is planned 100% to the Treasury Safe.
 5. **Fund.** Funding is owner-gated (2-of-3 Treasury Safe) and requires the exact plan
    hash — **planned ≠ funded**.
@@ -71,10 +71,11 @@ unclassified deltas. If the classifier is not confident, nothing is split.
 
 ```
 Verified $HISS trading fee (eligible amount only)
-  ├─ 50%  → xHISS stakers        (ERC-4626 reward injection)
-  ├─ 30%  → eligible depositors  (share-seconds, 30-day vesting)
-  ├─ 10%  → eligible providers   (facts-only scoring, 90-day vesting)
-  └─ 10%  → Treasury Safe        (absorbs floor-division dust; legs sum EXACTLY)
+  ├─ 50%  → xHISS stakers          (ERC-4626 reward injection)
+  ├─ 15%  → vault providers        (facts-only scoring, 90-day vesting)
+  ├─ 15%  → vault contributors     (share-seconds, 30-day vesting)
+  ├─ 10%  → Treasury Safe          (absorbs floor-division dust; legs sum EXACTLY)
+  └─ 10%  → economic burn          (dead address 0x…dEaD; totalSupply NOT reduced)
 
 Claimed WETH → 100% Treasury Safe (never split)
 ```
@@ -84,11 +85,11 @@ and the [rewards guide](../rewards/index.md).
 
 ## Caveats
 
-- **Distributor deployment.** The depositor-vesting distributor and the provider
-  distributor are **not deployed yet**; in split plans their recipients are `null` and
-  **nothing moves against a null recipient**. Do not describe those legs as live,
-  funded, or claimable. The xHISS staking vault and the Treasury Safe **are**
-  deployed.
+- **Distributor deployment.** The vault-contributor vesting distributor and the
+  vault-provider distributor are **not deployed yet**; in split plans their recipients
+  are `null` and **nothing moves against a null recipient**. Do not describe those legs
+  as live, funded, or claimable. The xHISS staking vault, the Treasury Safe, and the
+  economic-burn dead address **are** live.
 - **Not a forecast.** Historical or hypothetical fee figures are **not forecasts and
   not performance claims**. Fee income depends on trading activity that HISS does not
   control.

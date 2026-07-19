@@ -45,11 +45,14 @@ Example client config (stdio):
 - `hiss_get_vault_holdings` — a vault's current holdings from a live chain read.
 - `hiss_get_vault_performance` — historical performance (not a forecast, not a performance claim).
 - `hiss_get_staking_status` — xHISS staking status (not a performance claim).
-- `hiss_get_reward_status` — reward-split status. planned ≠ funded ≠ claimable.
+- `hiss_get_reward_status` — reward-split status for the 50/15/15/10/10 split (xHISS
+  stakers / Vault Providers / Vault Contributors / Treasury / economic burn to the dead
+  address). planned ≠ funded ≠ claimable.
 - `hiss_get_receipt` — read a HISS receipt by id.
 - `hiss_verify_receipt` — verify a receipt's integrity hash locally (on-chain settlement is separate).
 - `hiss_get_supported_assets` — source-verified assets vaults may hold.
-- `hiss_get_fee_schedule` — the current HISS fee schedule (vault fees and reward-split legs).
+- `hiss_get_fee_schedule` — the current HISS fee schedule (vault fees and the five
+  reward-split legs).
 
 ### Prepare tools (10)
 

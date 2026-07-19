@@ -34,19 +34,25 @@ Worked examples: [Vault fees](../fees/vault-fees.md).
 | Creator premint          | **15%**, 2-year vest, 30-day cliff | **always excluded from reward flows** |
 | Claimed WETH             | **100% → Treasury Safe**           | policy (never split)                  |
 
-## Reward split — verified $HISS trading fees (50/30/10/10)
+## Reward split — verified $HISS trading fees (50/15/15/10/10)
 
-| Leg               | Share (bps)     | Recipient                                  | Deployed?       |
-| ----------------- | --------------- | ------------------------------------------ | --------------- |
-| xHISS stakers     | **50%** (5,000) | xHISS vault `0x6998…67Be`                  | Yes             |
-| Depositor vesting | **30%** (3,000) | depositor distributor                      | **No** → `null` |
-| Provider rewards  | **10%** (1,000) | provider distributor                       | **No** → `null` |
-| Treasury          | **10%** (1,000) | Treasury Safe `0xF100…e36c` (absorbs dust) | Yes             |
+HISS Reward Method V2. **Vault contributors** is the current name for the former
+**depositor** cohort; **V1** (50/30/10/10, no burn) is historical.
+
+| Leg                | Share (bps)     | Recipient                                      | Deployed?       |
+| ------------------ | --------------- | ---------------------------------------------- | --------------- |
+| xHISS stakers      | **50%** (5,000) | xHISS vault `0x6998…67Be`                      | Yes             |
+| Vault providers    | **15%** (1,500) | vault-provider distributor                     | **No** → `null` |
+| Vault contributors | **15%** (1,500) | vault-contributor distributor                  | **No** → `null` |
+| Treasury           | **10%** (1,000) | Treasury Safe `0xF100…e36c` (absorbs dust)     | Yes             |
+| Economic burn      | **10%** (1,000) | dead address `0x…dEaD` (totalSupply unchanged) | Yes             |
 
 Provider scoring components: **40% equal / 30% external-TVL-days / 20% retention /
-10% operational**, with a **25%** per-group dominance cap. Vesting: **depositor 30
-days**, **provider 90 days**. Lifecycle: weekly provisional → monthly final → **7-day
-challenge** → funded → vesting → claimable.
+10% operational**, with a **25%** per-group dominance cap. Vesting: **vault contributor
+30 days**, **vault provider 90 days**. Lifecycle: weekly provisional → monthly final →
+**7-day challenge** → funded → vesting → claimable. The economic-burn leg is an
+ERC-20 transfer to the dead address and does not reduce `HISS.totalSupply` (burn metric
+= dead-address balance).
 
 Full mechanism: [Reward flywheel](../fees/reward-flywheel.md) and
 [Rewards](../rewards/index.md).

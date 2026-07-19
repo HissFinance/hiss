@@ -54,13 +54,17 @@ const str = (v: bigint) => v.toString();
 /** Descriptive reward-split model (constants, not a chain read). */
 export interface RewardModel {
   version: string;
-  /** 50/30/10/10 split of verified $HISS trading fees. */
+  /** 50/15/15/10/10 split of verified $HISS trading fees. */
   legs: {
     xhissStakersBps: number;
-    depositorVestingBps: number;
-    providerRewardsBps: number;
+    vaultProvidersBps: number;
+    vaultContributorsBps: number;
     treasuryBps: number;
+    /** Economic burn to the canonical dead address; does not reduce totalSupply. */
+    burnBps: number;
   };
+  /** Canonical economic-burn sink (dead address). */
+  burnAddress: string;
   wethPolicy: string;
   note: string;
 }
@@ -339,17 +343,26 @@ export class HissClient {
   // -------------------------------------------------------------------------
 
   /**
-   * The reward-split model (50/30/10/10 of verified $HISS trading fees).
-   * Constants only. Whether any leg is funded or claimable is a separate,
-   * gated, chain-verified fact — planned is not funded is not claimable.
+   * The reward-split model (HISS_REWARD_METHOD_V2, 50/15/15/10/10 of verified
+   * $HISS trading fees). Constants only. Whether any leg is funded or claimable
+   * is a separate, gated, chain-verified fact — planned is not funded is not
+   * claimable. The burn leg is an economic burn to the canonical dead address
+   * and does NOT reduce HISS.totalSupply.
    */
   getRewardMethod(): RewardModel {
     return {
-      version: "hiss-reward-split-v1",
-      legs: { xhissStakersBps: 5000, depositorVestingBps: 3000, providerRewardsBps: 1000, treasuryBps: 1000 },
+      version: "hiss-reward-split-v2",
+      legs: {
+        xhissStakersBps: 5000,
+        vaultProvidersBps: 1500,
+        vaultContributorsBps: 1500,
+        treasuryBps: 1000,
+        burnBps: 1000,
+      },
+      burnAddress: "0x000000000000000000000000000000000000dEaD",
       wethPolicy:
         "100% of claimed WETH routes to the Treasury Safe — never split, never to stakers or providers.",
-      note: "These are split constants, not a promise of yield. Some recipient distributors may be undeployed (null) — nothing moves against a null recipient. planned != funded != claimable.",
+      note: "These are split constants, not a promise of yield. 'Vault contributors' is the current name for the former depositor cohort. The burn leg is an economic burn to the dead address and does not reduce totalSupply. Some recipient distributors may be undeployed (null) — nothing moves against a null recipient. planned != funded != claimable.",
     };
   }
 

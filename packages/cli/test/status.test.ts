@@ -22,7 +22,7 @@ function mockClient(overrides: Partial<HissClient> = {}): HissClient {
     getVaultPerformance: notImplemented,
     getStakingStatus: notImplemented,
     getRewardStatus: notImplemented,
-    getDepositorReward: notImplemented,
+    getVaultContributorReward: notImplemented,
     getProviderReward: notImplemented,
     getReceipt: notImplemented,
     getSupportedAssets: notImplemented,

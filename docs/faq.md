@@ -25,6 +25,16 @@ on-chain contracts. Protocol actions require the 2-of-3 Treasury Safe. See
 Not yet — packages are **not published to npm**. Build from source:
 `git clone` → `pnpm install` → `pnpm build`. See [Getting started](./getting-started.md).
 
+### Does it cost anything to use?
+
+**No subscription.** The HISS **website and first-party app tools are free** — no
+subscriptions, no credits, no paywalls — and the packages are **open-source (Apache-2.0)**.
+You keep signing control: HISS prepares and verifies; your own wallet or Safe signs and
+submits. **Normal network gas and contract-enforced protocol fees still apply** (these are
+on-chain, not HISS charges). Separately, **x402 services are machine-to-machine (agent)
+rails** where configured — distinct from the free first-party website/app. See
+[x402](./x402.md).
+
 ### What is a vault?
 
 An ERC-4626 basket denominated in **USDG (6dp)**. A creator declares a target-weight
@@ -52,15 +62,19 @@ then a 2-day redeem window; **exits are never pausable**. See [xHISS](./staking/
 
 ### How does the reward flywheel work?
 
-Verified $HISS trading fees split **50/30/10/10** — xHISS stakers / depositors /
-providers / Treasury. Claimed WETH is 100% to the Treasury. **Planned ≠ funded ≠ vesting
-≠ claimable.** See [Reward flywheel](./fees/reward-flywheel.md).
+Verified $HISS trading fees split **50/15/15/10/10** — xHISS stakers / Vault Providers /
+Vault Contributors / Treasury / economic burn. The 10% economic-burn leg transfers HISS
+to the canonical dead address (`0x000000000000000000000000000000000000dEaD`): it leaves
+circulation but does **not** reduce `HISS.totalSupply`. Claimed WETH is 100% to the
+Treasury. **Planned ≠ funded ≠ vesting ≠ claimable.** (V1 was a four-leg 50/30/10/10 split
+with no burn — historical.) See [Reward flywheel](./fees/reward-flywheel.md).
 
-### Are depositor and provider rewards live?
+### Are Vault Contributor and Vault Provider rewards live?
 
 **No.** Those distributors are **not deployed yet**; in split plans their recipients are
-`null` and **nothing moves against them**. The xHISS staking leg and the Treasury leg are
-deployed. See [Rewards](./rewards/index.md).
+`null` and **nothing moves against them**. The xHISS staking leg, the Treasury leg, and
+the economic-burn leg are active. ("Vault Contributors" is the current name for the former
+depositor reward cohort.) See [Rewards](./rewards/index.md).
 
 ### Are Stock Tokens actual stock?
 

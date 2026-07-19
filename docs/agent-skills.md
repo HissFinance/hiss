@@ -22,18 +22,18 @@ supporting references) describing:
 Ten packs ship under [`skills/`](../skills). The filesystem is always the source of
 truth — `npx skills add HissFinance/hiss --list` prints the live set.
 
-| Skill                                                                   | What it helps an agent do                                                                |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [hiss-vault-agent-kit](../skills/hiss-vault-agent-kit/SKILL.md)         | Discover/read vaults, create a candidate, prepare deposits/withdrawals, verify receipts. |
-| [hiss-coilops](../skills/hiss-coilops/SKILL.md)                         | Turn a thesis into a bounded, versioned Coil — generate, validate, score, compile.       |
-| [hiss-staking](../skills/hiss-staking/SKILL.md)                         | Read xHISS status and prepare stake / cooldown / redeem transactions.                    |
-| [hiss-rewards](../skills/hiss-rewards/SKILL.md)                         | Explain and verify the 50/30/10/10 split; planned ≠ funded ≠ claimable.                  |
-| [hiss-receipts](../skills/hiss-receipts/SKILL.md)                       | Write and verify canonical-JSON receipts; reject forged execution claims.                |
-| [hiss-risk-fuses](../skills/hiss-risk-fuses/SKILL.md)                   | Audit the binding risk fuses and explain compile failures.                               |
-| [hiss-stock-tokens](../skills/hiss-stock-tokens/SKILL.md)               | Prepare/validate/reconcile Bankr trades of the 15 canonical stock tokens.                |
-| [hiss-bankrbot-robinhood](../skills/hiss-bankrbot-robinhood/SKILL.md)   | Compile a Coil for the Bankrbot → Robinhood MCP path (paper-first, gated).               |
-| [hiss-mcp](../skills/hiss-mcp/SKILL.md)                                 | Drive the HISS tools over the local MCP server rather than raw HTTP.                     |
-| [hiss-security-boundaries](../skills/hiss-security-boundaries/SKILL.md) | The trust/custody/consent guardrail the other packs are checked against.                 |
+| Skill                                                                   | What it helps an agent do                                                                        |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [hiss-vault-agent-kit](../skills/hiss-vault-agent-kit/SKILL.md)         | Discover/read vaults, create a candidate, prepare deposits/withdrawals, verify receipts.         |
+| [hiss-coilops](../skills/hiss-coilops/SKILL.md)                         | Turn a thesis into a bounded, versioned Coil — generate, validate, score, compile.               |
+| [hiss-staking](../skills/hiss-staking/SKILL.md)                         | Read xHISS status and prepare stake / cooldown / redeem transactions.                            |
+| [hiss-rewards](../skills/hiss-rewards/SKILL.md)                         | Explain and verify the 50/15/15/10/10 split (incl. economic burn); planned ≠ funded ≠ claimable. |
+| [hiss-receipts](../skills/hiss-receipts/SKILL.md)                       | Write and verify canonical-JSON receipts; reject forged execution claims.                        |
+| [hiss-risk-fuses](../skills/hiss-risk-fuses/SKILL.md)                   | Audit the binding risk fuses and explain compile failures.                                       |
+| [hiss-stock-tokens](../skills/hiss-stock-tokens/SKILL.md)               | Prepare/validate/reconcile Bankr trades of the 15 canonical stock tokens.                        |
+| [hiss-bankrbot-robinhood](../skills/hiss-bankrbot-robinhood/SKILL.md)   | Compile a Coil for the Bankrbot → Robinhood MCP path (paper-first, gated).                       |
+| [hiss-mcp](../skills/hiss-mcp/SKILL.md)                                 | Drive the HISS tools over the local MCP server rather than raw HTTP.                             |
+| [hiss-security-boundaries](../skills/hiss-security-boundaries/SKILL.md) | The trust/custody/consent guardrail the other packs are checked against.                         |
 
 ## Installing packs
 

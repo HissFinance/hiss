@@ -1,30 +1,39 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * HISS_REWARD_METHOD_V1 — the public methodology object plus pure, facts-only
- * allocation formulas for the depositor and provider reward legs.
+ * HISS_REWARD_METHOD_V2 — the public methodology object plus pure, facts-only
+ * allocation formulas for the vault-contributor and vault-provider reward legs.
+ *
+ * V2 splits verified $HISS trading fees 50/15/15/10/10 (xHISS stakers / vault
+ * providers / vault contributors / treasury / economic burn). "Vault
+ * contributors" is the current name for the former depositor cohort; the
+ * allocation methodology (share-seconds) is unchanged. V1 (50/30/10/10, no
+ * burn) is historical.
  *
  * NO performance inputs anywhere: no PnL, APY, return, rank, or volatility.
- * Depositor rewards are share-seconds (deposit participation). Provider
- * rewards are quality-weighted (40/30/20/10) and dominance-capped (25%).
- * Depositor rewards vest linearly over 30 days; provider rewards over 90 days.
+ * Vault-contributor rewards are share-seconds (deposit participation). Vault-
+ * provider rewards are quality-weighted (40/30/20/10) and dominance-capped
+ * (25%). Contributor rewards vest linearly over 30 days; provider rewards over
+ * 90 days. The economic-burn leg is transferred to the canonical dead address
+ * (does NOT reduce totalSupply).
  *
  * All timestamps and hashers are injected — the module performs no I/O.
  */
 
 import {
-  DEPOSITOR_VESTING_BPS,
-  PROVIDER_REWARDS_BPS,
+  VAULT_CONTRIBUTOR_BPS,
+  VAULT_PROVIDER_BPS,
   TREASURY_BPS,
+  BURN_BPS,
   XHISS_STAKER_BPS,
   splitEligibleHiss,
 } from "./split.js";
 import { proRata, toBase, waterfillCap } from "./math.js";
 
-export const HISS_REWARD_METHOD_VERSION = "HISS_REWARD_METHOD_V1";
+export const HISS_REWARD_METHOD_VERSION = "HISS_REWARD_METHOD_V2";
 
-/** Depositor leg: 30-day linear vest (seconds). */
-export const DEPOSITOR_VEST_SECONDS = 30 * 24 * 60 * 60;
-/** Provider leg: 90-day linear vest (seconds). */
+/** Vault-contributor leg: 30-day linear vest (seconds). */
+export const VAULT_CONTRIBUTOR_VEST_SECONDS = 30 * 24 * 60 * 60;
+/** Vault-provider leg: 90-day linear vest (seconds). */
 export const PROVIDER_VEST_SECONDS = 90 * 24 * 60 * 60;
 
 /** Provider component sub-pool split (bps of the provider pool; sum 10000). */
@@ -39,30 +48,36 @@ export const PROVIDER_COMPONENT_BPS = Object.freeze({
 export const PROVIDER_DOMINANCE_CAP_BPS = 2500;
 
 /** The frozen public methodology bundle. */
-export const HISS_REWARD_METHOD_V1 = Object.freeze({
+export const HISS_REWARD_METHOD_V2 = Object.freeze({
   version: HISS_REWARD_METHOD_VERSION,
   split: Object.freeze({
     xHissStakerBps: XHISS_STAKER_BPS,
-    depositorBps: DEPOSITOR_VESTING_BPS,
-    providerBps: PROVIDER_REWARDS_BPS,
+    vaultProviderBps: VAULT_PROVIDER_BPS,
+    vaultContributorBps: VAULT_CONTRIBUTOR_BPS,
     treasuryBps: TREASURY_BPS,
+    burnBps: BURN_BPS,
   }),
-  depositor: Object.freeze({
+  vaultContributor: Object.freeze({
     basis: "share_seconds",
-    vestSeconds: DEPOSITOR_VEST_SECONDS,
+    vestSeconds: VAULT_CONTRIBUTOR_VEST_SECONDS,
     dustPolicy: "unallocated_rolls_to_treasury_after_deadline",
   }),
-  provider: Object.freeze({
+  vaultProvider: Object.freeze({
     components: PROVIDER_COMPONENT_BPS,
     dominanceCapBps: PROVIDER_DOMINANCE_CAP_BPS,
     vestSeconds: PROVIDER_VEST_SECONDS,
     dustPolicy: "rollover_to_next_epoch",
     performanceInputsForbidden: true,
   }),
+  burn: Object.freeze({
+    kind: "economic_burn",
+    sink: "0x000000000000000000000000000000000000dEaD",
+    reducesTotalSupply: false,
+  }),
   authorization: Object.freeze({ finalizationRequiresSafe: true, safeThreshold: 2 }),
 } as const);
 
-export type HissRewardMethodV1 = typeof HISS_REWARD_METHOD_V1;
+export type HissRewardMethodV2 = typeof HISS_REWARD_METHOD_V2;
 
 // ---------------------------------------------------------------------------
 // Pool breakdown
@@ -71,30 +86,32 @@ export type HissRewardMethodV1 = typeof HISS_REWARD_METHOD_V1;
 export type EpochPoolBreakdown = {
   totalEligibleHiss: string;
   xHissStakerPool: string;
-  depositorPool: string;
-  providerPool: string;
+  vaultProviderPool: string;
+  vaultContributorPool: string;
   treasuryPool: string;
+  burnPool: string;
 };
 
-/** Split an epoch's eligible HISS into the four pools (canonical split math). */
+/** Split an epoch's eligible HISS into the five pools (canonical split math). */
 export function epochPoolBreakdown(totalEligibleHiss: string): EpochPoolBreakdown {
   const s = splitEligibleHiss(totalEligibleHiss);
   return {
     totalEligibleHiss: s.totalEligibleHiss,
     xHissStakerPool: s.xHissStakerAmount,
-    depositorPool: s.depositorVestingAmount,
-    providerPool: s.providerRewardsAmount,
+    vaultProviderPool: s.vaultProviderAmount,
+    vaultContributorPool: s.vaultContributorAmount,
     treasuryPool: s.treasuryAmount,
+    burnPool: s.burnAmount,
   };
 }
 
 // ---------------------------------------------------------------------------
-// Depositor rewards — share-seconds
+// Vault-contributor rewards — share-seconds
 // ---------------------------------------------------------------------------
 
-/** One constant-balance interval of vault shares held by a depositor. */
-export type DepositorShareInterval = {
-  depositor: string;
+/** One constant-balance interval of vault shares held by a contributor. */
+export type VaultContributorShareInterval = {
+  contributor: string;
   /** Vault shares held over the interval, base units (decimal string). */
   shares: string;
   /** Interval start (unix seconds, inclusive). */
@@ -103,52 +120,53 @@ export type DepositorShareInterval = {
   endTime: number;
 };
 
-export type DepositorAllocation = {
-  depositor: string;
+export type VaultContributorAllocation = {
+  contributor: string;
   amount: string;
   shareSeconds: string;
   vestStart: number;
   vestEnd: number;
 };
 
-export type DepositorAllocationResult = {
+export type VaultContributorAllocationResult = {
   version: typeof HISS_REWARD_METHOD_VERSION;
   poolAmount: string;
   totalShareSeconds: string;
-  allocations: DepositorAllocation[];
+  allocations: VaultContributorAllocation[];
   /** Floor-division remainder, unallocated. */
   dust: string;
 };
 
 /**
- * Allocate the depositor pool pro-rata by share-seconds (Σ shares × seconds
- * held) over the epoch. Deterministic ordering (address ascending); floor
- * division per depositor; the remainder is returned as dust (unallocated).
+ * Allocate the vault-contributor pool pro-rata by share-seconds (Σ shares ×
+ * seconds held) over the epoch. Deterministic ordering (address ascending);
+ * floor division per contributor; the remainder is returned as dust
+ * (unallocated).
  */
-export function allocateDepositorRewards(input: {
+export function allocateVaultContributorRewards(input: {
   poolAmount: string;
-  intervals: DepositorShareInterval[];
+  intervals: VaultContributorShareInterval[];
   vestStart: number;
-}): DepositorAllocationResult {
+}): VaultContributorAllocationResult {
   const pool = toBase("poolAmount", input.poolAmount);
 
-  const byDepositor = new Map<string, bigint>();
+  const byContributor = new Map<string, bigint>();
   for (const iv of input.intervals) {
     if (iv.endTime <= iv.startTime) continue;
     const shares = toBase("shares", iv.shares);
     const seconds = BigInt(iv.endTime - iv.startTime);
-    const key = iv.depositor.toLowerCase();
-    byDepositor.set(key, (byDepositor.get(key) ?? 0n) + shares * seconds);
+    const key = iv.contributor.toLowerCase();
+    byContributor.set(key, (byContributor.get(key) ?? 0n) + shares * seconds);
   }
 
-  const entries = [...byDepositor.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  const entries = [...byContributor.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
   const weights = entries.map(([, ss]) => ss);
   const { amounts, dust } = proRata(pool, weights);
   const totalShareSeconds = weights.reduce((sum, w) => sum + w, 0n);
-  const vestEnd = input.vestStart + DEPOSITOR_VEST_SECONDS;
+  const vestEnd = input.vestStart + VAULT_CONTRIBUTOR_VEST_SECONDS;
 
-  const allocations: DepositorAllocation[] = entries.map(([depositor, ss], i) => ({
-    depositor,
+  const allocations: VaultContributorAllocation[] = entries.map(([contributor, ss], i) => ({
+    contributor,
     amount: amounts[i]!.toString(),
     shareSeconds: ss.toString(),
     vestStart: input.vestStart,
@@ -165,7 +183,7 @@ export function allocateDepositorRewards(input: {
 }
 
 // ---------------------------------------------------------------------------
-// Provider rewards — 40/30/20/10 quality score, 25% dominance cap
+// Vault-provider rewards — 40/30/20/10 quality score, 25% dominance cap
 // ---------------------------------------------------------------------------
 
 /** Facts-only provider group input (exclusions already applied upstream). */
@@ -198,7 +216,7 @@ export type ProviderAllocationResult = {
 };
 
 /**
- * Allocate the provider pool by the 40/30/20/10 quality score (equal /
+ * Allocate the vault-provider pool by the 40/30/20/10 quality score (equal /
  * external-TVL-days / retention / operational), then apply the 25% dominance
  * cap with water-fill redistribution. Ineligible groups get zero. No
  * performance inputs exist. Overflow that cannot be placed rolls to the next
@@ -267,7 +285,7 @@ export function allocateProviderRewards(input: {
 }
 
 // ---------------------------------------------------------------------------
-// Linear vesting (mirrors the on-chain distributor for the depositor leg)
+// Linear vesting (mirrors the on-chain distributor for the contributor leg)
 // ---------------------------------------------------------------------------
 
 /**

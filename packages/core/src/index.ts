@@ -4,7 +4,7 @@
  *
  * Chain config, the canonical contract + asset registries, address and
  * symbol-space helpers, manifest/receipt/plan schemas, the fee model, and the
- * public HISS_REWARD_METHOD_V1 formulas. No database clients, no environment
+ * public HISS_REWARD_METHOD_V2 formulas. No database clients, no environment
  * loaders, no secrets, no admin actions.
  */
 

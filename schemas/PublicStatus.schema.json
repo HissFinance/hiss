@@ -42,6 +42,6 @@
       "evidence": "fresh_chain_read",
       "observedAt": "2026-01-01T00:00:00.000Z"
     },
-    { "subject": "depositorVestingDistributor", "level": "unknown", "evidence": "none" }
+    { "subject": "vaultContributorVestingDistributor", "level": "unknown", "evidence": "none" }
   ]
 }

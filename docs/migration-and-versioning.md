@@ -29,15 +29,18 @@ Several artifacts carry their own explicit versions so consumers can pin behavio
 | Artifact                          | Version identifier                                                        |
 | --------------------------------- | ------------------------------------------------------------------------- |
 | Vault manifest schema             | `vault-manifest-1.0.0`                                                    |
-| Reward split                      | `hiss-reward-split-v1`                                                    |
-| Reward methodology                | `HISS_REWARD_METHOD_V1`                                                   |
-| Depositor scoring                 | `hiss-depositor-scoring-v1`                                               |
+| Reward split                      | `hiss-reward-split-v2` (was `hiss-reward-split-v1`, historical)           |
+| Reward methodology                | `HISS_REWARD_METHOD_V2` (was `HISS_REWARD_METHOD_V1`, historical)         |
+| Vault-contributor scoring         | `hiss-depositor-scoring-v1` (share-seconds; methodology unchanged)        |
 | Provider rewards                  | `hiss-provider-rewards-v1`                                                |
 | Vesting                           | `hiss-reward-vesting-v1`                                                  |
 | Weekly checkpoint / monthly epoch | `hiss-reward-weekly-checkpoint-v1` / `hiss-reward-monthly-epoch-score-v1` |
 
 A change to a methodology or schema bumps its version; older artifacts remain
-interpretable under the version they declare.
+interpretable under the version they declare. The scoring/vesting/epoch identifiers
+keep their `-v1` strings because their math is **unchanged** by the V2 split — V2
+changed the leg proportions and added the economic-burn leg, not the per-cohort
+scoring. See [Reward Method V2](#reward-method-v2-migration).
 
 ## Contracts and addresses
 
@@ -53,11 +56,55 @@ interpretable under the version they declare.
 
 ## Reward methodology changes
 
-The reward methodology is a **frozen, versioned bundle** (`HISS_REWARD_METHOD_V1`). If
-parameters or curves change, a new version is introduced; existing epochs remain scored
-under the version they were finalized with. The lifecycle (weekly → monthly → 7-day
-challenge → funded → vesting → claimable) is part of the versioned method. See
-[Epochs and vesting](./rewards/epochs-and-vesting.md).
+The reward methodology is a **frozen, versioned bundle** — currently
+`HISS_REWARD_METHOD_V2`. If parameters or curves change, a new version is introduced;
+existing epochs remain scored under the version they were finalized with. The lifecycle
+(weekly → monthly → 7-day challenge → funded → vesting → claimable) is part of the
+versioned method. See [Epochs and vesting](./rewards/epochs-and-vesting.md).
+
+## Reward Method V2 migration
+
+**V1 (`HISS_REWARD_METHOD_V1`) is historical.** It split verified $HISS trading fees
+four ways — **50/30/10/10** (xHISS stakers / depositors / providers / Treasury), with no
+burn leg. Do not present 50/30/10/10 as the current split.
+
+**V2 (`HISS_REWARD_METHOD_V2`, `hiss-reward-split-v2`) is current.** It splits verified
+$HISS trading fees five ways — **50/15/15/10/10**:
+
+| Leg                    | Share           | Recipient                                                           |
+| ---------------------- | --------------- | ------------------------------------------------------------------- |
+| xHISS stakers          | 50% (5,000 bps) | xHISS staking vault (`injectRewards`, 24h drip)                     |
+| **Vault Providers**    | 15% (1,500 bps) | vault-provider rewards distributor (not deployed → `null`)          |
+| **Vault Contributors** | 15% (1,500 bps) | vault-contributor vesting distributor (not deployed → `null`)       |
+| Treasury Safe          | 10% (1,000 bps) | 2-of-3 Treasury Safe (absorbs floor-division dust)                  |
+| **Economic burn**      | 10% (1,000 bps) | canonical dead address `0x000000000000000000000000000000000000dEaD` |
+
+The five legs sum to exactly 10,000 bps. What changed from V1: the former 30% depositor
+leg was split into **Vault Providers (15%)** and **Vault Contributors (15%)**, and a new
+**10% economic-burn** leg was added (the Treasury leg stays 10%). "Vault Contributors" is
+purely a **rename** of the former depositor reward cohort — the share-seconds methodology
+(pro-rata by Σ shares × seconds held, 30-day linear vest, no PnL/APY inputs) is unchanged.
+Vault _depositors_ (the deposit action) keep that name; only the reward-cohort label moved.
+
+### Economic burn is not a supply burn
+
+The burn leg is an **economic burn**: HISS is transferred to the canonical dead address
+(`0x…dEaD`), so it leaves circulation (nobody holds the key), but **`HISS.totalSupply` is
+NOT reduced** — it is not an ERC-20 supply burn. The "amount burned" is measured as the
+live dead-address balance (`HISS.balanceOf(0x…dEaD)`), always described as economic burn.
+
+### Retroactive economic-burn migration
+
+The V2 upgrade included a **retroactive** economic-burn migration. Cumulative economic
+burn to the dead address is **219,158,426,524,474,729,694,326,935 base units**
+(~**219.16M HISS**, 18 decimals). This dead-address transfer leaves `HISS.totalSupply`
+**unchanged**.
+
+The retroactive migration is modelled as a **deployer-exclusion + owner-replenishment
+pair**: deployer-held / excluded HISS is excluded from reward accounting, and an
+owner-authorized replenishment funds the corresponding economic-burn transfer. The pair
+**nets out**, so accounting stays exact. (Described conceptually; verify any specific
+transfer with a live chain read.)
 
 ## Deprecation policy
 

@@ -24,6 +24,13 @@ HISS is safety-critical financial software. A few principles are non-negotiable:
    by environment-variable **name** only. Never commit a value.
 5. **On-chain state is the source of truth.** Do not hardcode balances or "live"
    status; read the chain.
+6. **The website and first-party app are free.** No subscriptions, no credits, no
+   paywalls, and these packages are open-source (Apache-2.0). Do not add pricing,
+   subscription, or paywall copy for the first-party surfaces. Users keep signing
+   control (their own wallet or Safe signs and submits); normal network gas and
+   contract-enforced protocol fees may still apply, and x402 services — where
+   configured — are separate machine-to-machine agent rails, not a website
+   subscription.
 
 ## Getting set up
 

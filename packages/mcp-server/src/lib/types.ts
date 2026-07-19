@@ -37,7 +37,7 @@ export interface HissClient {
   getVaultPerformance(vault: string): Promise<JsonRecord>;
   getStakingStatus(): Promise<JsonRecord>;
   getRewardStatus(): Promise<JsonRecord>;
-  getDepositorReward(address: string): Promise<JsonRecord>;
+  getVaultContributorReward(address: string): Promise<JsonRecord>;
   getProviderReward(groupId: string): Promise<JsonRecord>;
   getReceipt(id: string): Promise<JsonRecord>;
   getSupportedAssets(): Promise<JsonRecord[]>;

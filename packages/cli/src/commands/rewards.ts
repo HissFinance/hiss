@@ -19,13 +19,13 @@ export async function rewardsStatusCommand(client: HissClient): Promise<CommandR
   };
 }
 
-export async function rewardsDepositorCommand(client: HissClient, address: string): Promise<CommandResult> {
-  const record = await client.getDepositorReward(address);
+export async function rewardsContributorCommand(client: HissClient, address: string): Promise<CommandResult> {
+  const record = await client.getVaultContributorReward(address);
   return {
-    summary: `Depositor reward status read for ${address}.`,
+    summary: `Vault-contributor reward status read for ${address}.`,
     data: record,
     detail: [
-      "Depositor vesting distributor recipient may be null (not deployed) — nothing is claimable against null.",
+      "Vault contributors is the current name for the former depositor cohort. The vault-contributor vesting distributor recipient may be null (not deployed) — nothing is claimable against null.",
       REWARD_NOTE,
     ],
   };

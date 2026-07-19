@@ -51,16 +51,23 @@ constants are **immutable**; **exits are never pausable**. See
 
 ### Reward distributors
 
-- **VaultDepositorRewardsDistributor / …VestingDistributor** — the 30% depositor leg,
-  merkle-claimable with on-chain 30-day linear vesting.
-- **VaultProviderRewardsDistributor / …VestingDistributor** — the 10% provider leg,
-  merkle-claimable (90-day vesting is modelled/metadata pending the on-chain vesting
-  delta).
+- **VaultDepositorRewardsDistributor / …VestingDistributor** — the 15%
+  **Vault Contributors** leg (the reward cohort formerly named "depositor"; the
+  on-chain contract name is unchanged), merkle-claimable with on-chain 30-day linear
+  vesting.
+- **VaultProviderRewardsDistributor / …VestingDistributor** — the 15% **Vault
+  Providers** leg, merkle-claimable (90-day vesting is modelled/metadata pending the
+  on-chain vesting delta).
 
-> Reward-split plans carry `null` recipients for the depositor and provider
-> distributors until those are deployed and verified. **Nothing moves against a
-> `null` recipient.** Confirm deployment with a live no-bytecode/bytecode read before
-> describing a distributor as live.
+The remaining legs of the 50/15/15/10/10 split are the 50% xHISS staker injection,
+the 10% Treasury Safe leg, and the 10% **economic burn** to the canonical dead
+address `0x000000000000000000000000000000000000dEaD` (leaves circulation; does **not**
+reduce `HISS.totalSupply`).
+
+> Reward-split plans carry `null` recipients for the Vault Contributors and Vault
+> Providers distributors until those are deployed and verified. **Nothing moves
+> against a `null` recipient.** Confirm deployment with a live no-bytecode/bytecode
+> read before describing a distributor as live.
 
 ### Registries and adapters
 

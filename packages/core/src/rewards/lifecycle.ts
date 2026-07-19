@@ -15,7 +15,7 @@ export type RewardEpochState =
   | "vesting" // linear vesting underway; some portion may be claimable
   | "claimable" // vested-but-unclaimed amounts exist and are claimable
   | "claimed" // fully claimed
-  | "rolled_over"; // unclaimed remainder returned (depositor->treasury / provider->next epoch)
+  | "rolled_over"; // unclaimed remainder returned (contributor->treasury / provider->next epoch)
 
 export const REWARD_EPOCH_STATES: readonly RewardEpochState[] = [
   "provisional",

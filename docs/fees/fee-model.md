@@ -15,20 +15,27 @@ figure below drifts from that table, CI fails.
 - The 15% creator premint vests over 2 years with a 30-day cliff and is
   **always excluded** from reward flows.
 
-## Verified HISS-token trading fee split
+## Verified HISS-token trading fee split (HISS Reward Method V2)
 
 High-confidence, chain-classified HISS-token trading fees are split
-**50/30/10/10**:
+**50/15/15/10/10**:
 
-| Leg               | Share | Recipient                       |
-| ----------------- | ----- | ------------------------------- |
-| xHISS stakers     | 50%   | staking vault (`injectRewards`) |
-| Depositor vesting | 30%   | depositor vesting distributor   |
-| Provider rewards  | 10%   | provider rewards distributor    |
-| Treasury Safe     | 10%   | absorbs floor-division dust     |
+| Leg                | Share | Recipient                             |
+| ------------------ | ----- | ------------------------------------- |
+| xHISS stakers      | 50%   | staking vault (`injectRewards`)       |
+| Vault providers    | 15%   | vault-provider rewards distributor    |
+| Vault contributors | 15%   | vault-contributor vesting distributor |
+| Treasury Safe      | 10%   | absorbs floor-division dust           |
+| Economic burn      | 10%   | canonical dead address (`0x…dEaD`)    |
 
-The four legs sum to exactly 100. The classifier and the split both fail
-closed: low-confidence fee sources are never distributed.
+The five legs sum to exactly 100. The classifier and the split both fail
+closed: low-confidence fee sources are never distributed. **Vault contributors**
+is the current name for the former **depositor** reward cohort (methodology
+unchanged); **V1** (50/30/10/10, no burn) is historical.
+
+The economic-burn leg transfers $HISS to the dead address
+`0x000000000000000000000000000000000000dEaD` — it leaves circulation but does
+**not** reduce `HISS.totalSupply`. See [reward split](../rewards/reward-split.md).
 
 ## Claimed WETH
 

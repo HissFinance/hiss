@@ -28,6 +28,12 @@ The 50% staker leg of the [reward flywheel](../fees/reward-flywheel.md) is added
   rate jump.
 - **Reverts with zero stakers.** An injection cannot happen if there is nothing staked.
 
+The 50% staker leg is one of five legs of **HISS Reward Method V2** (token
+**50/15/15/10/10**); the split also routes a **10% economic burn** to the canonical dead
+address. That burn leaves circulation but does **not** reduce `HISS.totalSupply`, and the
+amount burned is a live read of the dead-address balance
+(`HISS.balanceOf(0x…dEaD)`).
+
 Details and history: [Reward injections](./reward-injections.md).
 
 ## Staking

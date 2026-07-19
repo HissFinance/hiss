@@ -26,6 +26,25 @@ Treasury Safe authorizes/funds ──▶ injectRewards ──▶ 24h linear drip
 Every step is gated. The staker leg is **planned** data until the Safe funds it, and it
 only affects value once `injectRewards` runs. See the [flywheel](../fees/reward-flywheel.md).
 
+## The staker leg in the full split
+
+The staker leg is the largest of the five legs of **HISS Reward Method V2**, which
+splits verified $HISS trading fees **50/15/15/10/10** (token):
+
+- **50%** — **xHISS stakers** (this injection).
+- **15%** — **Vault Providers** (distributor not deployed → recipient `null`).
+- **15%** — **Vault Contributors** (distributor not deployed → recipient `null`).
+- **10%** — **Treasury Safe** (2-of-3; absorbs floor-division dust so the legs sum exactly).
+- **10%** — **economic burn** → the canonical dead address
+  `0x000000000000000000000000000000000000dEaD`.
+
+The 50% staker leg is unchanged from V1. The burn leg is an **economic burn**: HISS is
+transferred to the dead address and leaves circulation (nobody holds the key), but
+`HISS.totalSupply` is **not** reduced — it is not an ERC-20 supply burn. The amount
+burned is measured as a **live read of the dead-address balance**
+(`HISS.balanceOf(0x…dEaD)`), never as a reduction of total supply. Nothing moves against
+a `null` recipient.
+
 ## Reading injection history
 
 ```ts
