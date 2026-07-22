@@ -267,11 +267,11 @@ flowchart TD
 
 The hosted product spans three hosts:
 
-| Host                                                 | Serves                                       |
-| ---------------------------------------------------- | -------------------------------------------- |
-| [www.hiss.finance](https://www.hiss.finance)         | Marketing, brand, top-level agent files      |
-| [app.hiss.finance](https://app.hiss.finance)         | The application and the public HTTP API      |
-| [docs.hiss.finance](https://docs.hiss.finance)       | Product documentation                        |
+| Host                                           | Serves                                  |
+| ---------------------------------------------- | --------------------------------------- |
+| [www.hiss.finance](https://www.hiss.finance)   | Marketing, brand, top-level agent files |
+| [app.hiss.finance](https://app.hiss.finance)   | The application and the public HTTP API |
+| [docs.hiss.finance](https://docs.hiss.finance) | Product documentation                   |
 
 Legacy `www.hiss.finance/app/*` and `www.hiss.finance/docs/*` URLs
 308-redirect (one hop) to their canonical hosts, so older links keep working.
