@@ -68,7 +68,7 @@ PLTR, TSLA, SPY, QQQ, SGOV, SLV, CUSO.
    or `jobId` → a `BankrStockTokenReceipt`. Only `onchain_confirmed` counts
    as settled.
 
-## API routes (base `https://www.hiss.finance`)
+## API routes (base `https://app.hiss.finance`; `www.hiss.finance` still serves these routes for compatibility)
 
 | Route                                    | In → Out                                                                                      |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------- |
