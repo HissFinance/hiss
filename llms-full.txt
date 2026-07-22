@@ -4,6 +4,8 @@
 
 This repository publishes the PUBLIC interface materials only: exact contract ABIs, canonical Robinhood Chain addresses with verification status, authored Solidity interfaces, and the HISS agent skill packs. It contains no deployment scripts, owner-action tooling, signed transactions, or credentials.
 
+Hosts: application + HTTP API https://app.hiss.finance · documentation https://docs.hiss.finance · marketing + agent files https://www.hiss.finance. Legacy www /app/* and /docs/* URLs 308-redirect (one hop) to their canonical hosts.
+
 ## Invariants (bind every surface)
 
 1. Prepare/verify only — no HISS route or tool sends a transaction.

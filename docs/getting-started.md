@@ -9,6 +9,13 @@ guide gets you from clone to first read/prepare.
 > [www.hiss.finance](https://www.hiss.finance). Build against the same primitives
 > here.
 
+> **Hosts.** The hosted product spans three hosts:
+> [www.hiss.finance](https://www.hiss.finance) (marketing and top-level agent
+> files), [app.hiss.finance](https://app.hiss.finance) (the application and the
+> public HTTP API), and [docs.hiss.finance](https://docs.hiss.finance) (product
+> documentation). Legacy `www.hiss.finance/app/*` and `www.hiss.finance/docs/*`
+> URLs 308-redirect (one hop) to their canonical hosts.
+
 > **Free to use.** The HISS website and first-party app tools are free — no
 > subscriptions, no credits, no paywalls — and these packages are open-source
 > (Apache-2.0). You keep signing control; HISS prepares and verifies while your own
