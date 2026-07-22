@@ -53,7 +53,7 @@ Consent, autonomy modes, and the LiveAutonomyAck live in
 ## Workflow
 
 1. Confirm the user's Coil (or route them to create one at
-   `/app/tools/bankrbot-robinhood`).
+   `https://app.hiss.finance/tools/bankrbot-robinhood`).
 2. `POST /api/bankrbot/validate-autonomy` — fix every issue before going on.
 3. Compile in `paper` mode: `POST /api/bankrbot/compile-robinhood-path`.
 4. Present the paper runbook + receipt; the user reviews it.
@@ -63,7 +63,7 @@ Consent, autonomy modes, and the LiveAutonomyAck live in
 7. After any session, `POST /api/bankrbot/post-run-audit` with the receipt
    and reported activity.
 
-## API routes (HTTP, base `https://www.hiss.finance`)
+## API routes (HTTP, base `https://app.hiss.finance`; `www.hiss.finance` still serves these routes for compatibility)
 
 | Route                                       | In → Out                                                                                  |
 | ------------------------------------------- | ----------------------------------------------------------------------------------------- |

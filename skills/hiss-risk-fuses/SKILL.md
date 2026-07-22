@@ -62,7 +62,8 @@ Capsules cannot compile without the mandatory set: `maxPositionWeight`,
 
 - MCP (local HISS MCP server): `hiss_validate_coil`, `hiss_compile_coil`.
   (The risk audit and drift check are HTTP-only.)
-- HTTP (base `https://www.hiss.finance`): `POST /api/tools/risk-audit`
+- HTTP (base `https://app.hiss.finance`; `www.hiss.finance` still serves
+  these routes for compatibility): `POST /api/tools/risk-audit`
   (alias `POST /api/coil/risk-audit`); drift with proposals:
   `POST /api/tools/drift-check` (alias `POST /api/coil/drift-check`).
 - Related packs: `hiss-coilops`, `hiss-receipts`.

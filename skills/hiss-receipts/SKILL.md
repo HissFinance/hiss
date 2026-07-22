@@ -64,6 +64,7 @@ verification fails any receipt claiming otherwise.
 
 - MCP (local HISS MCP server): `hiss_get_receipt`, `hiss_verify_receipt`.
   (Receipt creation and oracle-policy explanation are HTTP-only.)
-- HTTP (base `https://www.hiss.finance`): `POST /api/tools/receipt`,
+- HTTP (base `https://app.hiss.finance`; `www.hiss.finance` still serves
+  these routes for compatibility): `POST /api/tools/receipt`,
   `POST /api/coil/verify` with `{ coil, receipt }`.
 - Related packs: `hiss-coilops`, `hiss-risk-fuses`.

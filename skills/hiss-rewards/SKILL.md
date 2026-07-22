@@ -154,8 +154,10 @@ Five legs sum to exactly `10000` bps / 100%.
 
 ## Surfaces
 
-- Docs: `/docs/reward-split` · `/docs/hiss-reward-flywheel` ·
-  `/docs/hiss-fee-routing` · `/docs/provider-rewards`
+- Docs: `https://docs.hiss.finance/reward-split` ·
+  `https://docs.hiss.finance/hiss-reward-flywheel` ·
+  `https://docs.hiss.finance/hiss-fee-routing` ·
+  `https://docs.hiss.finance/provider-rewards`
 - MCP tools (see `hiss-mcp`): `hiss_get_reward_status` ·
   `hiss_get_protocol_status` (includes the Treasury Safe). Reward-injection
   history is HTTP-only.

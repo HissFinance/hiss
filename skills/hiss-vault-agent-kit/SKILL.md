@@ -54,7 +54,11 @@ manifest with any other `chainId` returns `400 VAULT_CHAIN_INVALID`.
   and may be region- or provider-restricted; issuer-side restrictions are
   per-asset disclosures the depositor acknowledges, never a HISS gate.
 
-## What your agent CAN do (real endpoints, base `https://www.hiss.finance`)
+## What your agent CAN do (real endpoints, base `https://app.hiss.finance`)
+
+(The canonical API base is `https://app.hiss.finance`;
+`https://www.hiss.finance` continues to serve the same routes for
+compatibility.)
 
 **Discover**
 
@@ -184,8 +188,8 @@ performance claim.
 
 ## Surfaces
 
-- Vaults hub: `https://www.hiss.finance/app/vaults` · create:
-  `/app/vaults/create` · marketplace: `/app/vaults/marketplace`
+- Vaults hub / marketplace: `https://app.hiss.finance/vaults` · create:
+  `https://app.hiss.finance/vaults/create`
 - Machine schema: `GET /api/vaults/schema` · authoritative status:
   `GET /api/vaults/readiness`
 - Public contract ABIs & addresses: `contracts/abi/`,

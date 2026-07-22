@@ -88,12 +88,14 @@ Vault address: `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`
 
 ## Surfaces
 
-- UI: `https://www.hiss.finance/app/stake`
+- UI: `https://app.hiss.finance/stake` (the legacy
+  `https://www.hiss.finance/app/stake` 308-redirects here)
 - Status: `GET /api/stake/status` · history: `GET /api/stake/reward-injections`
 - MCP tools (see `hiss-mcp`): `hiss_get_staking_status` ·
   `hiss_prepare_hiss_stake` · `hiss_prepare_xhiss_cooldown` ·
   `hiss_prepare_xhiss_redeem`. (A staker's specific position and reward-injection
   history are HTTP-only.)
-- Docs: `/docs/hiss-stake` · `/docs/xhiss` · `/docs/staking-risks`
+- Docs: `https://docs.hiss.finance/hiss-stake` ·
+  `https://docs.hiss.finance/xhiss` · `https://docs.hiss.finance/staking-risks`
 - Related packs: `hiss-rewards` (HISS Reward Method V2, the 50/15/15/10/10
   funding policy), `hiss-security-boundaries` (the 2-of-3 Safe powers).

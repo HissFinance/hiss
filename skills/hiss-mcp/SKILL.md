@@ -24,7 +24,9 @@ metadata:
 The HISS MCP server is a local **stdio** Model Context Protocol server that
 exposes the HISS compilation/verification toolset to your own agent as
 typed tools. It is a thin, deterministic surface over the same logic behind
-the public `https://www.hiss.finance` HTTP routes: it PREPARES artifacts
+the public `https://app.hiss.finance` HTTP routes (the canonical API base;
+`https://www.hiss.finance` continues to serve the same routes for
+compatibility): it PREPARES artifacts
 (Coils, capsules, deposit intents, command packs, receipts) and READS
 verified state. It never sends a transaction, never places an order, never
 holds keys, and never takes custody.
@@ -62,7 +64,7 @@ MCP server source (`packages/mcp-server/src/tools.ts`); the server's own
 
 **Not MCP tools — HTTP API only.** CoilOps generation/scoring, receipts and share
 cards, the Bankrbot → Robinhood path, autonomy-fuse validation, and Bankr
-stock-token trading are **HTTP endpoints** on `https://www.hiss.finance` (e.g.
+stock-token trading are **HTTP endpoints** on `https://app.hiss.finance` (e.g.
 `POST /api/tools/generate-coil`, `POST /api/bankrbot/compile-robinhood-path`,
 `POST /api/stocks/prepare-bankr-command`) — they are **not** MCP tools. See
 `hiss-coilops`, `hiss-bankrbot-robinhood`, and `hiss-stock-tokens` for those

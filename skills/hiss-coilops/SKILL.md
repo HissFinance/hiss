@@ -65,7 +65,8 @@ statement of current holdings** and not a return forecast.
 - MCP (local HISS MCP server, see `hiss-mcp`): `hiss_validate_coil`,
   `hiss_compile_coil`. (Coil generation, scoring, receipts, and share cards are
   HTTP-only — see the routes below.)
-- HTTP (base `https://www.hiss.finance`): `POST /api/tools/generate-coil`,
+- HTTP (base `https://app.hiss.finance`; `www.hiss.finance` still serves
+  these routes for compatibility): `POST /api/tools/generate-coil`,
   `POST /api/tools/validate-coil`, `POST /api/tools/score-coil`,
   `POST /api/tools/receipt`, `POST /api/tools/share-card` (JSON bodies;
   30 req / 5 min).

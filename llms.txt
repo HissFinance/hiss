@@ -30,7 +30,7 @@ This repository publishes the PUBLIC interface materials: exact contract ABIs, c
 
 ## Key facts
 
-- Base URL: https://www.hiss.finance · Explorer: https://robinhoodchain.blockscout.com
+- Hosts: application + HTTP API https://app.hiss.finance · documentation https://docs.hiss.finance · marketing + agent files https://www.hiss.finance. Legacy www /app/* and /docs/* URLs 308-redirect (one hop) to their canonical hosts. Each host serves its own /llms.txt (www: identity + top-level surfaces · app: application surfaces · docs: full documentation map); the expanded llms-full.txt lives on the docs host. Explorer: https://robinhoodchain.blockscout.com
 - VaultFactory `0x278d237c6890a5f7101296a9021ed9D26c821810` · flagship HISS Vault `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` · xHISS vault `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`.
 - $HISS token `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` (18 decimals, verified) · Treasury Safe (2-of-3) `0xF100Fc28dd1721C698046Dbd60408c523b69e36c`.
 - Compiler: solc 0.8.24, optimizer 200 runs, EVM cancun, bytecode_hash none.
