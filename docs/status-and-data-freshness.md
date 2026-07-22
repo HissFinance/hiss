@@ -37,6 +37,25 @@ Vaults hold real value; rewards are gated. A UI or agent that reports "live" or
 built to say **"unknown"** honestly rather than guess — and to fail closed rather than
 proceed on thin evidence.
 
+## Display continuity vs execution strictness (24/7)
+
+Vault surfaces separate what may be **shown** from what may be **executed**:
+
+- **Display is continuous.** Valuation state stays visible 24/7. Outside feed
+  hours it is computed from the **last verified** prices and labeled with its
+  price basis: `EXCHANGE_LIVE` (live feed round), `CARRIED_CLOSE` (a carried
+  close — display-only, **never** an execution basis), or `MODEL_ACCRUAL`
+  (accrual-like feeds, e.g. SGOV's once-daily round). A stale or carried value is
+  always presented as such, never as live.
+- **Execution stays strict.** Priced entry and exit require live, in-bound oracle
+  rounds on-chain; stale feeds make them revert (fail closed). Deposits are
+  additionally only **advertised** open while the trading session is open and the
+  freshest basket feed is within the 3,600-second deposit-freshness bound — see
+  [the effective deposit gate](./vaults/risk-fuses.md#the-effective-deposit-gate-advertised-availability).
+- **Unknown is not closed.** A failed read yields `UNKNOWN`: it is never collapsed
+  into "closed" (or "open"); surfaces keep the last verified state, labeled,
+  instead of overriding to a hard claim.
+
 ## Freshness in practice
 
 - **Share price, TVL, balances, staking rate** — always live reads; never cache and

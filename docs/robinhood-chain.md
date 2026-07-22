@@ -75,6 +75,26 @@ staleness, and verified-route requirements. A vault will not treat stale-fed ass
 as live-rebalanceable. See [Risk fuses](./vaults/risk-fuses.md) and
 [Data freshness](./status-and-data-freshness.md).
 
+On top of that execution policy, the hosted vault surfaces distinguish **display**
+from **execution** around the clock:
+
+- **Display continuity (24/7).** Vault pages keep showing valuation state outside
+  feed hours using the **last verified** prices, labeled with an explicit price
+  basis: `EXCHANGE_LIVE` (a live feed round), `CARRIED_CLOSE` (a carried close,
+  display-only), or `MODEL_ACCRUAL` (accrual-like feeds such as SGOV's
+  once-daily round). A carried close is **never** an execution basis — only
+  `EXCHANGE_LIVE` pricing is execution-grade.
+- **Advertised deposits narrow beyond the contract.** The contract's oracle
+  staleness bound still governs execution (stale feeds make priced entry/exit
+  revert — fail closed). Additionally, deposits are **advertised** open only while
+  the tokenized-equity trading session is open **and** the freshest basket feed is
+  at most **3,600 seconds** old (stale-mark dilution protection, policy
+  P-DEP-2/P-NAV-2). Outside that window the UI reports the deposit entry closed
+  with the reason, even where the contract itself would still accept.
+
+See [Risk fuses — the effective deposit gate](./vaults/risk-fuses.md#the-effective-deposit-gate-advertised-availability)
+and [Data freshness](./status-and-data-freshness.md#display-continuity-vs-execution-strictness-247).
+
 ## Explorer links
 
 - Address: `https://robinhoodchain.blockscout.com/address/<address>`
