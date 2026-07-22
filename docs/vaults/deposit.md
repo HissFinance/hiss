@@ -69,6 +69,29 @@ A deposit is settled only when the on-chain deposit transaction confirms and its
 **not** a completed deposit. If a status read fails, treat it as **unknown** — re-read
 the chain.
 
+## Deposit availability (when deposits are advertised open)
+
+Deposits are advertised open only when every provable condition holds — the
+contract's deposit switch, the on-chain readiness registry, usable live pricing,
+not-paused, and the per-basis feed-freshness policy (trading session open, every
+required basket feed within its bound). Outside those windows the deposit entry
+reports the honest reason (for example market-closed or oracle-unavailable) and
+reopens when feeds resume. See
+[the effective deposit gate](./risk-fuses.md#the-effective-deposit-gate-advertised-availability).
+
+## Deposit-anytime intents (pending activation — NOT live)
+
+A forward-priced "deposit anytime" path is **designed and fork-tested but not
+active**: the user would sign **once** at intent time (a USDG permit that is
+itself the intent — amount, vault, acknowledgments, and expiry pinned), and a
+keeper would submit the strike at the next fresh-price window, with shares
+minting directly to the user's wallet at that window's NAV and the intent
+cancellable any time before the strike. The executor contract
+(`HissDepositIntentExecutor`) is **not deployed** — deployment remains
+owner-gated behind the audit gate. Until it is deployed and activated, this
+path does not exist on-chain and nothing here should be read as an available
+action: deposits open when feeds resume publishing.
+
 ## Via Bankr (optional, region-dependent)
 
 Some deposits can be prepared as [Bankr commands](../bankrbot.md) (packs bounded in

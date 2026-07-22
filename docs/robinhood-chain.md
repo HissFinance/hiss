@@ -87,10 +87,11 @@ from **execution** around the clock:
 - **Advertised deposits narrow beyond the contract.** The contract's oracle
   staleness bound still governs execution (stale feeds make priced entry/exit
   revert — fail closed). Additionally, deposits are **advertised** open only while
-  the tokenized-equity trading session is open **and** the freshest basket feed is
-  at most **3,600 seconds** old (stale-mark dilution protection, policy
-  P-DEP-2/P-NAV-2). Outside that window the UI reports the deposit entry closed
-  with the reason, even where the contract itself would still accept.
+  the tokenized-equity trading session is open **and** every required basket
+  asset's feed is within its per-basis bound (live-feed assets 3,600 s;
+  accrual-like assets such as SGOV 26 h) — stale-mark dilution protection,
+  policy P-DEP-2/P-NAV-2. Outside that window the UI reports the deposit entry
+  closed with the reason, even where the contract itself would still accept.
 
 See [Risk fuses — the effective deposit gate](./vaults/risk-fuses.md#the-effective-deposit-gate-advertised-availability)
 and [Data freshness](./status-and-data-freshness.md#display-continuity-vs-execution-strictness-247).

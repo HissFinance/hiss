@@ -49,8 +49,9 @@ Vault surfaces separate what may be **shown** from what may be **executed**:
   always presented as such, never as live.
 - **Execution stays strict.** Priced entry and exit require live, in-bound oracle
   rounds on-chain; stale feeds make them revert (fail closed). Deposits are
-  additionally only **advertised** open while the trading session is open and the
-  freshest basket feed is within the 3,600-second deposit-freshness bound — see
+  additionally only **advertised** open while the trading session is open and
+  every required basket asset's feed is within its per-basis deposit-freshness
+  bound (live-feed assets 3,600 s; accrual-like assets 26 h) — see
   [the effective deposit gate](./vaults/risk-fuses.md#the-effective-deposit-gate-advertised-availability).
 - **Unknown is not closed.** A failed read yields `UNKNOWN`: it is never collapsed
   into "closed" (or "open"); surfaces keep the last verified state, labeled,

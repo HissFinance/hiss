@@ -21,21 +21,26 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
   getting-started, the llms files, and every skill pack now reference
   absolute canonical-host URLs; the canonical API base for the HTTP routes in
   the skills is `https://app.hiss.finance` (www continues to serve the same
-  routes for compatibility). Source release: production commit `1d1c50b`
-  (www/app/docs subdomain architecture — SEO/OG/host-routing migration +
-  24/7 vault terminal); post-cutover closeout refinements will be referenced
-  here when the corresponding source release is final.
+  routes for compatibility). Each host now serves its own `/llms.txt`
+  (www: identity + top-level surfaces · app: application surfaces · docs:
+  full documentation map, plus `llms-full.txt`). Source releases: production
+  commit `1d1c50b` (www/app/docs subdomain architecture — SEO/OG/host-routing
+  migration + 24/7 vault terminal) and the post-cutover closeout, source
+  commit `0057169` (OG v4, per-host discovery files, vault deposit-gate
+  honesty and per-basis freshness).
 - **24/7 vault display continuity + advertised-deposit narrowing.** Vault
   surfaces now display valuation state around the clock from last-verified
   prices labeled with an explicit basis (`EXCHANGE_LIVE` /
   `CARRIED_CLOSE` display-only / `MODEL_ACCRUAL`), while execution stays
   fail-closed on stale feeds. Deposits are advertised open only while the
-  trading session is open and the freshest basket feed is within 3,600s
-  (stale-mark dilution protection, policy P-DEP-2/P-NAV-2); the effective
-  deposit gate and its states are documented in
+  trading session is open and every required basket feed is within its
+  per-basis bound — live-feed assets 3,600 s, accrual-like assets (e.g.
+  SGOV) 26 h (stale-mark dilution protection, policy P-DEP-2/P-NAV-2) —
+  and the deposit entry reports honest gate reasons when closed. The
+  effective deposit gate and its states are documented in
   [Risk fuses](./docs/vaults/risk-fuses.md) and
-  [Data freshness](./docs/status-and-data-freshness.md). Same source
-  release (`1d1c50b`).
+  [Data freshness](./docs/status-and-data-freshness.md). Source releases
+  `1d1c50b` and `0057169`.
 
 - **HISS Reward Method V2 (`HISS_REWARD_METHOD_V2`, split version
   `hiss-reward-split-v2`).** The verified $HISS trading-fee split moves from the
@@ -56,6 +61,13 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **Deposit-anytime intent model — documented as pending activation, NOT
+  live.** A forward-priced deposit-intent path (one signature at intent
+  time; a keeper strikes at the next fresh-price window; cancellable before
+  the strike) is designed and fork-tested, but the executor contract
+  (`HissDepositIntentExecutor`) is **not deployed** — deployment stays
+  owner-gated behind the audit gate. See
+  [Deposit](./docs/vaults/deposit.md). Source `0057169`.
 - **Economic burn leg (10%).** A `BURN_BPS` leg transfers verified-fee HISS to the
   canonical dead address `HISS_BURN_ADDRESS`
   (`0x000000000000000000000000000000000000dEaD`). This is an **economic burn**:

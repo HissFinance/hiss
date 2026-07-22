@@ -65,8 +65,12 @@ any unknown:
 3. live pricing is usable (a reverting `totalAssets()` means every priced
    deposit/redeem path reverts too);
 4. the vault is not paused;
-5. **freshness policy (P-DEP-2/P-NAV-2):** the tokenized-equity trading session is
-   open **and** the freshest basket feed is at most **3,600 seconds** old.
+5. **freshness policy (P-DEP-2/P-NAV-2, per-basis):** the tokenized-equity trading
+   session is open **and** every required basket asset's feed is within its
+   per-basis bound — assets priced on a live exchange feed (`EXCHANGE_LIVE`)
+   within **3,600 seconds**, accrual-like assets (`MODEL_ACCRUAL`, e.g. SGOV's
+   once-daily round) within **26 hours** (24-hour cadence + 2-hour grace). Any
+   unreadable feed age fails closed (unverifiable is never advertised open).
 
 Condition 5 narrows the **advertised** gate beyond the contract: it closes the
 weekday overnight window where feeds are quiet (but still inside the contract's
