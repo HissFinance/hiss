@@ -11,6 +11,27 @@ commit in this repository. Pin to a tag for stability.
 
 Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADMAP.md).
 
+### Added
+
+- **Queued-deposit executor: documented as implemented, not active.** The
+  one-signature queued-deposit executor (permit-as-intent; keeper strikes at
+  the next fresh price; no second signature) is implemented and fork-proven in
+  the source release but remains inactive pending independent audit,
+  deployment approval, deployment, monitoring, keeper authorization, and
+  explicit activation. `docs/contracts.md` and `SECURITY.md` now carry the
+  readiness boundary. (Source release: post-release ops closeout, commits
+  through the PR referenced by the sync manifest.)
+
+### Fixed (hosted product, observable behavior)
+
+- Unknown vault URLs on the app host now return a real HTTP 404 (previously a
+  styled not-found page could answer 200 with mixed robots directives).
+- Search and AI crawlers now receive page metadata (title, canonical, social
+  tags) in the initial HTML head deterministically; browser streaming
+  behavior is unchanged.
+- Deposit-gate freshness during open market sessions follows the feeds'
+  deviation contract, so calm markets no longer read as stale mid-session.
+
 ### Changed
 
 - **Host architecture (www/app/docs).** The hosted product now spans three

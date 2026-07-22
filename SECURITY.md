@@ -106,6 +106,13 @@ Understanding these boundaries is essential to assessing a finding. See
   they are never a hard dependency of the protocol.
 - **Stock Tokens are economic exposure, not direct ownership.** They confer no legal
   or beneficial rights in the underlying issuer.
+- **The queued-deposit executor is not active.** The one-signature
+  queued-deposit executor contract is implemented and fork-proven but remains
+  inactive pending independent audit, production deployment approval,
+  deployment, monitoring, keeper authorization, and explicit activation. Until
+  every step completes and is verified, no keeper executes user deposit
+  intents in production, and findings against a deployed executor are out of
+  scope for the simple reason that none exists on chain.
 
 ## Fail-closed design
 

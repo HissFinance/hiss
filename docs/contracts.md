@@ -41,6 +41,24 @@ pro-rata. Enforces the [fee model](./fees/vault-fees.md) (high-water-mark perfor
 fee, protocol share; zero deposit/withdraw fees), a strategy-change notice period, and
 [risk fuses](./vaults/risk-fuses.md).
 
+### HissDepositIntentExecutor (implemented — not deployed, not active)
+
+A queued-deposit executor for the one-signature "deposit anytime" flow: a user
+signs a single EIP-2612 permit-as-intent (amount, vault, risk-acknowledgment
+hashes, deadline, cancel nonce) and a keeper later submits the strike
+transaction when the vault's freshness and pricing gates pass, minting shares
+to the signer at the fresh mark. Funds stay in the user's wallet until the
+single atomic execution; a second signature is never required.
+
+**Status: implemented and fork-proven but inactive.** It remains inactive
+pending independent audit, production deployment approval, deployment,
+monitoring, keeper authorization, and explicit activation. It has **no
+deployed address**, and no queued-deposit execution occurs in production. The
+deposit page reflects the same state. See
+[Deposits](./vaults/deposit.md) for the user-facing behavior and
+[SECURITY.md](../SECURITY.md#trust-boundaries-and-security-model) for the
+boundary treatment.
+
 ### XHissVault (staking)
 
 Single-asset ERC-4626-style staking over $HISS; **xHISS** is the 18-decimal share
