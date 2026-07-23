@@ -496,8 +496,10 @@ and [SECURITY.md](./SECURITY.md).
 
 ## Current protocol lifecycle
 
-Live, stamped snapshots (deployments, fees, status) are regenerated from chain
-reads and committed under [`docs/generated/`](./docs/generated/current-status.md).
+Live, stamped snapshots are regenerated from chain reads and committed under
+`docs/generated/` — [status](./docs/generated/current-status.md) ·
+[deployments](./docs/generated/current-deployments.md) ·
+[fees](./docs/generated/current-fees.md).
 Because on-chain state changes, treat those files as **snapshots with a freshness
 limit** — re-read the chain for anything transactional.
 
@@ -523,7 +525,7 @@ deposit, and driving the MCP server.
 
 | Area              | Start here                                                                                                                                                                                                         |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Orientation       | [Getting started](./docs/getting-started.md) · [Architecture](./docs/architecture.md) · [Glossary](./docs/glossary.md) · [FAQ](./docs/faq.md)                                                                      |
+| Orientation       | [Getting started](./docs/getting-started.md) · [Architecture](./docs/architecture.md) · [Glossary](./docs/glossary.md) · [FAQ](./docs/faq.md) · [Migration & versioning](./docs/migration-and-versioning.md)       |
 | Chain & contracts | [Robinhood Chain](./docs/robinhood-chain.md) · [Contracts](./docs/contracts.md)                                                                                                                                    |
 | Packages          | [SDK](./docs/sdk.md) · [CLI](./docs/cli.md) · [React](./docs/react.md) · [MCP](./docs/mcp.md)                                                                                                                      |
 | Vaults            | [Overview](./docs/vaults/index.md) · [Create](./docs/vaults/create-a-vault.md) · [Manifest](./docs/vaults/vault-manifest.md) · [Risk fuses](./docs/vaults/risk-fuses.md)                                           |
