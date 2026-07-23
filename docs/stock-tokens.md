@@ -60,6 +60,15 @@ reference price from what a specific size can actually transact (the same
 reference-vs-executable separation the HISS agent skills enforce). Venue and
 liquidity availability are **region-gated** like the tokens themselves.
 
+On-chain 24/7 stock-token liquidity is **real but thin and single-venue today**:
+proven per-asset USDG pools exist on the AMM, but depth is shallow and only one
+venue is code-verified (propAMM, RFQ, and orderbook venues remain discovered, not
+proven). The designed (undeployed, activation-gated)
+[24/7 vault architecture](./vaults/24-7-architecture.md) is staged to this measured
+reality — size-aware execution, dynamic safe-notional, and an in-kind exit — rather
+than assuming depth the pools do not have. Production 24/7 settlement is **not
+active**.
+
 Authoritative source: Robinhood's
 [Building with Stock Tokens — Trading Venues & Liquidity](https://docs.robinhood.com/chain/building-with-stock-tokens/#trading-venues--liquidity).
 

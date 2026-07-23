@@ -13,6 +13,30 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **24/7 vault architecture — designed, tested, undeployed (MAJOR).** Documents
+  the designed continuous around-the-clock valuation + settlement architecture:
+  the **five execution modes** (`MULTI_VENUE_EXECUTABLE`, `SINGLE_VENUE_BOUNDED`,
+  `BATCH_EXECUTABLE`, `IN_KIND_ONLY`, `TEMPORARILY_HALTED`), the **three settlement
+  lanes** (instant, batch-netting, and the valuation-free in-kind unconditional
+  exit), **Price Mesh V2** side-aware pricing (three distinct marks — a
+  manipulation-resistant reporting mid for NAV, an ask-side deposit mark, and a
+  bid-side redemption mark — a missing price is `UNKNOWN` never `0`, the spread is
+  anti-dilution retained by the vault for all holders), **dynamic safe-notional**,
+  **corporate-action handling** (multiplier applied exactly once — the on-chain
+  Chainlink feed is already multiplier-adjusted, REST `/prices` is raw), and the
+  **calendar-is-context-only** rule with smallest-scope degrade
+  (source → venue → asset → action-size → vault). New page
+  `docs/vaults/24-7-architecture.md`, reachable from the README Vaults map;
+  `docs/stock-tokens.md`, `docs/vaults/{index,deposit,withdraw}.md`,
+  `docs/status-and-data-freshness.md`, the `hiss-price-mesh` skill (v1 → v2),
+  `llms.txt`, and `llms-full.txt` reference it.
+  **Truthful status (on every surface): production 24/7 settlement is NOT active;
+  the V2 vault is undeployed; activation is separately gated behind independent
+  audits + explicit owner authorization; nothing is funded, live, or deployed.**
+  Liquidity is honestly noted as real but thin and single-venue today. No contract,
+  address, deployment, or on-chain behavior changed. (Source design release:
+  execution-mesh Phase 2, decision log EM-001..EM-012, source commits
+  `61f8104..3d48477`.)
 - **Skill architecture: nine new agentic-trading skills + capability manifest
   (MAJOR).** The public skill catalog grows from 10 to 19 packs. New packs for
   running a Coil against the user's OWN Robinhood Trading MCP session:

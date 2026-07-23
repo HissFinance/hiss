@@ -523,17 +523,17 @@ deposit, and driving the MCP server.
 
 ## Documentation map
 
-| Area              | Start here                                                                                                                                                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Orientation       | [Getting started](./docs/getting-started.md) · [Architecture](./docs/architecture.md) · [Glossary](./docs/glossary.md) · [FAQ](./docs/faq.md) · [Migration & versioning](./docs/migration-and-versioning.md)       |
-| Chain & contracts | [Robinhood Chain](./docs/robinhood-chain.md) · [Contracts](./docs/contracts.md)                                                                                                                                    |
-| Packages          | [SDK](./docs/sdk.md) · [CLI](./docs/cli.md) · [React](./docs/react.md) · [MCP](./docs/mcp.md)                                                                                                                      |
-| Vaults            | [Overview](./docs/vaults/index.md) · [Create](./docs/vaults/create-a-vault.md) · [Manifest](./docs/vaults/vault-manifest.md) · [Risk fuses](./docs/vaults/risk-fuses.md)                                           |
-| Fees              | [Overview](./docs/fees/index.md) · [Vault fees](./docs/fees/vault-fees.md) · [$HISS token fees](./docs/fees/hiss-token-fees.md) · [Reward flywheel](./docs/fees/reward-flywheel.md)                                |
-| Staking           | [Overview](./docs/staking/index.md) · [xHISS](./docs/staking/xhiss.md) · [Cooldown & redeem](./docs/staking/cooldown-and-redeem.md)                                                                                |
-| Rewards           | [Overview](./docs/rewards/index.md) · [Vault contributors](./docs/rewards/depositor-rewards.md) · [Vault providers](./docs/rewards/provider-rewards.md) · [Epochs & vesting](./docs/rewards/epochs-and-vesting.md) |
-| Agents            | [Agent skills](./docs/agent-skills.md) · [Bankrbot](./docs/bankrbot.md) · [x402](./docs/x402.md) · [CoilOps](./docs/coilops.md)                                                                                    |
-| Safety            | [Security](./docs/security.md) · [Trust boundaries](./docs/trust-boundaries.md) · [Receipts](./docs/receipts.md) · [Data freshness](./docs/status-and-data-freshness.md)                                           |
+| Area              | Start here                                                                                                                                                                                                                         |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Orientation       | [Getting started](./docs/getting-started.md) · [Architecture](./docs/architecture.md) · [Glossary](./docs/glossary.md) · [FAQ](./docs/faq.md) · [Migration & versioning](./docs/migration-and-versioning.md)                       |
+| Chain & contracts | [Robinhood Chain](./docs/robinhood-chain.md) · [Contracts](./docs/contracts.md)                                                                                                                                                    |
+| Packages          | [SDK](./docs/sdk.md) · [CLI](./docs/cli.md) · [React](./docs/react.md) · [MCP](./docs/mcp.md)                                                                                                                                      |
+| Vaults            | [Overview](./docs/vaults/index.md) · [Create](./docs/vaults/create-a-vault.md) · [Manifest](./docs/vaults/vault-manifest.md) · [Risk fuses](./docs/vaults/risk-fuses.md) · [24/7 architecture](./docs/vaults/24-7-architecture.md) |
+| Fees              | [Overview](./docs/fees/index.md) · [Vault fees](./docs/fees/vault-fees.md) · [$HISS token fees](./docs/fees/hiss-token-fees.md) · [Reward flywheel](./docs/fees/reward-flywheel.md)                                                |
+| Staking           | [Overview](./docs/staking/index.md) · [xHISS](./docs/staking/xhiss.md) · [Cooldown & redeem](./docs/staking/cooldown-and-redeem.md)                                                                                                |
+| Rewards           | [Overview](./docs/rewards/index.md) · [Vault contributors](./docs/rewards/depositor-rewards.md) · [Vault providers](./docs/rewards/provider-rewards.md) · [Epochs & vesting](./docs/rewards/epochs-and-vesting.md)                 |
+| Agents            | [Agent skills](./docs/agent-skills.md) · [Bankrbot](./docs/bankrbot.md) · [x402](./docs/x402.md) · [CoilOps](./docs/coilops.md)                                                                                                    |
+| Safety            | [Security](./docs/security.md) · [Trust boundaries](./docs/trust-boundaries.md) · [Receipts](./docs/receipts.md) · [Data freshness](./docs/status-and-data-freshness.md)                                                           |
 
 ## Contributing
 

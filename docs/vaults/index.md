@@ -21,6 +21,8 @@ strategy updates (7-day notice) ──▶ performance fees at high-water mark
 - **[Strategy updates](./strategy-updates.md)** — the disclosed change process.
 - **[Receipts](./receipts.md)** — verifiable records of on-chain actions.
 - **[Performance](./performance.md)** — share price, high-water mark, and fees.
+- **[24/7 architecture](./24-7-architecture.md)** — the designed (undeployed,
+  activation-gated) continuous valuation + settlement model.
 
 ## Key properties
 
@@ -38,6 +40,12 @@ strategy updates (7-day notice) ──▶ performance fees at high-water mark
 - **Change notice.** Strategy changes require a disclosed **7-day** notice.
 - **Routing disabled today.** Protocol-wide, live routing is off; a vault holds its
   base asset until per-asset live-rebalance readiness passes.
+- **24/7 settlement is designed, not active.** A continuous, around-the-clock
+  valuation + settlement architecture (five execution modes, three settlement
+  lanes, side-aware pricing, in-kind exit) is **designed and tested but undeployed**;
+  production 24/7 settlement is **not active** and is separately gated behind
+  independent audits and owner authorization. See
+  [24/7 architecture](./24-7-architecture.md).
 
 ## The flagship vault
 

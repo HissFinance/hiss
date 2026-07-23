@@ -57,6 +57,14 @@ Vault surfaces separate what may be **shown** from what may be **executed**:
   into "closed" (or "open"); surfaces keep the last verified state, labeled,
   instead of overriding to a hard claim.
 
+A continuous, around-the-clock **valuation + settlement** design — where
+calendar/session state is context only and on-chain market health (not the clock)
+decides availability — is documented in
+[24/7 vault architecture](./vaults/24-7-architecture.md). That architecture is
+**designed and tested but undeployed**; production 24/7 settlement is **not active**
+and is separately gated behind independent audits and owner authorization. Today's
+deployed vault keeps the strict, fail-closed off-hours execution posture above.
+
 ## Freshness in practice
 
 - **Share price, TVL, balances, staking rate** — always live reads; never cache and
