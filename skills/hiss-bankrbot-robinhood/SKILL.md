@@ -1,16 +1,13 @@
 ---
 name: hiss-bankrbot-robinhood
 description: Drive the Bankrbot → HISS → Robinhood MCP autonomous trading path — validate and compile a user-authored Coil with HISS, generate the Bankrbot command pack and Robinhood MCP execution capsule, run paper preview, pass the live-readiness gate, and audit activity afterwards. HISS compiles and verifies; it never stores credentials and never places orders. Use when a user wants Bankrbot to operate their Coil against their own Robinhood Agentic Account.
-tags: [bankrbot, robinhood-mcp, autonomous-trading-path, coilops, agents]
-version: 1
+tags: [bankrbot, robinhood-mcp, autonomous-trading-path, coilops, agents, x402]
+version: 3
 visibility: public
-required_mcp_tools:
-  - hiss_validate_coil
-  - hiss_compile_coil
 metadata:
   clawdbot:
     emoji: "🐍"
-    homepage: "https://hiss.finance"
+    homepage: "https://www.hiss.finance"
 ---
 
 # HISS Bankrbot → Robinhood MCP Path
@@ -21,12 +18,31 @@ This skill teaches an agent (Bankrbot or any MCP/HTTP-capable agent) to run
 the autonomous trading path: the user authors a Coil; HISS validates it,
 checks the ten mandatory autonomy fuses, and compiles a **Bankrbot command
 pack** plus a **Robinhood MCP execution capsule** (instruction pack); the
-user's own Robinhood MCP connection, in the user's own Agentic Account, is
-the only execution rail. HISS emits instructions, receipts, and audits —
-nothing else. HISS is not affiliated with Robinhood or Bankr.
+user's own Robinhood MCP connection (`https://agent.robinhood.com/mcp/trading`),
+in the user's own Agentic Account, is the only execution rail. HISS emits
+instructions, receipts, and audits — nothing else.
 
-Consent, autonomy modes, and the LiveAutonomyAck live in
-`hiss-security-boundaries` — read it before touching live modes.
+Canonical spec: https://www.hiss.finance/skill.md · Setup guide:
+https://docs.hiss.finance/bankrbot-robinhood
+
+## Compatibility-adapter routing (read first)
+
+This skill is a **compatibility adapter** for the Bankrbot entry point. The
+canonical, capability-gated agentic path is now `hiss-robinhood-agentic` and
+the focused skills it routes to (`hiss-coil-runner`, `hiss-robinhood-portfolio`,
+`hiss-robinhood-market-intelligence`, `hiss-robinhood-equities`,
+`hiss-robinhood-options`, `hiss-agentic-ledger`, `hiss-cross-rail-handoff`,
+`hiss-price-mesh`). When Bankrbot (or any agent) reaches this skill:
+
+- For the truth model, capability discovery, account scoping, the grant
+  precondition, and the kill/pause/revoke decomposition → defer to
+  `hiss-robinhood-agentic`. Do not re-derive them here; this adapter inherits
+  them unchanged.
+- For the actual order lifecycle → `hiss-robinhood-equities` /
+  `hiss-robinhood-options` (capability-gated, discovery-first).
+- The routes and packs below remain the Bankrbot-specific compile surface; the
+  execution semantics are the ones in `hiss-robinhood-agentic`. Nothing in this
+  adapter widens a bound, adds a capability, or changes `liveOrderSent: false`.
 
 ## Hard rules
 
@@ -44,16 +60,17 @@ Consent, autonomy modes, and the LiveAutonomyAck live in
    forged.
 6. **Use Robinhood MCP only through the user's configured agentic
    account** — the user's own OAuth connection and consent settings.
-7. **Require paper preview before `live_candidate`**, and require the
-   explicit LiveAutonomyAck — a mode string alone never enables autonomy.
+7. **Require paper preview before live_candidate**, and require the
+   explicit LiveAutonomyAck (see hiss-autonomous-trading-safety) —
+   a mode string alone never enables autonomy.
 8. Autonomous trading involves substantial risk, including loss of
    principal; the user is responsible for monitoring agents, account
-   activity, and positions. No performance promises.
+   activity, and positions. Say so when relevant — no performance promises.
 
 ## Workflow
 
 1. Confirm the user's Coil (or route them to create one at
-   `https://app.hiss.finance/tools/bankrbot-robinhood`).
+   https://app.hiss.finance/tools/bankrbot-robinhood).
 2. `POST /api/bankrbot/validate-autonomy` — fix every issue before going on.
 3. Compile in `paper` mode: `POST /api/bankrbot/compile-robinhood-path`.
 4. Present the paper runbook + receipt; the user reviews it.
@@ -63,26 +80,38 @@ Consent, autonomy modes, and the LiveAutonomyAck live in
 7. After any session, `POST /api/bankrbot/post-run-audit` with the receipt
    and reported activity.
 
-## API routes (HTTP, base `https://app.hiss.finance`; `www.hiss.finance` still serves these routes for compatibility)
+## API routes (HTTP, base https://app.hiss.finance)
 
-| Route                                       | In → Out                                                                                  |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `POST /api/bankrbot/compile-robinhood-path` | `{coil, options?}` → full path result (packs, runbook, gate, receipt, share card).        |
-| `POST /api/bankrbot/validate-autonomy`      | `{coil, autonomyMode?, fuses?, liveAutonomyAck?}` → issues + live-readiness gate verdict. |
-| `POST /api/bankrbot/generate-command-pack`  | `{coil, options?}` → BankrbotCommandPack + receipt.                                       |
-| `POST /api/bankrbot/post-run-audit`         | `{receipt, activity[]}` → PostRunAuditReport.                                             |
-| `GET /api/bankrbot/schema`                  | Machine-readable schemas for all of the above.                                            |
+| Route                                       | In → Out                                                                                    |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `POST /api/bankrbot/compile-robinhood-path` | `{coil, options?}` → full path result (packs, runbook, gate, receipt, share card).          |
+| `POST /api/bankrbot/validate-autonomy`      | `{coil, autonomyMode?, fuses?, liveAutonomyAck?}` → issues + live-readiness gate (verdict). |
+| `POST /api/bankrbot/generate-command-pack`  | `{coil, options?}` → BankrbotCommandPack + receipt.                                         |
+| `POST /api/bankrbot/post-run-audit`         | `{receipt, activity[]}` → PostRunAuditReport.                                               |
+| `GET /api/bankrbot/schema`                  | Machine-readable schemas for all of the above.                                              |
 
 256 KB body cap · 30 req / 5 min · credential-looking fields rejected and
 never echoed · `nowIso` pins the clock for deterministic output.
 
-## Interfaces
+## HTTP tool routes
 
-The Bankrbot → Robinhood path is exposed through the **HTTP API only** (the
-`POST /api/bankrbot/*` routes above) — it has **no dedicated MCP tools**. To
-prepare the underlying Coil over MCP, use `hiss_validate_coil` and
-`hiss_compile_coil` (see `hiss-mcp`), then drive the path via the HTTP routes.
-Every output passes the execution-claim guard.
+`POST /api/bankrbot/compile-robinhood-path` · `POST /api/bankrbot/validate-autonomy` ·
+`POST /api/bankrbot/generate-command-pack` · `POST /api/bankrbot/post-run-audit`
+(the Robinhood MCP instruction bundle is emitted as part of the compile-path
+output) — every output passes the execution-claim guard.
+
+## Paid x402 services (Bankr x402 Cloud; USDC on Base; 4xx = unbilled)
+
+| Service                            | Price      |
+| ---------------------------------- | ---------- |
+| `compile-coil-for-robinhood`       | $1.00/call |
+| `validate-autonomy-fuses`          | $0.50/call |
+| `generate-bankrbot-trading-prompt` | $0.50/call |
+| `simulate-rebalance-plan`          | $0.75/call |
+| `post-run-audit`                   | $0.50/call |
+
+Do not claim a service is deployed unless deployment is verified — see
+hiss-x402-agent-calls for the payment flow.
 
 ## Example prompts
 

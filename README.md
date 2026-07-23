@@ -111,10 +111,12 @@ local `file:` / `link:` reference.
 
 ## 🧠 Install HISS Agent Skills
 
-HISS ships **10 agent skills** — self-contained `SKILL.md` instruction packs that
+HISS ships **19 agent skills** — self-contained `SKILL.md` instruction packs that
 teach a compatible coding agent how to work with HISS vaults, staking, rewards,
-receipts, Bankr rails, Stock Tokens, the MCP server, and the HISS security
-boundaries. They are installed with the open-source [`skills`](https://github.com/vercel-labs/skills)
+receipts, Bankr rails, Stock Tokens, the MCP server, the HISS security boundaries,
+and the **agentic-trading** path (running a Coil against the user's OWN Robinhood
+Trading MCP session — HISS compiles/verifies, the user's own session executes).
+They are installed with the open-source [`skills`](https://github.com/vercel-labs/skills)
 CLI (`npx skills`), which supports Claude Code, Codex, Cursor, and other clients.
 
 > Skills are **instructions for an agent** — review a `SKILL.md` before installing
@@ -211,6 +213,24 @@ proves completion.
 | [**hiss-bankrbot-robinhood**](./skills/hiss-bankrbot-robinhood/SKILL.md)   | Compile a Coil for the Bankrbot → Robinhood MCP path — paper-first, live-readiness gated                                                          | Bankrbot command pack, Robinhood MCP capsule, paper runbook, audit                        |
 | [**hiss-mcp**](./skills/hiss-mcp/SKILL.md)                                 | Drive the HISS tools over the local MCP server rather than raw HTTP                                                                               | Prepared artifacts and verified state reads via MCP tools                                 |
 | [**hiss-security-boundaries**](./skills/hiss-security-boundaries/SKILL.md) | Enforce the trust boundaries — no custody, no credentials, no execution claims, autonomy consent gates                                            | The guardrail reference the other skills are checked against                              |
+
+**Agentic-trading skills** — for running a Coil against the user's OWN Robinhood
+Trading MCP session. HISS compiles and verifies (`liveOrderSent: false`); the user's
+own agent session executes, under the user's own OAuth, consent, and a signed autonomy
+grant. HISS holds no credentials, places no orders, takes no custody, and is not
+affiliated with Robinhood.
+
+| Skill                                                                                          | Use it when you want an agent to…                                                                                       | It produces                                                                     |
+| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [**hiss-robinhood-agentic**](./skills/hiss-robinhood-agentic/SKILL.md)                         | Enter the agentic path — the truth model, the LiveAutonomyGrant precondition, session-time discovery, kill/pause/revoke | The grant/handoff scaffolding the focused agentic skills inherit                |
+| [**hiss-robinhood-portfolio**](./skills/hiss-robinhood-portfolio/SKILL.md)                     | Read the granted account (default: the granted account fingerprint only) in the user's session                          | Scoped portfolio/position reads with an as-of age                               |
+| [**hiss-robinhood-market-intelligence**](./skills/hiss-robinhood-market-intelligence/SKILL.md) | Pull quotes, historicals, indicators, price-book, scanner — as CANDIDATES, never orders                                 | Candidate ideas + evidence, explicitly non-executable                           |
+| [**hiss-robinhood-equities**](./skills/hiss-robinhood-equities/SKILL.md)                       | Run equity review → place → reconcile in the user's own session — no bypass, no blind retry                             | A prepared capsule + reconciliation; the user's session places the order        |
+| [**hiss-robinhood-options**](./skills/hiss-robinhood-options/SKILL.md)                         | Work options — capability-gated and fail-closed until a session proves the capability                                   | Spec-only guidance until session-proven; then a gated review→place→reconcile    |
+| [**hiss-coil-runner**](./skills/hiss-coil-runner/SKILL.md)                                     | Run the Coil runtime loop — at-most-once submit, reconcile before any retry                                             | Per-tick fuse evaluations, journaled would-submits, reconciliation state        |
+| [**hiss-agentic-ledger**](./skills/hiss-agentic-ledger/SKILL.md)                               | Keep the local journal + three-layer receipt spine; export or delete on request                                         | A local journal + receipts; user-held custody, export/delete                    |
+| [**hiss-cross-rail-handoff**](./skills/hiss-cross-rail-handoff/SKILL.md)                       | Prepare a brokerage ↔ Robinhood Chain handoff with a MANUAL boundary — never a bridge                                   | Prepared steps + arrival reconciliation (correlation, not causation)            |
+| [**hiss-price-mesh**](./skills/hiss-price-mesh/SKILL.md)                                       | Keep price/valuation coherent — partial propagates, null is never zero, reference ≠ executable                          | A price/valuation view with explicit freshness and reference-vs-fill separation |
 
 ### How skills work
 

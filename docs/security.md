@@ -39,6 +39,30 @@ Reward and deployment flows **refuse rather than guess**:
 
 A finding that turns a fail-closed path into a fail-open one is high value.
 
+## Agentic-trading boundary (user's own Robinhood session)
+
+The agentic-trading skills run a Coil against the **user's own** Robinhood Trading MCP
+session — not a HISS-hosted one. The boundary is fixed:
+
+- **No HISS-hosted execution.** HISS never holds the user's Robinhood OAuth, opens a
+  broker connection, or routes an order. Placement happens only through the user's own
+  session, in the user's own Agentic account.
+- **Signed autonomy grant required.** A Coil graduates toward live only under an
+  explicit `LiveAutonomyGrant` bound to the granted account; order skills stay
+  preview-only until a session proves the capability, and options stay fail-closed
+  until proven.
+- **review → place → reconcile.** Orders follow review → place (user's session) →
+  reconcile; at-most-once submit, reconcile before any retry, never a blind re-place.
+- **Binding fuses; reads scoped.** Risk fuses are binding and never widened to compile;
+  reads default to the granted account fingerprint only.
+- **Handoffs are manual, never a bridge.** A brokerage ↔ chain movement is a prepared
+  MANUAL handoff reconciled by arrival evidence — never an automatic bridge, ETA, or
+  in-flight-funds claim.
+
+The sanitized capability model is under [`schemas/robinhood-mcp/`](../schemas/robinhood-mcp/);
+every capability marked `UNKNOWN` is treated as not-available until an authorized
+session proves it.
+
 ## Honest status is a safety property
 
 - A failed read is **unknown** — never "live" and never "not deployed".

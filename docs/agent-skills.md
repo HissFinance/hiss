@@ -19,8 +19,12 @@ supporting references) describing:
 
 ## The packs
 
-Ten packs ship under [`skills/`](../skills). The filesystem is always the source of
-truth — `npx skills add HissFinance/hiss --list` prints the live set.
+Nineteen packs ship under [`skills/`](../skills). The filesystem is always the source of
+truth — `npx skills add HissFinance/hiss --list` prints the live set. The machine-readable
+[`skills/skill-catalog.json`](../skills/skill-catalog.json) enumerates every pack with its
+safety metadata (`write_risk`, `runtime_requirement`, required capability families).
+
+**Core packs**
 
 | Skill                                                                   | What it helps an agent do                                                                        |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -34,6 +38,22 @@ truth — `npx skills add HissFinance/hiss --list` prints the live set.
 | [hiss-bankrbot-robinhood](../skills/hiss-bankrbot-robinhood/SKILL.md)   | Compile a Coil for the Bankrbot → Robinhood MCP path (paper-first, gated).                       |
 | [hiss-mcp](../skills/hiss-mcp/SKILL.md)                                 | Drive the HISS tools over the local MCP server rather than raw HTTP.                             |
 | [hiss-security-boundaries](../skills/hiss-security-boundaries/SKILL.md) | The trust/custody/consent guardrail the other packs are checked against.                         |
+
+**Agentic-trading packs** — for running a Coil against the user's OWN Robinhood
+Trading MCP session. HISS compiles/verifies (`liveOrderSent: false`); the user's own
+agent session executes under the user's own OAuth, consent, and signed autonomy grant.
+
+| Skill                                                                                       | What it helps an agent do                                                                     |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [hiss-robinhood-agentic](../skills/hiss-robinhood-agentic/SKILL.md)                         | Umbrella entry point: the truth model, the LiveAutonomyGrant precondition, kill/pause/revoke. |
+| [hiss-robinhood-portfolio](../skills/hiss-robinhood-portfolio/SKILL.md)                     | Granted-account-scoped reads (default: the granted account fingerprint only).                 |
+| [hiss-robinhood-market-intelligence](../skills/hiss-robinhood-market-intelligence/SKILL.md) | Quotes / historicals / indicators / scanner — scans surface as CANDIDATES, never orders.      |
+| [hiss-robinhood-equities](../skills/hiss-robinhood-equities/SKILL.md)                       | Equity review → place → reconcile in the user's session — no bypass, no blind retry.          |
+| [hiss-robinhood-options](../skills/hiss-robinhood-options/SKILL.md)                         | Options — capability-gated and fail-closed until a session proves the capability.             |
+| [hiss-coil-runner](../skills/hiss-coil-runner/SKILL.md)                                     | The Coil runtime loop — at-most-once submit, reconcile-before-retry.                          |
+| [hiss-agentic-ledger](../skills/hiss-agentic-ledger/SKILL.md)                               | The local journal + three-layer receipt spine; export / delete; custody stays with the user.  |
+| [hiss-cross-rail-handoff](../skills/hiss-cross-rail-handoff/SKILL.md)                       | Prepared brokerage↔chain handoffs with a MANUAL boundary — reconciliation, never a bridge.    |
+| [hiss-price-mesh](../skills/hiss-price-mesh/SKILL.md)                                       | The price/valuation mesh — partial propagates, null is never zero, reference ≠ executable.    |
 
 ## Installing packs
 

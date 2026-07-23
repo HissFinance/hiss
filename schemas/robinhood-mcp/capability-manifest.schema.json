@@ -1,0 +1,348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiss.finance/schemas/robinhood-mcp/capability-manifest.schema.json",
+  "title": "RobinhoodMcpCapabilityManifest",
+  "description": "Canonical machine-readable manifest of the Robinhood Trading MCP capability surface, as consumed by HISS skills, the coil runtime, and drift tooling. ONE source of truth: skills declare capability-family ids (see capabilityFamilies), never per-skill tool lists. Every UNKNOWN is a runtime FAIL-CLOSED default: not available, not permitted, must be reconciled out of band. Upgrading an UNKNOWN requires a dated primary-source citation OR an authorised-session schema capture committed to docs/mcp/evidence/. A secondary writeup never suffices. This manifest is derived from and must stay drift-consistent with docs/mcp/capability-matrix.json (the shipped, gate-tested matrix).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestVersion",
+    "derivedFrom",
+    "verifiedAt",
+    "publicImpact",
+    "failClosedRule",
+    "endpoint",
+    "globalSemantics",
+    "capabilityFamilies",
+    "capabilities",
+    "gatedTools",
+    "unknownCount"
+  ],
+  "properties": {
+    "manifestVersion": {
+      "type": "string",
+      "description": "Semantic-ish version of this manifest artifact (bump on any capability change)."
+    },
+    "derivedFrom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matrix", "matrixRevision", "toolCatalogEvidence", "endpointProbeEvidence"],
+      "description": "Provenance: the shipped matrix + evidence this manifest is a typed projection of. This manifest never introduces a capability the matrix has not verified.",
+      "properties": {
+        "matrix": { "type": "string" },
+        "matrixRevision": { "type": "integer" },
+        "toolCatalogEvidence": { "type": "string" },
+        "endpointProbeEvidence": { "type": "string" }
+      }
+    },
+    "verifiedAt": {
+      "type": "string",
+      "description": "ISO date of the most recent verification (probe + article re-fetch)."
+    },
+    "publicImpact": {
+      "type": "string",
+      "enum": ["INTERNAL", "PUBLIC_SKILL_SURFACE", "PUBLIC_COPY"],
+      "description": "This manifest itself is INTERNAL; the skills that read it are PUBLIC_SKILL_SURFACE. Classification is required per mission rule."
+    },
+    "failClosedRule": {
+      "type": "string",
+      "description": "Verbatim statement of the fail-closed rule the runtime imports."
+    },
+    "endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tradingUrl", "transport", "authModel", "scopesSupported", "introspectable"],
+      "properties": {
+        "tradingUrl": { "type": "string" },
+        "transport": { "type": "string", "description": "e.g. 'MCP Streamable HTTP, POST only'." },
+        "authModel": { "type": "string" },
+        "scopesSupported": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "OAuth scopes advertised. VERIFIED: only 'internal' — no read-vs-trade separation."
+        },
+        "introspectable": {
+          "type": "boolean",
+          "description": "Whether tools/list is answerable without a bearer token. VERIFIED false (401)."
+        }
+      }
+    },
+    "globalSemantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Cross-tool semantics. Each carries a status; UNKNOWN => fail-closed default.",
+      "required": [
+        "assetClasses",
+        "orderTypes",
+        "timeInForce",
+        "marketHours",
+        "rateLimits",
+        "idempotency",
+        "streaming",
+        "transferSurface",
+        "serverKillSwitch",
+        "sessionTokenLifetime",
+        "dataAccessScope",
+        "confirmation"
+      ],
+      "properties": {
+        "assetClasses": { "$ref": "#/$defs/semanticFact" },
+        "orderTypes": { "$ref": "#/$defs/semanticFact" },
+        "timeInForce": { "$ref": "#/$defs/semanticFact" },
+        "marketHours": { "$ref": "#/$defs/semanticFact" },
+        "rateLimits": { "$ref": "#/$defs/semanticFact" },
+        "idempotency": { "$ref": "#/$defs/semanticFact" },
+        "streaming": { "$ref": "#/$defs/semanticFact" },
+        "transferSurface": { "$ref": "#/$defs/semanticFact" },
+        "serverKillSwitch": { "$ref": "#/$defs/semanticFact" },
+        "sessionTokenLifetime": { "$ref": "#/$defs/semanticFact" },
+        "dataAccessScope": { "$ref": "#/$defs/semanticFact" },
+        "confirmation": { "$ref": "#/$defs/semanticFact" }
+      }
+    },
+    "capabilityFamilies": {
+      "type": "array",
+      "description": "The §28.5 families a skill may declare in its frontmatter. Closed set — a skill referencing a family id not in this list fails validation.",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/capabilityFamily" }
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "The verified tool surface, one RobinhoodMcpCapability per MCP tool.",
+      "items": { "$ref": "#/$defs/robinhoodMcpCapability" }
+    },
+    "gatedTools": {
+      "type": "array",
+      "description": "The §28.5 'do not assume exists' list. A skill may not claim any of these un-gated. Mix of SCHEMA-UNKNOWN (exists, params auth-walled) and VERIFIED-ABSENT (does not exist).",
+      "items": { "$ref": "#/$defs/gatedTool" }
+    },
+    "unknownCount": {
+      "type": "integer",
+      "description": "Frozen count of C1 UNKNOWN semantics. The runtime pins this; drift is a release-blocking event.",
+      "const": 9
+    }
+  },
+  "$defs": {
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["VERIFIED", "VERIFIED-PARTIAL", "VERIFIED-ABSENT", "REPORTED", "SCHEMA-UNKNOWN", "UNKNOWN"]
+    },
+    "semanticFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "statement", "failClosedDefault"],
+      "properties": {
+        "status": { "$ref": "#/$defs/verificationStatus" },
+        "statement": { "type": "string" },
+        "evidence": { "type": "string" },
+        "failClosedDefault": {
+          "type": "string",
+          "description": "What the runtime assumes when status is UNKNOWN or ABSENT."
+        }
+      }
+    },
+    "capabilityFamily": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "consumes", "readOnly", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": ["account_read", "market_read", "equities", "options", "scanners", "watchlists"]
+        },
+        "label": { "type": "string" },
+        "description": { "type": "string" },
+        "readOnly": {
+          "type": "boolean",
+          "description": "True if every member tool is read/simulate class (no state-write, no order-write)."
+        },
+        "consumes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "The tool names this family resolves to. A tool may appear in more than one family."
+        }
+      }
+    },
+    "robinhoodMcpCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "toolName",
+        "group",
+        "families",
+        "riskClass",
+        "accountScoped",
+        "agenticAccountRequired",
+        "currentlyDocumented",
+        "schemaDiscovered",
+        "officialDescription",
+        "descriptionStatus",
+        "inputSchemaStatus",
+        "outputSchemaStatus",
+        "supportedAssetClasses",
+        "supportedOrderTypes",
+        "supportedTif",
+        "freshness",
+        "pagination",
+        "rateLimit",
+        "retryPolicy",
+        "limitations",
+        "livePolicy",
+        "mustBeGated"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^tool\\.[a-z_]+$",
+          "description": "Stable id, form tool.<name>. Matches the shipped matrix row id."
+        },
+        "toolName": { "type": "string" },
+        "group": {
+          "type": "string",
+          "enum": ["account_portfolio_other", "watchlist", "market_data", "equities", "options", "scanner"],
+          "description": "Robinhood's own article section heading (source grouping)."
+        },
+        "families": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["account_read", "market_read", "equities", "options", "scanners", "watchlists"]
+          },
+          "description": "The capability-family ids skills consume this tool through."
+        },
+        "riskClass": {
+          "type": "string",
+          "enum": ["read", "simulate", "state-write", "order-write"],
+          "description": "read: no side effect. simulate: review_* pre-trade validation, no binding. state-write: mutates brokerage-side watchlist/scan state (non-capital). order-write: capital-moving place/cancel."
+        },
+        "accountScoped": {
+          "type": "string",
+          "enum": ["all-accounts-read", "agentic-account-write", "market-global", "none"],
+          "description": "all-accounts-read: read spans EVERY Robinhood account (VERIFIED asymmetry). agentic-account-write: write confined to the Agentic account. market-global: not account-scoped. none: n/a."
+        },
+        "agenticAccountRequired": {
+          "type": "boolean",
+          "description": "True only for order-write tools — placement is confined to the Agentic account."
+        },
+        "currentlyDocumented": {
+          "type": "boolean",
+          "description": "Named + described in the official article (VERIFIED). All 50 are true."
+        },
+        "schemaDiscovered": {
+          "type": "boolean",
+          "description": "Whether the input/output schema has been captured from an authorised session. Currently false for all 50 (auth-walled). False => callers MUST discover shape at session time and validate before every call."
+        },
+        "officialDescription": { "type": "string" },
+        "descriptionStatus": { "$ref": "#/$defs/verificationStatus" },
+        "inputSchemaStatus": { "$ref": "#/$defs/verificationStatus" },
+        "outputSchemaStatus": { "$ref": "#/$defs/verificationStatus" },
+        "supportedAssetClasses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["equity", "option", "index", "crypto-watch-only", "UNKNOWN"]
+          },
+          "description": "Asset classes this tool operates on. Trading is long equities + options only (VERIFIED); crypto is watch-only."
+        },
+        "supportedOrderTypes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "For order/simulate tools only. UNKNOWN for all — no order type is named in any official source; discover per session."
+        },
+        "supportedTif": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Time-in-force values. UNKNOWN for all — undocumented; discover per session."
+        },
+        "freshness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "note"],
+          "properties": {
+            "status": { "$ref": "#/$defs/verificationStatus" },
+            "note": { "type": "string" }
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "note"],
+          "properties": {
+            "status": { "$ref": "#/$defs/verificationStatus" },
+            "note": { "type": "string" }
+          }
+        },
+        "rateLimit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["payloadCap", "requestRate"],
+          "properties": {
+            "payloadCap": {
+              "type": "string",
+              "description": "Per-call payload cap where officially stated (e.g. '20 symbols'), else UNKNOWN. NOT a request-rate limit."
+            },
+            "requestRate": {
+              "type": "string",
+              "description": "Request-rate limit. UNKNOWN for all tools — undisclosed; runtime imposes conservative self-budgets + 429 backoff."
+            }
+          }
+        },
+        "retryPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["retrySafe", "idempotency", "onAmbiguousFailure"],
+          "properties": {
+            "retrySafe": {
+              "type": "string",
+              "description": "'yes' for reads; 'NO' for order-write (no client-order-id documented)."
+            },
+            "idempotency": {
+              "type": "string",
+              "description": "Server idempotency guarantee. UNKNOWN/absent for order-write — assume none."
+            },
+            "onAmbiguousFailure": {
+              "type": "string",
+              "description": "Mandated behaviour on an ambiguous transport failure. For order-write: reconciliation_required via C6 order-list diff, coil halts, NEVER blind retry."
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Verified constraints and un-verifiable-therefore-fail-closed notes."
+        },
+        "livePolicy": {
+          "type": "string",
+          "description": "Runtime posture: who may call this tool and when. HISS-hosted services never call any of them; only the user's own agent session."
+        },
+        "mustBeGated": {
+          "type": "string",
+          "enum": ["no", "schema-unknown", "verified-absent"],
+          "description": "schema-unknown: exists but params auth-walled, skill must schema-discover. verified-absent: relates to a capability that does NOT exist and must never be claimed. no: standard read usable at name level."
+        }
+      }
+    },
+    "gatedTool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "status", "reason", "skillRule"],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "description": "Tool name or capability phrase (e.g. 'quote WebSocket', 'bulk cancel-all')."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["SCHEMA-UNKNOWN", "VERIFIED-ABSENT"]
+        },
+        "reason": { "type": "string" },
+        "skillRule": {
+          "type": "string",
+          "description": "What a skill is permitted to say — the frontmatter/copy rule the product lane checks against."
+        }
+      }
+    }
+  }
+}

@@ -81,6 +81,33 @@ for the legacy → canonical mapping and the per-interface (MCP / SDK / CLI / HT
 equivalents. `pnpm check:skill-tool-refs` enforces this against the generated
 registry.
 
+## Robinhood MCP capability manifest (agentic-trading skills)
+
+The HISS MCP server above is HISS's own local read/prepare surface. It is **not** the
+Robinhood Trading MCP and never proxies it. The agentic-trading skills
+([`hiss-robinhood-agentic`](../skills/hiss-robinhood-agentic/SKILL.md) and the focused
+packs it hands off to) instead drive the **user's own** connection to Robinhood's
+official Trading MCP, in the user's own Agentic account, under the user's own OAuth and
+a signed autonomy grant. HISS compiles/verifies (`liveOrderSent: false`); the user's
+session executes.
+
+Those skills declare against a **capability-family model**, not per-skill tool lists:
+each skill names capability-family ids (e.g. `market_data`, `equities`, `options`,
+`scanner`, `account_portfolio_other`, `watchlist`) and discovers the concrete tools at
+session time. The sanitized machine-readable manifest lives under
+[`schemas/robinhood-mcp/`](../schemas/robinhood-mcp/):
+
+- `capability-snapshot.sanitized.json` — the documented capability surface, one entry
+  per tool, with an explicit `UNKNOWN` for every fact not confirmed from an authorized
+  session (schemas, order types, rate limits, pagination).
+- `capability-family-map.json` — the family → capability grouping the skills declare.
+- `capability-manifest.schema.json` — the JSON schema for the manifest.
+
+Discovery is **fail-closed**: every `UNKNOWN` is treated as not-available and
+not-permitted until an authorized session proves it. HISS-hosted services never call
+any Robinhood Trading MCP tool. See [`skills/skill-catalog.json`](../skills/skill-catalog.json)
+for each pack's required capability families and safety metadata.
+
 ## Building your own agent flows
 
 Combine tools into read → prepare pipelines. Example: `hiss_get_staking_status`

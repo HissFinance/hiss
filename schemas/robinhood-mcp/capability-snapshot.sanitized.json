@@ -1,0 +1,2309 @@
+{
+  "capabilities": [
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["account_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "account_portfolio_other",
+      "id": "tool.get_accounts",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "View all your Robinhood accounts",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_accounts"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["account_read"],
+      "freshness": {
+        "note": "Officially described as real-time / live.",
+        "status": "VERIFIED"
+      },
+      "group": "account_portfolio_other",
+      "id": "tool.get_portfolio",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Get a snapshot of your portfolio, including total value, values by asset class, and real-time buying power",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_portfolio"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["account_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "account_portfolio_other",
+      "id": "tool.get_realized_pnl",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "View realized profit and loss for your account over a custom time window, broken down by asset class",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_realized_pnl"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["account_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "account_portfolio_other",
+      "id": "tool.get_pnl_trade_history",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "DENIED — not in the shipped allowlist; AGENTIC_NEW_TOOL_ADOPTION.adopted=false (RISK-1)",
+      "mustBeGated": "no",
+      "officialDescription": "View your trade-by-trade realized P&L history",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_pnl_trade_history"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "account_portfolio_other",
+      "id": "tool.search",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Find a company name or partial name to a ticker",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "search"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.get_watchlists",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "List user’s watchlists",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_watchlists"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.get_watchlist_items",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "List symbols in a specific watchlist",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_watchlist_items"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists", "options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.get_option_watchlist",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Load an options watchlist",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_option_watchlist"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.get_popular_watchlists",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Discover Robinhood lists (like “100 most popular”)",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_popular_watchlists"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.create_watchlist",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Make a new custom watchlist.",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "create_watchlist"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.update_watchlist",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Rename or update a watchlist’s name description",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "update_watchlist"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.follow_watchlist",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Follow a Robinhood list",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "follow_watchlist"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.unfollow_watchlist",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Stop following a Robinhood list",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "unfollow_watchlist"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.add_to_watchlist",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Add stocks, crypto, or indexes to a watchlist",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity", "index", "crypto-watch-only"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "add_to_watchlist"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.remove_from_watchlist",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Remove stocks, crypto, or indexes from a watchlist",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity", "index", "crypto-watch-only"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "remove_from_watchlist"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists", "options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.add_option_to_watchlist",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Add an options contract to a watchlist",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "add_option_to_watchlist"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["watchlists", "options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "watchlist",
+      "id": "tool.remove_option_from_watchlist",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Remove an options contract from a watchlist",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "remove_option_from_watchlist"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "market_data",
+      "id": "tool.get_equity_historicals",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Get OHLCV price bars across a time range",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_equity_historicals"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "market_data",
+      "id": "tool.get_equity_fundamentals",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Get valuation ratios, market cap, 52-week range, dividend info, and today’s OHLCV",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_equity_fundamentals"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "market_data",
+      "id": "tool.get_financials",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "§28.5 GATED (SCHEMA-UNKNOWN): Reference by name only; do not assert available line items or period options. Discover per session."
+      ],
+      "livePolicy": "DENIED — not in the shipped allowlist; AGENTIC_NEW_TOOL_ADOPTION.adopted=false (RISK-1)",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Get a company's reported financials over time—revenue, gross profit, net income, and net margin—by quarter or year for one or more stocks",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_financials"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "Officially described as real-time / live.",
+        "status": "VERIFIED"
+      },
+      "group": "market_data",
+      "id": "tool.get_equity_price_book",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "§28.5 GATED (SCHEMA-UNKNOWN): May state the 4-stock cap and real-time framing; MUST NOT claim a specific book depth or level count. Discover per session."
+      ],
+      "livePolicy": "DENIED — not in the shipped allowlist; AGENTIC_NEW_TOOL_ADOPTION.adopted=false (RISK-1)",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Get a real-time Level 2 order book showing bid/ask price levels and resting size on each side, for up to 4 stocks",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "up to 4 stocks per call (VERIFIED)",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_equity_price_book"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "market_data",
+      "id": "tool.get_equity_technical_indicators",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Compute a technical indicator (RSI, MACD, Bollinger Bands, moving averages, and more) for a stock over a time range",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_equity_technical_indicators"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "market_data",
+      "id": "tool.get_earnings_results",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Look up a specific stock's earnings history and next report. See estimated vs. actual EPS for recent quarters, plus the upcoming quarter's estimate and report date.",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_earnings_results"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "market_data",
+      "id": "tool.get_earnings_calendar",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "List earnings reports scheduled across the market over a date window (up to 31 days), optionally limited to large-cap names",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "date window up to 31 days (VERIFIED)",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_earnings_calendar"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "market_data",
+      "id": "tool.get_indexes",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Look up market indexes by symbol",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["index"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_indexes"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read"],
+      "freshness": {
+        "note": "Officially described as real-time / live.",
+        "status": "VERIFIED"
+      },
+      "group": "market_data",
+      "id": "tool.get_index_quotes",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Get real-time index values",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["index"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_index_quotes"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["account_read", "equities"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "equities",
+      "id": "tool.get_equity_positions",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "View open equity positions with quantity and cost basis",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_equity_positions"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["account_read", "equities"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "equities",
+      "id": "tool.get_equity_tax_lots",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "DENIED — not in the shipped allowlist; AGENTIC_NEW_TOOL_ADOPTION.adopted=false (RISK-1)",
+      "mustBeGated": "no",
+      "officialDescription": "View the open tax lots for an equity holding, each with its quantity, cost basis, acquisition date, and long/short-term status",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_equity_tax_lots"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read", "equities"],
+      "freshness": {
+        "note": "Officially described as real-time / live.",
+        "status": "VERIFIED"
+      },
+      "group": "equities",
+      "id": "tool.get_equity_quotes",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Get real-time equity quotes and prior close for up to 20 symbols",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "up to 20 symbols per call (VERIFIED)",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_equity_quotes"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["equities"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "equities",
+      "id": "tool.get_equity_orders",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Get equity order status history",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_equity_orders"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["equities"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "equities",
+      "id": "tool.get_equity_tradability",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Exposes fractional eligibility, but whether place_equity_order accepts fractional/notional quantity is UNKNOWN."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Check if a symbol can be traded and find out if it can be traded fractionally",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_equity_tradability"
+    },
+    {
+      "accountScoped": "agentic-account-write",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["equities"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "equities",
+      "id": "tool.review_equity_order",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "review_* is a SIMULATION returning pre-trade warnings — not a two-phase commit and not a broker confirmation."
+      ],
+      "livePolicy": "PREVIEW/REVIEW — structurally mandatory before the matching place_* call",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Simulate an equity order and get pre-trade warnings",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "simulate",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": ["UNKNOWN"],
+      "supportedTif": ["UNKNOWN"],
+      "toolName": "review_equity_order"
+    },
+    {
+      "accountScoped": "agentic-account-write",
+      "agenticAccountRequired": true,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["equities"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "equities",
+      "id": "tool.place_equity_order",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Order types UNKNOWN — no type named in any official source; discover per session.",
+        "Time-in-force UNKNOWN; no client-order-id / idempotency key; no server confirmation gate.",
+        "Placement confined to the Agentic account."
+      ],
+      "livePolicy": "LIVE-CAPABLE in the USER's session only, behind grant + fuses + mandatory review_equity_order",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Place an equity order",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "UNKNOWN — no client-order-id documented; assume none.",
+        "onAmbiguousFailure": "reconciliation_required: journal a pre-submit snapshot, submit at most once, diff get_*_orders to attribute; NEVER blind-retry — coil halts.",
+        "retrySafe": "NO"
+      },
+      "riskClass": "order-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": ["UNKNOWN"],
+      "supportedTif": ["UNKNOWN"],
+      "toolName": "place_equity_order"
+    },
+    {
+      "accountScoped": "agentic-account-write",
+      "agenticAccountRequired": true,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["equities"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "equities",
+      "id": "tool.cancel_equity_order",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Order types UNKNOWN — no type named in any official source; discover per session.",
+        "Time-in-force UNKNOWN; no client-order-id / idempotency key; no server confirmation gate.",
+        "Placement confined to the Agentic account."
+      ],
+      "livePolicy": "LIVE-CAPABLE in the USER's session only, behind grant + fuses",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Cancel an open equity order",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "UNKNOWN — no client-order-id documented; assume none.",
+        "onAmbiguousFailure": "reconciliation_required: journal a pre-submit snapshot, submit at most once, diff get_*_orders to attribute; NEVER blind-retry — coil halts.",
+        "retrySafe": "NO"
+      },
+      "riskClass": "order-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": ["UNKNOWN"],
+      "supportedTif": ["UNKNOWN"],
+      "toolName": "cancel_equity_order"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "options",
+      "id": "tool.get_option_level_upgrade_info",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Only returns a link to apply for options access — the agent cannot grant itself options permission."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Get a link to apply for options trading access on an account",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_option_level_upgrade_info"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read", "options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "options",
+      "id": "tool.get_option_historicals",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "§28.5 GATED (SCHEMA-UNKNOWN): Reference by name only; no interval/span list, no bar-shape claim. Discover per session."
+      ],
+      "livePolicy": "DENIED — not in the shipped allowlist; AGENTIC_NEW_TOOL_ADOPTION.adopted=false (RISK-1)",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Get OHLC price bars for option contracts across a time range",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_option_historicals"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read", "options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "options",
+      "id": "tool.get_option_chains",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Load option chains",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_option_chains"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read", "options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "options",
+      "id": "tool.get_option_instruments",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Load option contracts filtered by expiry, strike, or type",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_option_instruments"
+    },
+    {
+      "accountScoped": "market-global",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["market_read", "options"],
+      "freshness": {
+        "note": "Officially described as real-time / live.",
+        "status": "VERIFIED"
+      },
+      "group": "options",
+      "id": "tool.get_option_quotes",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Get real-time quotes for option contracts",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_option_quotes"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["account_read", "options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "options",
+      "id": "tool.get_option_positions",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "View open or closed options positions",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_option_positions"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "options",
+      "id": "tool.get_option_orders",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "Get options order history",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_option_orders"
+    },
+    {
+      "accountScoped": "agentic-account-write",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "options",
+      "id": "tool.review_option_order",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "review_* is a SIMULATION returning pre-trade warnings — not a two-phase commit and not a broker confirmation."
+      ],
+      "livePolicy": "PREVIEW/REVIEW — structurally mandatory before the matching place_* call",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Simulate an options order with pre-trade alerts",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "simulate",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": ["UNKNOWN"],
+      "supportedTif": ["UNKNOWN"],
+      "toolName": "review_option_order"
+    },
+    {
+      "accountScoped": "agentic-account-write",
+      "agenticAccountRequired": true,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "options",
+      "id": "tool.cancel_option_order",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Order types UNKNOWN — no type named in any official source; discover per session.",
+        "Time-in-force UNKNOWN; no client-order-id / idempotency key; no server confirmation gate.",
+        "Placement confined to the Agentic account."
+      ],
+      "livePolicy": "PREVIEW-ONLY — semantics.optionsLevels UNKNOWN keeps option order tools non-live",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Cancel an open options order",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "UNKNOWN — no client-order-id documented; assume none.",
+        "onAmbiguousFailure": "reconciliation_required: journal a pre-submit snapshot, submit at most once, diff get_*_orders to attribute; NEVER blind-retry — coil halts.",
+        "retrySafe": "NO"
+      },
+      "riskClass": "order-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": ["UNKNOWN"],
+      "supportedTif": ["UNKNOWN"],
+      "toolName": "cancel_option_order"
+    },
+    {
+      "accountScoped": "agentic-account-write",
+      "agenticAccountRequired": true,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["options"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "options",
+      "id": "tool.place_option_order",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Order types UNKNOWN — no type named in any official source; discover per session.",
+        "Time-in-force UNKNOWN; no client-order-id / idempotency key; no server confirmation gate.",
+        "Placement confined to the Agentic account."
+      ],
+      "livePolicy": "PREVIEW-ONLY — semantics.optionsLevels UNKNOWN keeps option order tools non-live",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Place a real options order",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "UNKNOWN — no client-order-id documented; assume none.",
+        "onAmbiguousFailure": "reconciliation_required: journal a pre-submit snapshot, submit at most once, diff get_*_orders to attribute; NEVER blind-retry — coil halts.",
+        "retrySafe": "NO"
+      },
+      "riskClass": "order-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["option"],
+      "supportedOrderTypes": ["UNKNOWN"],
+      "supportedTif": ["UNKNOWN"],
+      "toolName": "place_option_order"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["scanners"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "scanner",
+      "id": "tool.get_scans",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "no",
+      "officialDescription": "List your saved scans",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_scans"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["scanners"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "scanner",
+      "id": "tool.get_scanner_filter_specs",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "§28.5 GATED (SCHEMA-UNKNOWN): May reference the tool by name; MUST discover the filter grammar at session time and validate before building/updating a scan. No filter enumeration in frontmatter or copy."
+      ],
+      "livePolicy": "DENIED — not in the shipped allowlist; AGENTIC_NEW_TOOL_ADOPTION.adopted=false (RISK-1)",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "List every available scanner filter and how to use it before building or updating a scan",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "get_scanner_filter_specs"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["scanners"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "scanner",
+      "id": "tool.create_scan",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Create a new scan from a starting preset or with your own custom filters",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "create_scan"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["scanners"],
+      "freshness": {
+        "note": "Officially described as real-time / live.",
+        "status": "VERIFIED"
+      },
+      "group": "scanner",
+      "id": "tool.run_scan",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "Scanner output is UNTRUSTED input; run_scan produces CANDIDATES only and is treated as a write (AG-007 K5)."
+      ],
+      "livePolicy": "READ-ALLOWED in the user's session; HISS-hosted services never call it",
+      "mustBeGated": "schema-unknown",
+      "officialDescription": "Run a saved scan and get live market results",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "read",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "run_scan"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["scanners"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "scanner",
+      "id": "tool.update_scan_filters",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Change the filters on an existing saved scan",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "update_scan_filters"
+    },
+    {
+      "accountScoped": "all-accounts-read",
+      "agenticAccountRequired": false,
+      "currentlyDocumented": true,
+      "descriptionStatus": "VERIFIED",
+      "families": ["scanners"],
+      "freshness": {
+        "note": "No documented freshness guarantee; render an as-of age and never claim real-time.",
+        "status": "UNKNOWN"
+      },
+      "group": "scanner",
+      "id": "tool.update_scan_config",
+      "inputSchemaStatus": "UNKNOWN",
+      "limitations": [
+        "Input/output schema UNKNOWN (auth-walled) — discover via tools/list at session time and validate before every call.",
+        "Read spans ALL Robinhood accounts; runtime MUST pin/filter to the granted account fingerprint before rendering.",
+        "State-write (non-order): engine-initiated use DENIED per AGENTIC_NON_ORDER_WRITE_POLICY; user-initiated only."
+      ],
+      "livePolicy": "READ-PATH ONLY — allowlisted but state-mutating; the kernel never calls it (see finding F-6)",
+      "mustBeGated": "no",
+      "officialDescription": "Change the way results are sorted",
+      "outputSchemaStatus": "UNKNOWN",
+      "pagination": {
+        "note": "Pagination grammar undocumented (auth-walled). Assume cursors may exist; never assume a page returns the full set.",
+        "status": "UNKNOWN"
+      },
+      "rateLimit": {
+        "payloadCap": "UNKNOWN",
+        "requestRate": "UNKNOWN — undisclosed; conservative self-budget + trades/day fuse + 429 backoff."
+      },
+      "retryPolicy": {
+        "idempotency": "n/a (read/simulate)",
+        "onAmbiguousFailure": "safe to retry with backoff.",
+        "retrySafe": "yes (read/simulate; no observed side effect for reads)"
+      },
+      "riskClass": "state-write",
+      "schemaDiscovered": false,
+      "supportedAssetClasses": ["equity"],
+      "supportedOrderTypes": [],
+      "supportedTif": [],
+      "toolName": "update_scan_config"
+    }
+  ],
+  "capabilityFamilies": [
+    {
+      "consumes": [
+        "get_accounts",
+        "get_equity_positions",
+        "get_equity_tax_lots",
+        "get_option_positions",
+        "get_pnl_trade_history",
+        "get_portfolio",
+        "get_realized_pnl"
+      ],
+      "description": "Account identity, portfolio snapshot, balances, realized P&L, and current holdings/positions/tax lots. VERIFIED asymmetry: reads span ALL of the user’s Robinhood accounts, not just the Agentic account.",
+      "id": "account_read",
+      "label": "Account & portfolio reads",
+      "readOnly": true
+    },
+    {
+      "consumes": [
+        "get_earnings_calendar",
+        "get_earnings_results",
+        "get_equity_fundamentals",
+        "get_equity_historicals",
+        "get_equity_price_book",
+        "get_equity_quotes",
+        "get_equity_technical_indicators",
+        "get_financials",
+        "get_index_quotes",
+        "get_indexes",
+        "get_option_chains",
+        "get_option_historicals",
+        "get_option_instruments",
+        "get_option_quotes",
+        "search"
+      ],
+      "description": "Quotes, historicals, fundamentals, financials, technicals, earnings, indexes, symbol search, option chains/instruments/quotes, Level 2 book. Not account-scoped.",
+      "id": "market_read",
+      "label": "Market & reference data reads",
+      "readOnly": true
+    },
+    {
+      "consumes": [
+        "cancel_equity_order",
+        "get_equity_orders",
+        "get_equity_positions",
+        "get_equity_quotes",
+        "get_equity_tax_lots",
+        "get_equity_tradability",
+        "place_equity_order",
+        "review_equity_order"
+      ],
+      "description": "Equity positions, quotes, orders, tradability, and the review→place→cancel order lifecycle. Order writes are Agentic-account-confined.",
+      "id": "equities",
+      "label": "Equities trading surface",
+      "readOnly": false
+    },
+    {
+      "consumes": [
+        "add_option_to_watchlist",
+        "cancel_option_order",
+        "get_option_chains",
+        "get_option_historicals",
+        "get_option_instruments",
+        "get_option_level_upgrade_info",
+        "get_option_orders",
+        "get_option_positions",
+        "get_option_quotes",
+        "get_option_watchlist",
+        "place_option_order",
+        "remove_option_from_watchlist",
+        "review_option_order"
+      ],
+      "description": "Option chains/instruments/quotes/positions/orders/historicals, the options watchlist, level-upgrade link, and the review→place→cancel lifecycle. Options level is UNKNOWN and gated.",
+      "id": "options",
+      "label": "Options trading surface",
+      "readOnly": false
+    },
+    {
+      "consumes": [
+        "create_scan",
+        "get_scanner_filter_specs",
+        "get_scans",
+        "run_scan",
+        "update_scan_config",
+        "update_scan_filters"
+      ],
+      "description": "Saved scans, filter-spec discovery, scan CRUD, and run_scan. Scanner output is UNTRUSTED input; run_scan is treated as a write (AG-007 K5).",
+      "id": "scanners",
+      "label": "Scanners",
+      "readOnly": false
+    },
+    {
+      "consumes": [
+        "add_option_to_watchlist",
+        "add_to_watchlist",
+        "create_watchlist",
+        "follow_watchlist",
+        "get_option_watchlist",
+        "get_popular_watchlists",
+        "get_watchlist_items",
+        "get_watchlists",
+        "remove_from_watchlist",
+        "remove_option_from_watchlist",
+        "unfollow_watchlist",
+        "update_watchlist"
+      ],
+      "description": "Watchlist reads and user-initiated CRUD (equity + option). Engine-initiated writes are DENIED per AGENTIC_NON_ORDER_WRITE_POLICY.",
+      "id": "watchlists",
+      "label": "Watchlists",
+      "readOnly": false
+    }
+  ],
+  "derivedFrom": {
+    "endpointProbeEvidence": "docs/mcp/evidence/endpoint-probe-2026-07-22.json",
+    "matrix": "docs/mcp/capability-matrix.json",
+    "matrixRevision": 2,
+    "toolCatalogEvidence": "docs/mcp/evidence/tool-catalog-2026-07-22.json"
+  },
+  "endpoint": {
+    "authModel": "OAuth 2.1 Bearer, PKCE S256, auth-code + refresh, public client; interactive browser re-auth",
+    "introspectable": false,
+    "scopesSupported": ["internal"],
+    "tradingUrl": "https://agent.robinhood.com/mcp/trading",
+    "transport": "MCP Streamable HTTP, POST only (GET->405 allow: POST)"
+  },
+  "failClosedRule": "Every UNKNOWN is a runtime FAIL-CLOSED default: not available, not permitted, must be reconciled out of band. Upgrading an UNKNOWN requires a dated primary-source citation OR an authorised-session schema capture committed to docs/mcp/evidence/. A secondary writeup never suffices.",
+  "gatedTools": [
+    {
+      "reason": "Tool EXISTS in the verified 50 (lists scanner filters), but its output schema is auth-walled. A skill must not hard-code any filter id, operator, or value grammar.",
+      "ref": "get_scanner_filter_specs",
+      "skillRule": "May reference the tool by name; MUST discover the filter grammar at session time and validate before building/updating a scan. No filter enumeration in frontmatter or copy.",
+      "status": "SCHEMA-UNKNOWN"
+    },
+    {
+      "reason": "Tool EXISTS (OHLC bars for option contracts) but input params (interval set, span) and output shape are auth-walled.",
+      "ref": "get_option_historicals",
+      "skillRule": "Reference by name only; no interval/span list, no bar-shape claim. Discover per session.",
+      "status": "SCHEMA-UNKNOWN"
+    },
+    {
+      "reason": "Tool EXISTS (reported financials by quarter/year) but the field set, period grammar, and multi-symbol cap are auth-walled.",
+      "ref": "get_financials",
+      "skillRule": "Reference by name only; do not assert available line items or period options. Discover per session.",
+      "status": "SCHEMA-UNKNOWN"
+    },
+    {
+      "reason": "Tool EXISTS (real-time Level 2 book, up to 4 stocks) but the depth, level count, and output shape are auth-walled. The 4-stock cap is the only VERIFIED parameter fact.",
+      "ref": "get_equity_price_book",
+      "skillRule": "May state the 4-stock cap and real-time framing; MUST NOT claim a specific book depth or level count. Discover per session.",
+      "status": "SCHEMA-UNKNOWN"
+    },
+    {
+      "reason": "GET with Accept: text/event-stream returns 405 allow: POST BEFORE auth on both trading and banking hosts. No server-push, no subscription, no webhook in any official article.",
+      "ref": "quote WebSocket / streaming quotes / SSE subscription",
+      "skillRule": "MUST NOT claim streaming, push, real-time subscriptions, or WebSocket quotes. Every broker-derived value renders an as-of age; fills are discovered only by polling get_*_orders.",
+      "status": "VERIFIED-ABSENT"
+    },
+    {
+      "reason": "No in-band MCP tool disconnects a session or acts as a server-side kill switch. The only documented control is the user manually disconnecting/reconnecting the MCP in Robinhood’s app (DELETE terminates a session but is auth-gated and client-driven).",
+      "ref": "MCP-disconnect / server-side kill tool",
+      "skillRule": "MUST NOT present a one-click server kill. The kill layer is client-side (per-coil / global / revoke grant / stop runtime) with the platform disconnect as the outer ring only.",
+      "status": "VERIFIED-ABSENT"
+    },
+    {
+      "reason": "Only per-order cancel_equity_order and cancel_option_order exist. No cancel-all, no flatten, no liquidate tool in the 50.",
+      "ref": "bulk cancel-all / liquidate-all",
+      "skillRule": "MUST NOT claim a cancel-all or liquidate control. Any exit is a separately authorized, order-by-order prepared action.",
+      "status": "VERIFIED-ABSENT"
+    },
+    {
+      "reason": "No money-movement tool in the 50 (33 reads + 11 watchlist/scan writes + 2 reviews + 4 order tools). Banking MCP scope is credit-card, read-only. Funding is a USER action in Robinhood’s app.",
+      "ref": "deposit / withdrawal / ACH / wire / internal-transfer / bridge tools",
+      "skillRule": "MUST NOT claim any funding, transfer, deposit, withdrawal, or bridge capability. Cross-rail movement is a prepared handoff (docs/agentic/cross-rail-boundary.md), never an automated transfer.",
+      "status": "VERIFIED-ABSENT"
+    }
+  ],
+  "globalSemantics": {
+    "assetClasses": {
+      "evidence": "src.tools-article asset-class sentence, re-verified 2026-07-22",
+      "failClosedDefault": "Capsules reject non-equity/non-option execution at compile time.",
+      "statement": "Long equities and options only. No shorting, crypto, futures, event contracts, or tokenized execution.",
+      "status": "VERIFIED"
+    },
+    "confirmation": {
+      "evidence": "src.overview-article + src.tools-article",
+      "failClosedDefault": "Autonomy is an agent-layer property; the grant is the only real gate; HISS default stays no-autotrade; review before place is structural.",
+      "statement": "Agent can trade without confirmation if so instructed; review_* is simulation, not a server confirmation gate.",
+      "status": "VERIFIED"
+    },
+    "dataAccessScope": {
+      "evidence": "src.overview-article read-access disclosure",
+      "failClosedDefault": "Broker reads stay in the local runtime; pin/filter to the granted account fingerprint before rendering.",
+      "statement": "READ = every Robinhood account (incl. account numbers, positions, balances, full order history, watchlists, scans). WRITE = the Agentic account only.",
+      "status": "VERIFIED"
+    },
+    "idempotency": {
+      "failClosedDefault": "Assume none. At-most-once submit; reconcile via C6 order-list diff; never retry place_* on ambiguous failure.",
+      "statement": "No client-order-id / idempotency key documented; schemas auth-walled so absence is inferred, not proven.",
+      "status": "UNKNOWN"
+    },
+    "marketHours": {
+      "failClosedDefault": "Regular trading hours only; a capsule may narrow, never widen.",
+      "statement": "No extended-hours parameter documented.",
+      "status": "UNKNOWN"
+    },
+    "orderTypes": {
+      "failClosedDefault": "Only order shapes proven from a live session schema; no TIF/type assumption; trailing stops synthesised from quotes + orders.",
+      "statement": "No order type is named in any official source.",
+      "status": "UNKNOWN"
+    },
+    "rateLimits": {
+      "failClosedDefault": "Conservative self-budgets + trades/day fuse + 429 backoff.",
+      "statement": "Request-rate limits and 429 semantics undisclosed.",
+      "status": "UNKNOWN"
+    },
+    "serverKillSwitch": {
+      "failClosedDefault": "Client-side kill layer is mandatory (per-coil + global); platform disconnect is the outer ring.",
+      "statement": "Only user-driven disconnect/reconnect of the MCP is documented; no in-band server kill tool.",
+      "status": "VERIFIED-ABSENT"
+    },
+    "sessionTokenLifetime": {
+      "failClosedDefault": "Token expiry = HALT + notify, never a retry storm.",
+      "statement": "Token TTLs and revocation propagation undocumented.",
+      "status": "UNKNOWN"
+    },
+    "streaming": {
+      "evidence": "src.probe.get 2026-07-22",
+      "failClosedDefault": "Polling only. Fills discovered by polling get_*_orders; every value renders an as-of age.",
+      "statement": "No server-initiated event stream. GET/SSE returns 405 allow: POST before auth on trading and banking.",
+      "status": "VERIFIED-ABSENT"
+    },
+    "timeInForce": {
+      "failClosedDefault": "No TIF assumed; discover per session.",
+      "statement": "TIF values undocumented.",
+      "status": "UNKNOWN"
+    },
+    "transferSurface": {
+      "evidence": "src.tools-article full 50-tool surface + src.oauth.banking + src.credit-card-article",
+      "failClosedDefault": "Cross-rail movement is a prepared handoff, never an automated transfer.",
+      "statement": "No funding, deposit, withdrawal, ACH, wire, internal-transfer, or bridge tool. Banking MCP is card-scoped (credit-card).",
+      "status": "VERIFIED-ABSENT"
+    }
+  },
+  "manifestVersion": "1.0.0",
+  "publicImpact": "INTERNAL",
+  "unknownCount": 9,
+  "verifiedAt": "2026-07-22"
+}

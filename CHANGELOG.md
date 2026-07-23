@@ -13,6 +13,25 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **Skill architecture: nine new agentic-trading skills + capability manifest
+  (MAJOR).** The public skill catalog grows from 10 to 19 packs. New packs for
+  running a Coil against the user's OWN Robinhood Trading MCP session:
+  `hiss-robinhood-agentic` (umbrella truth model + LiveAutonomyGrant),
+  `hiss-robinhood-portfolio`, `hiss-robinhood-market-intelligence`,
+  `hiss-robinhood-equities`, `hiss-robinhood-options`, `hiss-coil-runner`,
+  `hiss-agentic-ledger`, `hiss-cross-rail-handoff`, and `hiss-price-mesh`. HISS
+  compiles/verifies (`liveOrderSent: false`); the user's own session executes
+  under the user's own OAuth, consent, and a signed autonomy grant. Adds the
+  sanitized Robinhood MCP capability manifest under `schemas/robinhood-mcp/`
+  (snapshot + family map + JSON schema) and a generated
+  `skills/skill-catalog.json` carrying each pack's safety metadata
+  (`write_risk`, `runtime_requirement`, required capability families).
+  **Migration note:** existing packs are compatible — `hiss-coilops`,
+  `hiss-risk-fuses`, `hiss-receipts`, `hiss-security-boundaries`,
+  `hiss-bankrbot-robinhood`, `hiss-stock-tokens`, and `hiss-vault-agent-kit`
+  are refreshed (tool references normalized to the canonical MCP surface plus
+  HTTP routes; no behavior change). No tool, contract, or address changed.
+  (Source release: skill-architecture RC `53bbf97`.)
 - **Queued-deposit executor: documented as implemented, not active.** The
   one-signature queued-deposit executor (permit-as-intent; keeper strikes at
   the next fresh price; no second signature) is implemented and fork-proven in
