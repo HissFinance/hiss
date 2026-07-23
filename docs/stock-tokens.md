@@ -34,6 +34,35 @@ and a jurisdiction gate.
 - **Corporate-action awareness.** Tokenized instruments can carry UI multipliers for
   corporate actions; HISS surfaces treat these as data, not as ownership events.
 
+## Liquidity and trading venues
+
+Stock Tokens on Robinhood Chain draw liquidity from several venues. Builders can
+leverage these directly; HISS itself only **prepares and verifies** — it provides
+no liquidity, quotes no fills, and places no orders.
+
+- **AMM pools** — Uniswap-style on-chain pools give composable liquidity that
+  smart-contract flows integrate directly. HISS vault rebalancing routes through
+  AMM liquidity, oracle-guarded and slippage-bounded.
+- **propAMM (proprietary AMM)** — market-maker-backed on-chain AMMs such as
+  **Rialto**. Because a propAMM is on-chain, it offers composable liquidity that
+  DeFi apps can integrate directly into smart-contract flows — unlike RFQ, which
+  relies on off-chain signed quotes.
+- **RFQ (request-for-quote)** — off-chain signed market-maker quotes sourced
+  through aggregators; wallets and apps integrate those aggregators as a liquidity
+  source. Named aggregators include **0x RFQ**, **1inch Fusion**, and **LiFi**.
+- **Direct mint & burn** — reserved for authorized participants and market makers;
+  the ultimate source of Stock Token supply that underpins secondary-market
+  liquidity.
+- **Orderbook** — Stock Tokens also trade on **Lighter** (spot and perpetuals).
+
+A reference quote from any venue is **not** an executable fill — always separate a
+reference price from what a specific size can actually transact (the same
+reference-vs-executable separation the HISS agent skills enforce). Venue and
+liquidity availability are **region-gated** like the tokens themselves.
+
+Authoritative source: Robinhood's
+[Building with Stock Tokens — Trading Venues & Liquidity](https://docs.robinhood.com/chain/building-with-stock-tokens/#trading-venues--liquidity).
+
 ## Representative assets
 
 The flagship vault's allowed set includes mega-cap tech (AAPL, MSFT, NVDA, GOOGL, AMZN,
