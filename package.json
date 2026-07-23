@@ -20,13 +20,14 @@
     "contracts:test": "tsx scripts/contracts-test.ts",
     "schemas:validate": "tsx scripts/validate-schemas.ts",
     "docs:check": "tsx scripts/check-doc-links.ts",
+    "check:nav": "tsx scripts/check-nav.ts",
     "check:private-boundary": "tsx scripts/check-private-boundary.ts",
     "check:execution-claims": "tsx scripts/check-execution-claims.ts",
     "check:skill-tool-refs": "tsx scripts/check-skill-tool-refs.ts",
     "check:fee-docs": "tsx scripts/check-fee-docs.ts",
     "check:secrets": "tsx scripts/check-secrets.ts",
     "licenses:check": "tsx scripts/check-licenses.ts",
-    "check:all": "pnpm schemas:validate && pnpm docs:check && pnpm check:private-boundary && pnpm check:execution-claims && pnpm check:skill-tool-refs && pnpm check:fee-docs && pnpm check:secrets && pnpm licenses:check"
+    "check:all": "pnpm schemas:validate && pnpm docs:check && pnpm check:nav && pnpm check:private-boundary && pnpm check:execution-claims && pnpm check:skill-tool-refs && pnpm check:fee-docs && pnpm check:secrets && pnpm licenses:check"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

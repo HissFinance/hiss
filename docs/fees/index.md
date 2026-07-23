@@ -61,5 +61,5 @@ Each fee is documented with the same fields so you can verify it independently:
 - **Depositor principal** is never charged a performance fee — the protocol share is
   carved from the _creator's_ fee, never from principal.
 
-Continue to: [Vault fees](./vault-fees.md) · [$HISS token fees](./hiss-token-fees.md) ·
-[Reward flywheel](./reward-flywheel.md).
+Continue to: [Fee model](./fee-model.md) · [Vault fees](./vault-fees.md) ·
+[$HISS token fees](./hiss-token-fees.md) · [Reward flywheel](./reward-flywheel.md).

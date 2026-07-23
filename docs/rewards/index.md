@@ -28,6 +28,8 @@ performance claim.** **Vault contributors** is the current name for the former
   measured.
 - **[Epochs and vesting](./epochs-and-vesting.md)** — the weekly/monthly lifecycle,
   7-day challenge window, and linear vesting.
+- **[Reward split](./reward-split.md)** — the exact 50/15/15/10/10 methodology
+  (HISS Reward Method V2), each leg, and the retained historical V1.
 
 ## Principles across all rewards
 
