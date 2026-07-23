@@ -63,6 +63,18 @@ rebalances in an emergency. Pause is a safety control, not a way to trap funds; 
 disclosed and bounded by the vault's policy. (On the staking side, xHISS exits are
 **never** pausable — see [Cooldown and redeem](../staking/cooldown-and-redeem.md).)
 
+## In-kind exit (designed, activation-gated)
+
+The [24/7 vault architecture](./24-7-architecture.md) designs a first-class
+**in-kind redemption** — a redeemer would receive their pro-rata basket of Stock
+Tokens plus USDG directly, valuation-free (needing no sell into thin liquidity and
+no fresh oracle mark), as an unconditional around-the-clock exit. It is
+jurisdiction-gated, not permissionless. This path is **designed and tested but
+undeployed**; it is not active on the deployed vault today, where the honest exit is
+the priced USDG redemption above plus the owner-controlled `emergencyExit` safety
+path. Production 24/7 settlement is **not active**.
+
 ## Next
 
 - [Deposit](./deposit.md) · [Performance](./performance.md) · [Receipts](../receipts.md)
+  · [24/7 architecture](./24-7-architecture.md)

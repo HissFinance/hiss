@@ -2,7 +2,7 @@
 name: hiss-price-mesh
 description: Instructions for reconciling prices across the user's two rails while strictly separating a REFERENCE QUOTE (informational, may be stale, never executable) from EXECUTABLE LIQUIDITY (what a specific venue could actually fill for a specific size, session-discovered). Combines Robinhood MCP equity/index quotes (schema-unknown) and Robinhood Chain reads under per-source freshness budgets; never presents a reference quote as a fill, never claims a cross-rail parity. This is a set of instructions, not a price oracle service. Use when a user needs a cross-rail price view or asks "what can I actually get".
 tags: [price-mesh, quotes, liquidity, cross-rail, robinhood-chain, freshness]
-version: 1
+version: 2
 visibility: public
 required_hiss_skills: [hiss-robinhood-market-intelligence]
 required_mcp_servers: [robinhood-trading-mcp]
@@ -122,6 +122,20 @@ sessionProven: boolean }[] }`.
 - The user's Robinhood MCP quote tools (discovered) for brokerage reference.
 - Public RPC (`rpc.mainnet.chain.robinhood.com`) for chain reads.
 
+## Side-aware vault marks (designed, activation-gated)
+
+The reference-vs-executable discipline this skill enforces is the same principle
+behind the designed (undeployed) [24/7 vault architecture](../../docs/vaults/24-7-architecture.md).
+There, per asset, a single generic price is rejected in favor of three distinct
+marks: a manipulation-resistant **reporting mark** (mid, for NAV), an **ask-side
+deposit mark**, and a **bid-side redemption mark**, with a live, expiring
+**safe-notional** for the transactable size. A missing price is `UNKNOWN`, never
+`0`. When an agent explains vault valuation, keep those marks distinct and never
+present the reporting mid as an executable entry/exit price. That architecture is
+**designed and tested but not active**; production 24/7 settlement is separately
+gated behind independent audits and owner authorization, and nothing is funded or
+deployed.
+
 ## Related skills
 
 - `hiss-robinhood-market-intelligence` (quotes/scanner) · `hiss-stock-tokens`
@@ -139,5 +153,8 @@ sessionProven: boolean }[] }`.
 
 ## Version & migration
 
-v1 — spec v4 §28.3. Reference/executable separation is the invariant.
-Capability references migrate to `schemas/robinhood-mcp/**` on landing.
+v2 — adds the side-aware vault-mark note (reporting mid / ask deposit / bid
+redemption + safe-notional) from the designed, activation-gated 24/7 vault
+architecture; the reference/executable separation remains the core invariant.
+v1 — spec v4 §28.3. Capability references migrate to `schemas/robinhood-mcp/**`
+on landing.

@@ -79,6 +79,14 @@ reports the honest reason (for example market-closed or oracle-unavailable) and
 reopens when feeds resume. See
 [the effective deposit gate](./risk-fuses.md#the-effective-deposit-gate-advertised-availability).
 
+A separate, broader **24/7 settlement** architecture — side-aware deposit pricing
+(entry valued at the ask plus the real cost to acquire, retained by the vault for
+all holders), execution-coupled minting from realized value, dynamic safe-notional
+caps, and batch/in-kind lanes — is designed and tested but **undeployed**. It does
+not change the deployed vault's fail-closed off-hours behavior above. Production
+24/7 settlement is **not active**. See
+[24/7 architecture](./24-7-architecture.md).
+
 ## Deposit-anytime intents (pending activation — NOT live)
 
 A forward-priced "deposit anytime" path is **designed and fork-tested but not
