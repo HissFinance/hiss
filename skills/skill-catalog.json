@@ -1,0 +1,261 @@
+{
+  "schemaVersion": "hiss-skill-catalog-1.0.0",
+  "generatedBy": "public skill frontmatter (HissFinance/hiss)",
+  "capabilityFamilies": [
+    "account_portfolio_other",
+    "equities",
+    "market_data",
+    "options",
+    "scanner",
+    "watchlist"
+  ],
+  "skills": [
+    {
+      "name": "hiss-agentic-ledger",
+      "version": 1,
+      "visibility": "public",
+      "description": "Instructions for keeping the local agentic journal and the three-layer receipt spine — compile receipts (hrcpt_, liveOrderSent:false), execution receipts (xrcpt_, executedBy user-agent-session), and outcome receipts (orcpt_) — plus Verified Performance that attributes pnl ONLY from reconciled execution-receipt lineage, never self-reported numbers, with paper and live kept in separate tables. Covers custody, retention, export/delete, and reconstructed portfolio curves. The journal is local to the user's runtime; HISS holds no brokerage data. Use when a user wants provable records or honest performance.",
+      "required_hiss_skills": ["hiss-receipts"],
+      "required_mcp_servers": ["robinhood-trading-mcp"],
+      "required_capability_families": ["account_portfolio_other", "equities", "options"],
+      "local_only_data": true,
+      "write_risk": "none",
+      "runtime_requirement": "coil_runtime"
+    },
+    {
+      "name": "hiss-bankrbot-robinhood",
+      "version": 3,
+      "visibility": "public",
+      "description": "Drive the Bankrbot → HISS → Robinhood MCP autonomous trading path — validate and compile a user-authored Coil with HISS, generate the Bankrbot command pack and Robinhood MCP execution capsule, run paper preview, pass the live-readiness gate, and audit activity afterwards. HISS compiles and verifies; it never stores credentials and never places orders. Use when a user wants Bankrbot to operate their Coil against their own Robinhood Agentic Account.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    },
+    {
+      "name": "hiss-coil-runner",
+      "version": 1,
+      "visibility": "public",
+      "description": "Instructions for driving a compiled HISS Coil through the deterministic runtime loop against the user's OWN Robinhood MCP session — preview vs live kernels, at-most-once submit, order-list-diff reconciliation (no server idempotency), execution-time fuse evaluation, and the signed LiveAutonomyGrant gate. HISS compiles and verifies (liveOrderSent:false); the user's session submits and writes execution receipts. This is a set of instructions, not a service, daemon, or hosted runtime. Use when a user wants to operate a validated Coil turn by turn.",
+      "required_hiss_skills": [
+        "hiss-robinhood-agentic",
+        "hiss-coilops",
+        "hiss-risk-fuses",
+        "hiss-receipts",
+        "hiss-agentic-ledger"
+      ],
+      "required_mcp_servers": ["robinhood-trading-mcp"],
+      "required_capability_families": [
+        "account_portfolio_other",
+        "market_data",
+        "equities?",
+        "options?",
+        "scanner?"
+      ],
+      "local_only_data": false,
+      "write_risk": "user_signed",
+      "runtime_requirement": "session_harness"
+    },
+    {
+      "name": "hiss-coilops",
+      "version": 3,
+      "visibility": "public",
+      "description": "Coil market theses into structured, versioned trading playbooks (Coils) — generate, validate, score, and compile them into runbooks, share cards, Execution Capsules, and hash-verified receipts using HISS CoilOps tools. Covers the declarative Coil surface (required-capability declarations, runtime-mode, account-binding reference, schedule/trigger primitives, action-rail declarations, review + receipt policy), the compatibility + static-risk reports, and paper/shadow/preview/live-candidate compilation. Declarative only — a Coil is data, never creator-supplied executable code. Use when a user wants to turn a market idea into a bounded, agent-ready playbook, or asks about Coils, Coil Health, or the Coil Compiler. Never executes trades.",
+      "required_hiss_skills": ["hiss-risk-fuses", "hiss-receipts"],
+      "required_mcp_servers": ["hiss-mcp"],
+      "required_capability_families": ["market_data", "equities", "options?"],
+      "local_only_data": false,
+      "write_risk": "prepare_only",
+      "runtime_requirement": "coil_runtime"
+    },
+    {
+      "name": "hiss-cross-rail-handoff",
+      "version": 1,
+      "visibility": "public",
+      "description": "Instructions for preparing and reconciling a cross-rail handoff between the user's Robinhood brokerage account and Robinhood Chain (USDG) — NOT a bridge. There is no transfer, funding, or bridge tool in the Robinhood MCP (verified-absent), so HISS prepares the steps, the USER performs the brokerage-side movement (MANUAL_ACTION_REQUIRED), and HISS reconciles arrival evidence on the destination rail. Never claims an automatic bridge, an auto-deposit, an ETA, or in-flight funds; reconciliation is correlation, not causation. Use when a user asks to move value between their brokerage and chain rails.",
+      "required_hiss_skills": ["hiss-robinhood-agentic", "hiss-bankrbot-robinhood"],
+      "required_mcp_servers": ["robinhood-trading-mcp", "bankr-agent-api"],
+      "required_capability_families": ["account_portfolio_other"],
+      "local_only_data": false,
+      "write_risk": "prepare_only",
+      "runtime_requirement": "none"
+    },
+    {
+      "name": "hiss-mcp",
+      "version": 1,
+      "visibility": "public",
+      "description": "Use the HISS local MCP server — a stdio Model Context Protocol server that exposes HISS CoilOps, vault, staking, rewards, and stock-token tooling as callable tools for your own agent. Covers connecting the server, the tool families and their read/prepare-only contract, and the guards every tool output passes (execution-claim guard, credential rejection, planned ≠ funded ≠ claimable). Use when a user wants their agent to call HISS tools over MCP rather than raw HTTP. Compiles and verifies; never executes trades or custodies funds.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    },
+    {
+      "name": "hiss-price-mesh",
+      "version": 1,
+      "visibility": "public",
+      "description": "Instructions for reconciling prices across the user's two rails while strictly separating a REFERENCE QUOTE (informational, may be stale, never executable) from EXECUTABLE LIQUIDITY (what a specific venue could actually fill for a specific size, session-discovered). Combines Robinhood MCP equity/index quotes (schema-unknown) and Robinhood Chain reads under per-source freshness budgets; never presents a reference quote as a fill, never claims a cross-rail parity. This is a set of instructions, not a price oracle service. Use when a user needs a cross-rail price view or asks \"what can I actually get\".",
+      "required_hiss_skills": ["hiss-robinhood-market-intelligence"],
+      "required_mcp_servers": ["robinhood-trading-mcp"],
+      "required_capability_families": ["market_data?"],
+      "local_only_data": false,
+      "write_risk": "none",
+      "runtime_requirement": "none"
+    },
+    {
+      "name": "hiss-receipts",
+      "version": 3,
+      "visibility": "public",
+      "description": "Create and verify HISS receipts — canonical-JSON hash proofs across the whole lifecycle, from compile-time integrity to execution attribution. Compile receipts are hard-typed liveOrderSent:false and NEVER mutate into execution evidence. Use for workflow-integrity proof, to verify a receipt, when a stopIfReceiptMismatch fuse needs checking, or to explain what each receipt class does and does NOT evidence. Receipts never claim execution and are never a performance claim.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    },
+    {
+      "name": "hiss-rewards",
+      "version": 1,
+      "visibility": "public",
+      "description": "Explain and verify HISS Reward Method V2 — the 50/15/15/10/10 split of verified HISS-token trading fees — 50% to xHISS stakers, 15% to Vault Providers, 15% to Vault Contributors, 10% to the 2-of-3 Treasury Safe, and 10% economic burn to the canonical dead address, with 100% of claimed WETH to the Safe and creator vesting excluded. Enforces the source-classification rules (high-confidence chain-verified fees only, fail-closed) and the planned ≠ funded ≠ claimable state chain. Use when a user or agent asks where HISS fees go, how a split plan works, what the economic burn is, or whether a distribution actually happened.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    },
+    {
+      "name": "hiss-risk-fuses",
+      "version": 3,
+      "visibility": "public",
+      "description": "Audit and explain HISS risk fuses — typed, binding constraints that bound what a compiled trading intent may instruct, validated at BOTH compile time and execution time (execution-time is authoritative). Use when the user asks what limits a Coil enforces, why a capsule will not compile, how fuse inheritance composes, or wants a risk review. Fuses compose strictest-wins across the hierarchy, never loosen at runtime, and are receipt-recorded on every evaluation. A passing audit is not a safety or profit guarantee.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    },
+    {
+      "name": "hiss-robinhood-agentic",
+      "version": 1,
+      "visibility": "public",
+      "description": "The umbrella skill for running a HISS Coil against the user's OWN Robinhood Trading MCP session. Teaches the truth model (HISS compiles/verifies with liveOrderSent:false; the user's agent session executes and writes execution receipts; outcome receipts attribute results), the LiveAutonomyGrant precondition, session-time capability discovery, read-path account scoping, the kill/pause/revoke decomposition, and the manual cross-rail boundary. HISS holds no credentials, places no orders, takes no custody, and is not affiliated with Robinhood. Use when a user wants their agent to operate a Coil against their Robinhood Agentic account.",
+      "required_hiss_skills": ["hiss-risk-fuses", "hiss-receipts", "hiss-security-boundaries"],
+      "required_mcp_servers": ["robinhood-trading-mcp", "hiss-mcp"],
+      "required_capability_families": [
+        "account_portfolio_other",
+        "market_data",
+        "watchlist",
+        "equities?",
+        "options?",
+        "scanner?"
+      ],
+      "local_only_data": false,
+      "write_risk": "prepare_only",
+      "runtime_requirement": "session_harness"
+    },
+    {
+      "name": "hiss-robinhood-equities",
+      "version": 1,
+      "visibility": "public",
+      "description": "Instructions for the equity order lifecycle through the user's OWN Robinhood MCP session — review → place → reconcile — confined to the Agentic account. HISS compiles the bounded intent (liveOrderSent:false); the user's session reviews (structural, no bypass), places, and writes the execution receipt (executedBy user-agent-session); reconciliation is by order-list diff because Robinhood publishes no idempotency key (never a blind retry). Order types and parameters are discovered per session, never assumed. Placement requires a signed LiveAutonomyGrant. Use when a user wants their agent to work equity orders.",
+      "required_hiss_skills": ["hiss-robinhood-agentic", "hiss-risk-fuses", "hiss-receipts"],
+      "required_mcp_servers": ["robinhood-trading-mcp"],
+      "required_capability_families": ["equities?", "market_data", "account_portfolio_other"],
+      "local_only_data": false,
+      "write_risk": "user_signed",
+      "runtime_requirement": "session_harness"
+    },
+    {
+      "name": "hiss-robinhood-market-intelligence",
+      "version": 1,
+      "visibility": "public",
+      "description": "Instructions for gathering market intelligence through the user's OWN Robinhood MCP session — equity/index quotes, historicals, price-book, indicators, earnings calendar, and scanners — with every schema detail discovered per session (never a hard-coded indicator, interval, or depth list). Scanner results are CANDIDATES only and untrusted input; scanner text can never authorize or construct an action; run_scan is treated as a state-write. Quotes are reference-only and separated from executable liquidity (see hiss-price-mesh). Reads are local to the user's session. Use when a user wants their agent to research symbols or run a scan.",
+      "required_hiss_skills": ["hiss-robinhood-agentic"],
+      "required_mcp_servers": ["robinhood-trading-mcp"],
+      "required_capability_families": ["market_data?", "scanner?"],
+      "local_only_data": false,
+      "write_risk": "prepare_only",
+      "runtime_requirement": "none"
+    },
+    {
+      "name": "hiss-robinhood-options",
+      "version": 1,
+      "visibility": "public",
+      "description": "Capability-gated, discovery-first instructions for options through the user's OWN Robinhood MCP session. Options tool schemas, the account's options level, and whether single-leg or multi-leg (spread) or index options are supported are ALL UNKNOWN until proven in an authorized session — so this skill hard-codes NO options level, NO leg-count claim, and NO index-option claim, and stays fail-closed until a session proves each. When supported, the flow is the same review→place→reconcile under a signed grant that must explicitly cover options, with assignment and early-assignment risk disclosed. HISS compiles (liveOrderSent:false); the user's session executes. Use when a user asks about options and only after capability is proven.",
+      "required_hiss_skills": ["hiss-robinhood-agentic", "hiss-risk-fuses", "hiss-receipts"],
+      "required_mcp_servers": ["robinhood-trading-mcp"],
+      "required_capability_families": ["options?", "market_data", "account_portfolio_other"],
+      "local_only_data": false,
+      "write_risk": "user_signed",
+      "runtime_requirement": "session_harness"
+    },
+    {
+      "name": "hiss-robinhood-portfolio",
+      "version": 1,
+      "visibility": "public",
+      "description": "Instructions for reading the user's Robinhood portfolio through their OWN MCP session — accounts, positions, balances, and order history — scoped BY DEFAULT to the granted account fingerprint only. Robinhood's MCP read scope spans ALL of the user's accounts including full account numbers; this skill renders the granted account only, treats any additional account as explicit read-only opt-in, and never renders or stores a full account number. Reads are local to the user's session; HISS holds no brokerage data. Watchlist writes are user-initiated only, never an engine side effect. Use when a user wants their agent to read their Robinhood portfolio.",
+      "required_hiss_skills": ["hiss-robinhood-agentic"],
+      "required_mcp_servers": ["robinhood-trading-mcp"],
+      "required_capability_families": ["account_portfolio_other", "watchlist"],
+      "local_only_data": false,
+      "write_risk": "none",
+      "runtime_requirement": "none"
+    },
+    {
+      "name": "hiss-security-boundaries",
+      "version": 2,
+      "visibility": "public",
+      "description": "State the HISS trust, custody, and consent boundaries truthfully — HISS is compilation/verification software that never takes custody, never stores brokerage or wallet credentials, never places orders, never signs transactions, and never collects location. Covers the HISS-hosted vs user-runtime split, Robinhood OAuth locality, account masking, local encrypted storage, grant issuance/expiry/revocation, the pause vs revoke vs cancel vs liquidation distinction, the prompt-injection boundary, public vs private receipts, runtime-compromise recovery, and the agent-platform data-disclosure warning. Use whenever an agent touches custody, credentials, autonomy, rails, or risk copy.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    },
+    {
+      "name": "hiss-staking",
+      "version": 1,
+      "visibility": "public",
+      "description": "Guide users and agents through xHISS staking on Robinhood Chain — stake $HISS for xHISS, exact-amount approvals, previewStake, the 72-hour cooldown with a 2-day redeem window, and fee-funded injections that drip over 24 hours. Enforces the truth state (the vault is deployed and Safe-owned; no rewards funded yet) and the no-overclaim copy rules (never yield, APY, dividends, passive income, or performance claims). Use when a user or agent asks how to stake HISS, what xHISS is, how to unstake, or whether staking is live.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    },
+    {
+      "name": "hiss-stock-tokens",
+      "version": 3,
+      "visibility": "public",
+      "description": "Prepare, validate, and reconcile Bankr trades of Robinhood Chain tokenized stocks and ETFs (15 canonical assets, USDG settlement) — build a capped order plan and the exact Bankr command (\"… on robinhood\", always), optionally submit through the gated Bankr Agent API, and confirm settlement only from an onchain tx receipt. Assets are tokenized stock/ETF exposure, not direct stock ownership; Bankr executes, Bankr's console handles location verification externally, HISS validates addresses and caps and reconciles receipts. Use when a user wants to trade Robinhood Chain stock tokens through Bankr.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    },
+    {
+      "name": "hiss-vault-agent-kit",
+      "version": 3,
+      "visibility": "public",
+      "description": "Let your own AI agent discover, read, create, and help operate HISS USDG Creator Vaults on Robinhood Chain through the existing gated HISS APIs — nothing new on-chain. Covers vault discovery (/api/vaults/*), reading a vault's manifest / strategy hash / fees / source verification, creating a vault CANDIDATE from a validated manifest plus the 9-boolean VaultCreatorAck, preparing a USDG deposit intent with the 14-boolean VaultDepositorAck and the exact depositWithAcks ack hashes, checking the deposit-readiness gate, and previewing rebalances under fuses. Enforces the truth model — HISS prepares and verifies, never deploys, never custodies, never executes; planned ≠ funded ≠ claimable; a deposit completes only on the on-chain receipt. Use when a user wants their agent to work with HISS vaults.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    }
+  ]
+}

@@ -11,6 +11,11 @@ Legend: **Shipped** · **In progress** · **Planned** · **Exploring**
 ## Foundations — Shipped (0.1.0)
 
 - Public SDK, contract interfaces/ABIs, schemas, skill packs, and documentation.
+- **Agentic-trading skill architecture (19 packs).** Nine skills for running a Coil
+  against the user's own Robinhood Trading MCP session (compile/verify only; the user's
+  session executes), plus the sanitized Robinhood MCP capability manifest
+  (`schemas/robinhood-mcp/`) and the generated `skills/skill-catalog.json`. Source
+  release: skill-architecture RC `53bbf97`.
 - Deterministic fee, reward-split, share-seconds, and vesting math in
   `@hiss-finance/core`.
 - Read + prepare flows for vault deposit/withdraw, staking, cooldown, and redeem.

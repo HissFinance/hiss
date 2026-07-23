@@ -20,6 +20,16 @@ This repository publishes the PUBLIC interface materials: exact contract ABIs, c
 - [hiss-stock-tokens](skills/hiss-stock-tokens/SKILL.md): Prepare and reconcile Bankr trades of Robinhood Chain tokenized stocks (Rail B), USDG settlement; tokenized exposure, not direct ownership.
 - [hiss-mcp](skills/hiss-mcp/SKILL.md): Use the local HISS stdio MCP server and its tool families.
 - [hiss-security-boundaries](skills/hiss-security-boundaries/SKILL.md): Custody, credential, consent, and the three-rail Bankr boundaries in depth.
+- [hiss-robinhood-agentic](skills/hiss-robinhood-agentic/SKILL.md): Umbrella agentic-trading skill — run a Coil against the user's OWN Robinhood Trading MCP session; truth model, LiveAutonomyGrant, kill/pause/revoke. HISS compiles/verifies; the user's session executes.
+- [hiss-robinhood-portfolio](skills/hiss-robinhood-portfolio/SKILL.md): Granted-account-scoped reads (default: the granted account fingerprint only).
+- [hiss-robinhood-market-intelligence](skills/hiss-robinhood-market-intelligence/SKILL.md): Quotes/historicals/indicators/scanner — surfaced as CANDIDATES, never orders.
+- [hiss-robinhood-equities](skills/hiss-robinhood-equities/SKILL.md): Equity review → place → reconcile in the user's own session; no bypass, no blind retry.
+- [hiss-robinhood-options](skills/hiss-robinhood-options/SKILL.md): Options — capability-gated, fail-closed until a session proves the capability.
+- [hiss-coil-runner](skills/hiss-coil-runner/SKILL.md): The Coil runtime loop — at-most-once submit, reconcile before retry.
+- [hiss-agentic-ledger](skills/hiss-agentic-ledger/SKILL.md): Local journal + three-layer receipt spine; user-held custody; export/delete.
+- [hiss-cross-rail-handoff](skills/hiss-cross-rail-handoff/SKILL.md): Prepared brokerage↔Robinhood Chain handoffs with a MANUAL boundary — reconciliation, never a bridge.
+- [hiss-price-mesh](skills/hiss-price-mesh/SKILL.md): The price/valuation mesh — partial propagates, null is never zero, reference ≠ executable.
+- [Robinhood MCP capability manifest](schemas/robinhood-mcp/): Sanitized machine-readable capability model (snapshot + family map + schema) the agentic skills declare against.
 
 ## Contracts
 

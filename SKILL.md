@@ -2,7 +2,7 @@
 name: hiss-finance
 description: Public agent guide to HISS Finance — compilation and verification software for Robinhood Chain. Covers the CoilOps planning pipeline (Coils, risk fuses, receipts), USDG Creator Vaults, xHISS staking and the HISS Reward Method V2 50/15/15/10/10 reward split (xHISS stakers / vault providers / vault contributors / treasury / economic burn to the dead address; V1's 50/30/10/10 is historical), the Bankrbot → Robinhood MCP autonomy path, and tokenized stock-token trading — all under one rule set: HISS prepares and verifies; users' wallets, Safes, and their own broker/agent sessions sign and execute. The website and first-party app tools are free (packages open-source); HISS never takes custody, never stores credentials, and never places orders. Not affiliated with Robinhood, Bankr, or Chainlink. Not investment advice.
 tags: [hiss, coilops, usdg-vaults, xhiss, staking, reward-split, bankrbot, robinhood-mcp, stock-tokens, robinhood-chain, agents]
-version: 2
+version: 3
 visibility: public
 metadata:
   clawdbot:
@@ -54,6 +54,27 @@ Base URL for public APIs: `https://www.hiss.finance`.
 | `hiss-stock-tokens`        | Prepare and reconcile Bankr trades of Robinhood Chain tokenized stocks (Rail B).                              |
 | `hiss-mcp`                 | Use the local HISS stdio MCP server and its tool families.                                                    |
 | `hiss-security-boundaries` | Custody, credential, consent, and rail boundaries — the invariants above, in depth.                           |
+
+### Agentic-trading packs (user's OWN Robinhood Trading MCP session)
+
+These run a Coil against the user's own Robinhood Agentic account. HISS compiles and
+verifies (`liveOrderSent: false`); the user's own agent session executes under the
+user's own OAuth, consent, and a signed autonomy grant. HISS holds no credentials,
+places no orders, and is not affiliated with Robinhood. Machine-readable capability
+model: [`schemas/robinhood-mcp/`](schemas/robinhood-mcp/) and
+[`skills/skill-catalog.json`](skills/skill-catalog.json).
+
+| Pack                                 | What it covers                                                                                     |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `hiss-robinhood-agentic`             | Umbrella entry: truth model, LiveAutonomyGrant precondition, session discovery, kill/pause/revoke. |
+| `hiss-robinhood-portfolio`           | Granted-account-scoped reads (default: the granted account fingerprint only).                      |
+| `hiss-robinhood-market-intelligence` | Quotes/historicals/indicators/scanner — surfaced as CANDIDATES, never orders.                      |
+| `hiss-robinhood-equities`            | Equity review → place → reconcile in the user's session — no bypass, no blind retry.               |
+| `hiss-robinhood-options`             | Options — capability-gated, fail-closed until a session proves the capability.                     |
+| `hiss-coil-runner`                   | The Coil runtime loop — at-most-once submit, reconcile before retry.                               |
+| `hiss-agentic-ledger`                | Local journal + three-layer receipt spine; user-held custody; export/delete.                       |
+| `hiss-cross-rail-handoff`            | Prepared brokerage ↔ chain handoffs with a MANUAL boundary — reconciliation, never a bridge.       |
+| `hiss-price-mesh`                    | Price/valuation mesh — partial propagates, null is never zero, reference ≠ executable.             |
 
 ## Public contract materials (in `contracts/`)
 
