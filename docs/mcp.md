@@ -9,9 +9,17 @@ wallet to sign. The server's own `list_tools` response is always the source of t
 
 ## Running
 
+Two transports expose the **same** tools and handlers (one `createServer()`
+factory — identical behavior, identical guards):
+
 ```bash
-pnpm --filter @hiss-finance/mcp-server start   # stdio transport
+pnpm --filter @hiss-finance/mcp-server start        # stdio transport   (hiss-mcp)
+pnpm --filter @hiss-finance/mcp-server start:http   # Streamable HTTP   (hiss-mcp-http)
 ```
+
+The HTTP server is stateless (no session state; a fresh server + transport per
+request), serves `POST /mcp` plus a `GET /healthz` liveness probe, and binds to
+`127.0.0.1:8730` by default (`HISS_MCP_HTTP_HOST` / `HISS_MCP_HTTP_PORT`).
 
 Example client config (stdio):
 
