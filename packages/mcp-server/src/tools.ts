@@ -20,10 +20,17 @@ import { validateCoil, compileCoil, CoilCompileError } from "./lib/coil.js";
 import { verifyReceipt } from "./lib/receipt.js";
 import { isCompleteVaultCandidate } from "./lib/client.js";
 import type { HissClient, JsonRecord, UnsignedTx } from "./lib/types.js";
+import type { StockPremiumEngine } from "./lib/stock-premium.js";
 
 export interface ToolContext {
   client: HissClient;
   nowIso: string;
+  /**
+   * Injected Stock-Premium engine. When absent, the Stock-Premium tools fall
+   * back to the deterministic DEMO `stockPremiumFixtureEngine`; the private
+   * deployment injects the real `@hiss/core` engine.
+   */
+  stockPremium?: StockPremiumEngine;
 }
 
 export interface ToolOutcome {
@@ -570,7 +577,19 @@ const PREPARE_TOOLS: ToolDefinition[] = [
   },
 ];
 
-export const HISS_TOOLS: ToolDefinition[] = [...READ_TOOLS, ...PREPARE_TOOLS];
+// Import after the base ToolDefinition/ToolInputError are declared above so the
+// circular import (tools-stock-premium.ts imports types + ToolInputError from
+// here) resolves cleanly — the Stock-Premium defs use those only inside handlers.
+import { STOCK_PREMIUM_TOOLS } from "./tools-stock-premium.js";
+
+/**
+ * The full registry. The count is DYNAMIC (`HISS_TOOLS.length`) — the base 22
+ * read/prepare tools plus the 11 Stock-Premium engine-bridge tools. Never
+ * hard-code the total anywhere.
+ */
+export const HISS_TOOLS: ToolDefinition[] = [...READ_TOOLS, ...PREPARE_TOOLS, ...STOCK_PREMIUM_TOOLS];
+
+export { STOCK_PREMIUM_TOOLS };
 
 export function getTool(name: string): ToolDefinition | undefined {
   return HISS_TOOLS.find((t) => t.name === name);

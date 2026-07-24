@@ -177,7 +177,7 @@ documentation.
 - **CLI (`@hiss-finance/cli`)** — status reads, manifest validation, and
   transaction preparation from the terminal.
 - **MCP server (`@hiss-finance/mcp-server`)** — a local Model Context Protocol
-  server exposing 22 read/prepare tools; agents never execute or move funds.
+  server exposing 33 read/prepare tools; agents never execute or move funds.
 - **Contract interfaces & ABIs** — `contracts/` interfaces and ABIs for the vault
   factory, flagship vault, xHISS staking vault, registries, reward distributors,
   and rebalance adapter.

@@ -14,6 +14,7 @@ export {
 } from "./server.js";
 export {
   HISS_TOOLS,
+  STOCK_PREMIUM_TOOLS,
   getTool,
   ToolInputError,
   type ToolDefinition,
@@ -21,6 +22,32 @@ export {
   type ToolOutcome,
   type ToolKind,
 } from "./tools.js";
+export {
+  stockPremiumFixtureEngine,
+  verifyStockPremiumReceipt,
+  StockPremiumInputError,
+  type StockPremiumEngine,
+  type StockPremiumDataMode,
+  type RegistryResult,
+  type ScanResult,
+  type ExplainResult,
+  type LadderPreviewResult,
+  type LadderRungDTO,
+  type PositionReadResult,
+  type PrepareResult,
+  type PrepareSuccess,
+  type PrepareFailure,
+  type VerifyReceiptResult,
+  type StockPremiumRejection,
+  type StockPremiumRejectReason,
+  type PremiumObservationDTO,
+  type ScanRowDTO,
+  type StockTokenRegistryEntryDTO,
+  type PreparedIntentDTO,
+  type PreparedBindingDTO,
+  type PrepareReceiptDTO,
+  type SignatureReviewDTO,
+} from "./lib/stock-premium.js";
 export { createHissClient, type ClientOptions } from "./lib/client.js";
 export type { HissClient, UnsignedTx, JsonRecord } from "./lib/types.js";
 export { assertNoExecutionClaim, findExecutionClaim, ExecutionClaimError } from "./lib/guard.js";

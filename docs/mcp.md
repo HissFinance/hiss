@@ -2,7 +2,7 @@
 
 `@hiss-finance/mcp-server` is a local [Model Context Protocol](https://modelcontextprotocol.io)
 server that exposes HISS Finance to any MCP-compatible agent (Claude, and other MCP
-clients). It registers **22 tools** (12 read, 10 prepare) — all of which **read or
+clients). It registers **33 tools** (18 read, 15 prepare) — all of which **read or
 prepare only**, so **agents never execute trades, move funds, or take custody**.
 Preparation returns artifacts and unsigned transactions for a human or the user's
 wallet to sign. The server's own `list_tools` response is always the source of truth.
@@ -42,9 +42,9 @@ Example client config (stdio):
 - **Fail closed.** Missing artifacts, low-confidence classification, or missing
   authorization refuse.
 
-## The 22 tools
+## The 33 tools
 
-### Read tools (12)
+### Read tools (18)
 
 - `hiss_get_protocol_status` — protocol status snapshot (network, token, Safe, vault count).
 - `hiss_get_contract_registry` — deployed contract registry (name → address).
@@ -61,8 +61,21 @@ Example client config (stdio):
 - `hiss_get_supported_assets` — source-verified assets vaults may hold.
 - `hiss_get_fee_schedule` — the current HISS fee schedule (vault fees and the five
   reward-split legs).
+- `hiss_stock_token_registry` — the dynamic, admission-gated Robinhood Chain Stock-Token
+  registry (canonical address is identity; a matching ticker is never sufficient).
+- `hiss_stock_premium_scan` — scan Stock-Token premium/discount, ranked by a bounded,
+  amount-aware, risk-adjusted score. Fees are not profit; a premium is a size-dependent,
+  uncertain edge.
+- `hiss_stock_premium_explain` — amount-aware, direction-specific premium evidence for one
+  Stock Token (raw reference, multiplier-once, executable price, impact, capacity, fuse verdict).
+- `hiss_lp_ladder_preview` — preview a one-sided Uniswap v3 USDG range-ladder with its full
+  honest cost + inventory model. Preview only.
+- `hiss_lp_position_read` — read a Uniswap v3 LP position by tokenId (a value that cannot be
+  read is null, never zero).
+- `hiss_lp_verify_receipt` — verify a Stock-Premium LP receipt's integrity hash locally
+  (a preparation receipt is never evidence of on-chain settlement).
 
-### Prepare tools (10)
+### Prepare tools (15)
 
 - `hiss_create_vault_candidate` — assemble a candidate VaultManifest (a draft — nothing is created).
 - `hiss_validate_vault_candidate` — validate a manifest fail-closed (chain, USDG, fee bounds, skin, fuses).
@@ -74,6 +87,13 @@ Example client config (stdio):
 - `hiss_prepare_xhiss_redeem` — prepare an **unsigned** redeem within your open window.
 - `hiss_validate_coil` — validate a CoilOps playbook manifest (local and deterministic).
 - `hiss_compile_coil` — compile a coil manifest into a deterministic, hash-stamped plan (not execution).
+- `hiss_lp_prepare_mint` — prepare a typed **unsigned** one-sided USDG LP mint package (a bounded
+  buy ladder) for the user's own authority. Fail-closed; nothing is signed or sent.
+- `hiss_lp_prepare_increase` — prepare a typed **unsigned** increaseLiquidity package (exact, never
+  unbounded, approvals).
+- `hiss_lp_prepare_withdraw` — prepare a typed **unsigned** decreaseLiquidity (withdraw) package.
+- `hiss_lp_prepare_collect` — prepare a typed **unsigned** collect package (fees to the user's own recipient).
+- `hiss_lp_prepare_close` — prepare a typed **unsigned** burn (close) package for a fully-exited position.
 
 > Bankr and Robinhood-MCP rails are **region- and provider-dependent**, have limited
 > rollout, and are **planning/preparation only** — they are documented separately and
