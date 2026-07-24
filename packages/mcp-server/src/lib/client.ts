@@ -39,6 +39,7 @@ import {
   ROBINHOOD_CHAIN_MAINNET,
   type ActionPlan,
 } from "@hiss-finance/sdk";
+import { assertRealizableUnsignedTx } from "./txguard.js";
 import type { HissClient, JsonRecord, UnsignedTx } from "./types.js";
 
 export interface ClientOptions {
@@ -75,24 +76,13 @@ function toBaseUnits(value: string, decimals: number): bigint {
   return BigInt(whole) * 10n ** BigInt(decimals) + BigInt((frac || "0").padEnd(decimals, "0"));
 }
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-
 /**
  * Normalize an SDK ActionPlan into the CLI's strictly-unsigned shape. Fail
  * CLOSED: a prepare must never return a success-shaped result with an empty or
- * zero target, or empty / selector-less calldata — that would be a deceptive
- * "prepared" tx that does nothing or, worse, sends value to the zero address.
+ * zero target, or empty / selector-less calldata (see {@link assertRealizableUnsignedTx}).
  */
 function planToUnsigned(plan: ActionPlan): UnsignedTx {
-  const to = String(plan.target ?? "");
-  const data = String(plan.calldata ?? "");
-  if (!ADDRESS_RE.test(to) || to.toLowerCase() === ZERO_ADDRESS) {
-    throw new Error(`Refusing to return an unsigned tx with an empty/zero target ("${to}").`);
-  }
-  // Real calldata is at minimum a 4-byte selector: "0x" + 8 hex chars.
-  if (!/^0x[0-9a-fA-F]{8,}$/.test(data)) {
-    throw new Error(`Refusing to return an unsigned tx with empty / selector-less calldata ("${data}").`);
-  }
+  assertRealizableUnsignedTx(plan.target, plan.calldata);
   return {
     chainId: plan.chainId,
     to: plan.target,
