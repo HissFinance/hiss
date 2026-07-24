@@ -1,7 +1,18 @@
 {
   "$comment": "Classification of hiss_* identifiers that are NOT canonical MCP tools. The canonical set is generated from packages/mcp-server/src/tools.ts by mcp-registry.ts. Used by check:skill-tool-refs for messages + allow rules, and by docs/mcp/tool-name-migration.md. documentationLabels are permitted in skill prose; legacyAliases / httpApi / privateInternal must NOT appear as tool references in skills.",
   "documentationLabels": {
-    "hiss_trading_fee": "Source-classification tag for a fee delta (used by the reward split), not a tool."
+    "hiss_trading_fee": "Source-classification tag for a fee delta (used by the reward split), not a tool.",
+    "hiss_stock_token_registry": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_stock_premium_scan": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_stock_premium_explain": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_lp_ladder_preview": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_lp_position_read": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_lp_prepare_mint": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_lp_prepare_increase": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_lp_prepare_withdraw": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_lp_prepare_collect": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_lp_prepare_close": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool.",
+    "hiss_lp_verify_receipt": "Planned Stock Premium LP read/prepare MCP tool surface \u2014 referenced in the hiss-stock-premium-lp-manager skill as the intended canonical tools; pending public MCP registration (engine mirror). Documentation label, not yet a live tool."
   },
   "legacyAliases": {
     "hiss_get_xhiss_status": "hiss_get_staking_status",

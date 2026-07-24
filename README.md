@@ -111,7 +111,7 @@ local `file:` / `link:` reference.
 
 ## 🧠 Install HISS Agent Skills
 
-HISS ships **19 agent skills** — self-contained `SKILL.md` instruction packs that
+HISS ships **20 agent skills** — self-contained `SKILL.md` instruction packs that
 teach a compatible coding agent how to work with HISS vaults, staking, rewards,
 receipts, Bankr rails, Stock Tokens, the MCP server, the HISS security boundaries,
 and the **agentic-trading** path (running a Coil against the user's OWN Robinhood
@@ -210,6 +210,7 @@ proves completion.
 | [**hiss-receipts**](./skills/hiss-receipts/SKILL.md)                       | Write and verify canonical-JSON SHA-256 receipts; reject any forged execution claim                                                               | Receipts and `{ok, mismatches[]}` verification verdicts                                   |
 | [**hiss-risk-fuses**](./skills/hiss-risk-fuses/SKILL.md)                   | Audit the binding risk fuses on a Coil and explain why a capsule will/won't compile                                                               | Per-fuse descriptions, bound-check issues, a `risk_fuse` receipt                          |
 | [**hiss-stock-tokens**](./skills/hiss-stock-tokens/SKILL.md)               | Prepare, validate, and reconcile Bankr trades of the 15 canonical Robinhood Chain stock tokens                                                    | Order plan + exact Bankr command; a settlement receipt from an on-chain tx                |
+| [**hiss-stock-premium-lp-manager**](./skills/hiss-stock-premium-lp-manager/SKILL.md) | Scan Stock-Token premium/discount by canonical address, preview one-sided USDG v3 range-ladders, and prepare typed **UNSIGNED** LP positions (mint/collect/withdraw/close) the user signs — fees are not profit, never guaranteed arbitrage | Amount-aware premium evidence, range-ladder previews, prepare-only LP intents + signature reviews, deterministic receipts |
 | [**hiss-bankrbot-robinhood**](./skills/hiss-bankrbot-robinhood/SKILL.md)   | Compile a Coil for the Bankrbot → Robinhood MCP path — paper-first, live-readiness gated                                                          | Bankrbot command pack, Robinhood MCP capsule, paper runbook, audit                        |
 | [**hiss-mcp**](./skills/hiss-mcp/SKILL.md)                                 | Drive the HISS tools over the local MCP server rather than raw HTTP                                                                               | Prepared artifacts and verified state reads via MCP tools                                 |
 | [**hiss-security-boundaries**](./skills/hiss-security-boundaries/SKILL.md) | Enforce the trust boundaries — no custody, no credentials, no execution claims, autonomy consent gates                                            | The guardrail reference the other skills are checked against                              |
