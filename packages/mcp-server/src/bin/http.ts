@@ -56,7 +56,11 @@ const httpServer = createNodeHttpServer(async (req: IncomingMessage, res: Server
   }
 
   if (url.pathname !== MCP_PATH) {
-    sendJson(res, 404, { jsonrpc: "2.0", error: { code: -32601, message: `No route for ${url.pathname}.` }, id: null });
+    sendJson(res, 404, {
+      jsonrpc: "2.0",
+      error: { code: -32601, message: `No route for ${url.pathname}.` },
+      id: null,
+    });
     return;
   }
 
@@ -76,7 +80,10 @@ const httpServer = createNodeHttpServer(async (req: IncomingMessage, res: Server
     if (!res.headersSent) {
       sendJson(res, 400, {
         jsonrpc: "2.0",
-        error: { code: -32700, message: `Bad MCP request: ${err instanceof Error ? err.message : String(err)}` },
+        error: {
+          code: -32700,
+          message: `Bad MCP request: ${err instanceof Error ? err.message : String(err)}`,
+        },
         id: null,
       });
     }
@@ -84,7 +91,9 @@ const httpServer = createNodeHttpServer(async (req: IncomingMessage, res: Server
 });
 
 httpServer.listen(PORT, HOST, () => {
-  process.stderr.write(`hiss-finance MCP server ready on http://${HOST}:${PORT}${MCP_PATH} (streamable HTTP).\n`);
+  process.stderr.write(
+    `hiss-finance MCP server ready on http://${HOST}:${PORT}${MCP_PATH} (streamable HTTP).\n`,
+  );
 });
 
 process.on("SIGINT", () => httpServer.close(() => process.exit(0)));

@@ -198,11 +198,20 @@ export class HissClient {
       addrs.value.map(async (address) => {
         const [symbol, decimals, policy] = await Promise.all([
           soft<string>(
-            () => this.client.readContract({ address, abi: ERC20_ABI, functionName: "symbol" }) as Promise<string>,
+            () =>
+              this.client.readContract({
+                address,
+                abi: ERC20_ABI,
+                functionName: "symbol",
+              }) as Promise<string>,
           ),
           soft<number>(
             () =>
-              this.client.readContract({ address, abi: ERC20_ABI, functionName: "decimals" }) as Promise<number>,
+              this.client.readContract({
+                address,
+                abi: ERC20_ABI,
+                functionName: "decimals",
+              }) as Promise<number>,
           ),
           soft<{ enabled: boolean; maxAllocationBps: number }>(
             () =>
@@ -310,19 +319,27 @@ export class HissClient {
 
     if (assets.length === 0) {
       const baseAsset = await soft<`0x${string}`>(
-        () => this.client.readContract({ address: vault, abi: VAULT_ABI, functionName: "asset" }) as Promise<`0x${string}`>,
+        () =>
+          this.client.readContract({
+            address: vault,
+            abi: VAULT_ABI,
+            functionName: "asset",
+          }) as Promise<`0x${string}`>,
       );
       const registry = await this.registryAssetAddresses();
       const set = new Map<string, `0x${string}`>();
-      if (baseAsset.state === "live" && baseAsset.value) set.set(baseAsset.value.toLowerCase(), baseAsset.value);
+      if (baseAsset.state === "live" && baseAsset.value)
+        set.set(baseAsset.value.toLowerCase(), baseAsset.value);
       if (registry.state === "live" && registry.value) {
         for (const a of registry.value) set.set(a.toLowerCase(), a);
         source = "onchain_registry";
-        note = "Holdings over the vault's base asset plus the live VaultAssetRegistry allow-list on chain 4663.";
+        note =
+          "Holdings over the vault's base asset plus the live VaultAssetRegistry allow-list on chain 4663.";
       } else {
         source = "degraded_base_only";
         registryError = registry.error;
-        note = "VaultAssetRegistry read is degraded (UNKNOWN); holdings cover only the vault's base asset. A degraded read is never treated as an empty allow-list.";
+        note =
+          "VaultAssetRegistry read is degraded (UNKNOWN); holdings cover only the vault's base asset. A degraded read is never treated as an empty allow-list.";
       }
       assets = [...set.values()];
     }
@@ -331,10 +348,20 @@ export class HissClient {
       assets.map(async (asset) => {
         const [symbol, decimals, balance] = await Promise.all([
           soft<string>(
-            () => this.client.readContract({ address: asset, abi: ERC20_ABI, functionName: "symbol" }) as Promise<string>,
+            () =>
+              this.client.readContract({
+                address: asset,
+                abi: ERC20_ABI,
+                functionName: "symbol",
+              }) as Promise<string>,
           ),
           soft<number>(
-            () => this.client.readContract({ address: asset, abi: ERC20_ABI, functionName: "decimals" }) as Promise<number>,
+            () =>
+              this.client.readContract({
+                address: asset,
+                abi: ERC20_ABI,
+                functionName: "decimals",
+              }) as Promise<number>,
           ),
           soft<bigint>(
             () =>

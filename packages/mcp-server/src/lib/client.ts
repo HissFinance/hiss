@@ -235,7 +235,9 @@ export function createHissClient(opts: ClientOptions = {}): HissClient {
 
     prepareVaultWithdrawal: async (vault, shares, receiver) => {
       if (!receiver) {
-        throw new Error("prepareVaultWithdrawal requires a `receiver` address to send the withdrawn USDG to.");
+        throw new Error(
+          "prepareVaultWithdrawal requires a `receiver` address to send the withdrawn USDG to.",
+        );
       }
       const plan = sdkPrepareVaultWithdrawal({
         vault: asAddress(vault, "vault"),

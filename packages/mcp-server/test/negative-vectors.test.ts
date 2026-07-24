@@ -43,7 +43,12 @@ const NEGATIVE: Record<string, JsonRecord[]> = {
   hiss_get_contract_registry: [{ password: "hunter2" }],
   hiss_get_vaults: [{ private_key: "0x" + "a".repeat(64) }],
   hiss_get_staking_status: [{ secret: "x" }],
-  hiss_get_reward_status: [{ mnemonic: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about" }],
+  hiss_get_reward_status: [
+    {
+      mnemonic:
+        "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+    },
+  ],
   hiss_get_supported_assets: [{ bearer: "token" }],
   hiss_get_fee_schedule: [{ accessToken: "abc" }],
   // Reads with required args.
@@ -65,12 +70,20 @@ const NEGATIVE: Record<string, JsonRecord[]> = {
     { vault: "bad", amount: "100", receiver: ADDR },
     { vault: ADDR, amount: "", receiver: ADDR },
   ],
-  hiss_prepare_vault_withdrawal: [{}, { vault: ADDR, shares: "1" }, { vault: "bad", shares: "1", receiver: ADDR }],
+  hiss_prepare_vault_withdrawal: [
+    {},
+    { vault: ADDR, shares: "1" },
+    { vault: "bad", shares: "1", receiver: ADDR },
+  ],
   hiss_prepare_hiss_stake: [{}, { amount: "" }, { amount: 500 }],
   hiss_prepare_xhiss_cooldown: [{}, { xhissAmount: 50 }],
   hiss_prepare_xhiss_redeem: [{}, { xShares: "25" }, { xShares: "25", receiver: "bad" }],
   hiss_validate_coil: [{}, { manifest: 42 }],
-  hiss_compile_coil: [{}, { manifest: { schema: "coil-manifest-1.0.0" } }, { manifest: {}, nowIso: "not-a-date" }],
+  hiss_compile_coil: [
+    {},
+    { manifest: { schema: "coil-manifest-1.0.0" } },
+    { manifest: {}, nowIso: "not-a-date" },
+  ],
 };
 
 describe("negative-vector coverage: all 22 tools reject bad input with typed errors", () => {
@@ -102,7 +115,10 @@ describe("credential guard", () => {
       { seed: "x" },
       { nested: { password: "x" } },
       { value: "0x" + "a".repeat(64) },
-      { phrase: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about" },
+      {
+        phrase:
+          "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+      },
     ]) {
       expect(() => assertNoCredentials(bad)).toThrow(CredentialRejectedError);
     }
@@ -124,16 +140,58 @@ describe("credential guard", () => {
 describe("execution-claim guard + unsigned invariant across all prepares", () => {
   const prepareTools = HISS_TOOLS.filter((t) => t.kind === "prepare").map((t) => t.name);
   const VALID: Record<string, JsonRecord> = {
-    hiss_create_vault_candidate: { name: "D", allowedAssets: ["USDG"], creator: { address: ADDR, skinInGameUsdg: 1 } },
-    hiss_validate_vault_candidate: { manifest: { schema: "vault-manifest-1.0.0", chainId: 4663, name: "V", baseAsset: "USDG", allowedAssets: ["USDG"], fees: { managementBps: 0, performanceBps: 0 }, creator: { address: ADDR, skinInGameUsdg: 1 }, rebalance: { fuses: { maxAssetWeightBps: 4000, maxSlippageBps: 50, maxDailyTurnoverBps: 2000 } } } },
-    hiss_prepare_vault_creation: { manifest: { schema: "vault-manifest-1.0.0", chainId: 4663, name: "V", baseAsset: "USDG", allowedAssets: ["USDG"], fees: { managementBps: 0, performanceBps: 0 }, creator: { address: ADDR, skinInGameUsdg: 1 }, rebalance: { fuses: { maxAssetWeightBps: 4000, maxSlippageBps: 50, maxDailyTurnoverBps: 2000 } } } },
+    hiss_create_vault_candidate: {
+      name: "D",
+      allowedAssets: ["USDG"],
+      creator: { address: ADDR, skinInGameUsdg: 1 },
+    },
+    hiss_validate_vault_candidate: {
+      manifest: {
+        schema: "vault-manifest-1.0.0",
+        chainId: 4663,
+        name: "V",
+        baseAsset: "USDG",
+        allowedAssets: ["USDG"],
+        fees: { managementBps: 0, performanceBps: 0 },
+        creator: { address: ADDR, skinInGameUsdg: 1 },
+        rebalance: { fuses: { maxAssetWeightBps: 4000, maxSlippageBps: 50, maxDailyTurnoverBps: 2000 } },
+      },
+    },
+    hiss_prepare_vault_creation: {
+      manifest: {
+        schema: "vault-manifest-1.0.0",
+        chainId: 4663,
+        name: "V",
+        baseAsset: "USDG",
+        allowedAssets: ["USDG"],
+        fees: { managementBps: 0, performanceBps: 0 },
+        creator: { address: ADDR, skinInGameUsdg: 1 },
+        rebalance: { fuses: { maxAssetWeightBps: 4000, maxSlippageBps: 50, maxDailyTurnoverBps: 2000 } },
+      },
+    },
     hiss_prepare_vault_deposit: { vault: ADDR, amount: "100", receiver: ADDR },
     hiss_prepare_vault_withdrawal: { vault: ADDR, shares: "10", receiver: ADDR },
     hiss_prepare_hiss_stake: { amount: "500" },
     hiss_prepare_xhiss_cooldown: { xhissAmount: "50" },
     hiss_prepare_xhiss_redeem: { xShares: "25", receiver: ADDR },
-    hiss_validate_coil: { manifest: { schema: "coil-manifest-1.0.0", name: "C", universe: ["AAPL"], rules: [{ when: "x", weight: 1 }], fuses: { maxPositionBps: 2000, maxGrossExposureBps: 10000, allowShorting: false } } },
-    hiss_compile_coil: { manifest: { schema: "coil-manifest-1.0.0", name: "C", universe: ["AAPL"], rules: [{ when: "x", weight: 1 }], fuses: { maxPositionBps: 2000, maxGrossExposureBps: 10000, allowShorting: false } } },
+    hiss_validate_coil: {
+      manifest: {
+        schema: "coil-manifest-1.0.0",
+        name: "C",
+        universe: ["AAPL"],
+        rules: [{ when: "x", weight: 1 }],
+        fuses: { maxPositionBps: 2000, maxGrossExposureBps: 10000, allowShorting: false },
+      },
+    },
+    hiss_compile_coil: {
+      manifest: {
+        schema: "coil-manifest-1.0.0",
+        name: "C",
+        universe: ["AAPL"],
+        rules: [{ when: "x", weight: 1 }],
+        fuses: { maxPositionBps: 2000, maxGrossExposureBps: 10000, allowShorting: false },
+      },
+    },
   };
 
   it("no prepare tool's summary reads like a completed on-chain action", async () => {
@@ -145,7 +203,14 @@ describe("execution-claim guard + unsigned invariant across all prepares", () =>
   });
 
   it("every tx-producing prepare returns signed:false and admits nothing was sent", async () => {
-    const txTools = ["hiss_prepare_vault_creation", "hiss_prepare_vault_deposit", "hiss_prepare_vault_withdrawal", "hiss_prepare_hiss_stake", "hiss_prepare_xhiss_cooldown", "hiss_prepare_xhiss_redeem"];
+    const txTools = [
+      "hiss_prepare_vault_creation",
+      "hiss_prepare_vault_deposit",
+      "hiss_prepare_vault_withdrawal",
+      "hiss_prepare_hiss_stake",
+      "hiss_prepare_xhiss_cooldown",
+      "hiss_prepare_xhiss_redeem",
+    ];
     for (const name of txTools) {
       const result = await callHissTool(name, VALID[name] ?? {}, deps);
       const sc = result.structuredContent as JsonRecord;
@@ -159,7 +224,9 @@ describe("execution-claim guard + unsigned invariant across all prepares", () =>
 describe("fail-closed prepare guard (no empty-target / selector-less calldata)", () => {
   it("rejects empty / zero target", () => {
     expect(() => assertRealizableUnsignedTx("", "0xdeadbeef")).toThrow();
-    expect(() => assertRealizableUnsignedTx("0x0000000000000000000000000000000000000000", "0xdeadbeef")).toThrow();
+    expect(() =>
+      assertRealizableUnsignedTx("0x0000000000000000000000000000000000000000", "0xdeadbeef"),
+    ).toThrow();
     expect(() => assertRealizableUnsignedTx("not-an-address", "0xdeadbeef")).toThrow();
   });
 
