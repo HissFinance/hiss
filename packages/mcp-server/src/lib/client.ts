@@ -75,8 +75,24 @@ function toBaseUnits(value: string, decimals: number): bigint {
   return BigInt(whole) * 10n ** BigInt(decimals) + BigInt((frac || "0").padEnd(decimals, "0"));
 }
 
-/** Normalize an SDK ActionPlan into the CLI's strictly-unsigned shape. */
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+/**
+ * Normalize an SDK ActionPlan into the CLI's strictly-unsigned shape. Fail
+ * CLOSED: a prepare must never return a success-shaped result with an empty or
+ * zero target, or empty / selector-less calldata — that would be a deceptive
+ * "prepared" tx that does nothing or, worse, sends value to the zero address.
+ */
 function planToUnsigned(plan: ActionPlan): UnsignedTx {
+  const to = String(plan.target ?? "");
+  const data = String(plan.calldata ?? "");
+  if (!ADDRESS_RE.test(to) || to.toLowerCase() === ZERO_ADDRESS) {
+    throw new Error(`Refusing to return an unsigned tx with an empty/zero target ("${to}").`);
+  }
+  // Real calldata is at minimum a 4-byte selector: "0x" + 8 hex chars.
+  if (!/^0x[0-9a-fA-F]{8,}$/.test(data)) {
+    throw new Error(`Refusing to return an unsigned tx with empty / selector-less calldata ("${data}").`);
+  }
   return {
     chainId: plan.chainId,
     to: plan.target,
@@ -93,7 +109,7 @@ function planToUnsigned(plan: ActionPlan): UnsignedTx {
 }
 
 /** True when a value carries the vault-kit VaultCandidate shape createVault needs. */
-function isCompleteCandidate(v: unknown): v is JsonRecord {
+export function isCompleteVaultCandidate(v: unknown): v is JsonRecord {
   if (typeof v !== "object" || v === null) return false;
   const c = v as JsonRecord;
   return (
@@ -173,24 +189,9 @@ export function createHissClient(opts: ClientOptions = {}): HissClient {
       return { id, receipt: null, note };
     },
 
-    // No enumerated tradable-asset registry in this build; return the canonical
-    // public assets from SDK constants (real addresses), not a fabricated list.
-    getSupportedAssets: async () => [
-      {
-        key: "usdg",
-        symbol: "USDG",
-        address: ADDRESSES.usdg,
-        decimals: DECIMALS.usdg,
-        role: "base settlement asset",
-      },
-      {
-        key: "hiss",
-        symbol: "HISS",
-        address: ADDRESSES.hiss,
-        decimals: DECIMALS.hiss,
-        role: "protocol token",
-      },
-    ],
+    // Real canonical set: USDG base + HISS + the live on-chain VaultAssetRegistry
+    // stock-token allow-list (chain 4663). Fail-soft inside the SDK.
+    getSupportedAssets: async () => (await read.getSupportedAssets()) as unknown as JsonRecord,
 
     // Fee schedule = the protocol reward-split constants (a real SDK source)
     // plus a note that per-vault fees are set at creation and read per-vault.
@@ -206,8 +207,8 @@ export function createHissClient(opts: ClientOptions = {}): HissClient {
       // weightBps, minSkinBps, strategy, jurisdiction). If the caller supplies a
       // complete vault-kit VaultCandidate we build a real plan; otherwise we
       // decline honestly rather than fabricate deploy parameters.
-      const candidate = isCompleteCandidate(manifest.candidate) ? manifest.candidate : manifest;
-      if (!isCompleteCandidate(candidate)) {
+      const candidate = isCompleteVaultCandidate(manifest.candidate) ? manifest.candidate : manifest;
+      if (!isCompleteVaultCandidate(candidate)) {
         throw new Error(
           "prepareVaultCreation requires a complete VaultCandidate (allocations with addresses + weightBps, share symbol, asset, minSkinBps, strategy, jurisdiction). The simplified vault-manifest does not carry on-chain deploy parameters — supply a full candidate.",
         );

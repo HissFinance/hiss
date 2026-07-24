@@ -18,6 +18,7 @@ import { assertNoCredentials } from "./lib/credentials.js";
 import { validateVaultManifest, VAULT_MANIFEST_SCHEMA } from "./lib/validate.js";
 import { validateCoil, compileCoil, CoilCompileError } from "./lib/coil.js";
 import { verifyReceipt } from "./lib/receipt.js";
+import { isCompleteVaultCandidate } from "./lib/client.js";
 import type { HissClient, JsonRecord, UnsignedTx } from "./lib/types.js";
 
 export interface ToolContext {
@@ -271,13 +272,12 @@ const READ_TOOLS: ToolDefinition[] = [
     description: "List source-verified assets vaults may hold on Robinhood Chain.",
     inputSchema: { type: "object", properties: {} },
     handler: async (_args, ctx) => {
-      const assets = await ctx.client.getSupportedAssets();
+      const result = await ctx.client.getSupportedAssets();
+      const registryAssets = Array.isArray(result.assets) ? result.assets.length : 0;
+      const baseAssets = Array.isArray(result.base) ? result.base.length : 0;
       return {
-        summary: `${assets.length} supported asset(s) listed.`,
-        structured: {
-          assets,
-          note: "Canonical public assets known to this SDK build. USDG is the base settlement asset; the full tradable stock-token registry is not enumerated here.",
-        },
+        summary: `${baseAssets} base + ${registryAssets} registry asset(s) listed (source: ${String(result.source ?? "unknown")}).`,
+        structured: result,
       };
     },
   },
@@ -365,20 +365,38 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     title: "Prepare vault creation",
     kind: "prepare",
     description:
-      "Prepare an UNSIGNED vault-creation transaction from a valid manifest. Refuses an invalid manifest.",
+      "Prepare an UNSIGNED VaultFactory.createVault transaction. Accepts a COMPLETE vault-kit VaultCandidate " +
+      "(with allocations, symbol, asset, minSkinBps, strategy, jurisdiction, feeRecipient) — the real deploy " +
+      "path. A simplified draft manifest is validated but declined, because it does not carry on-chain deploy " +
+      "parameters. Refuses an invalid manifest.",
     inputSchema: {
       type: "object",
       required: ["manifest"],
-      properties: { manifest: { type: "object" } },
+      properties: {
+        manifest: {
+          type: "object",
+          description:
+            "A complete vault-kit VaultCandidate (with `feeRecipient`), or `{ candidate, feeRecipient }`, to " +
+            "produce a real createVault package. A simplified draft manifest is validated then declined.",
+        },
+      },
     },
     handler: async (args, ctx) => {
       const manifest = requireRecord(args, "manifest");
-      const verdict = validateVaultManifest(manifest);
-      if (!verdict.ok) {
-        throw new ToolInputError(
-          "Refusing to prepare: manifest is invalid.",
-          verdict.issues.map((i) => ({ code: i.code, message: `${i.path}: ${i.message}` })),
-        );
+      const candidate = isCompleteVaultCandidate(manifest.candidate) ? manifest.candidate : manifest;
+      // A complete VaultCandidate goes straight to the real deploy path — the
+      // SDK validates deployment-readiness fail-closed and builds real calldata.
+      // A simplified draft is validated with the MCP manifest rules first, then
+      // handed to the SDK which returns an honest typed decline (a draft carries
+      // no on-chain deploy parameters, and we never fabricate them).
+      if (!isCompleteVaultCandidate(candidate)) {
+        const verdict = validateVaultManifest(manifest);
+        if (!verdict.ok) {
+          throw new ToolInputError(
+            "Refusing to prepare: manifest is invalid.",
+            verdict.issues.map((i) => ({ code: i.code, message: `${i.path}: ${i.message}` })),
+          );
+        }
       }
       const tx = await ctx.client.prepareVaultCreation(manifest);
       return {

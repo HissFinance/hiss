@@ -50,7 +50,7 @@ export interface HissClient {
   getVaultContributorReward(address: string): Promise<JsonRecord>;
   getProviderReward(groupId: string): Promise<JsonRecord>;
   getReceipt(id: string): Promise<JsonRecord>;
-  getSupportedAssets(): Promise<JsonRecord[]>;
+  getSupportedAssets(): Promise<JsonRecord>;
   getFeeSchedule(): Promise<JsonRecord>;
   // ---- prepares (unsigned only) ----
   prepareVaultCreation(manifest: JsonRecord): Promise<UnsignedTx>;
