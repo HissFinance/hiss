@@ -7,16 +7,16 @@ The entire Stock Premium LP Manager is driven by the `@hiss/core`
 (intended) MCP tools, and this skill. It never builds a second pricing engine: it
 CONSUMES the canonical HISS Price Mesh.
 
-| Module | Responsibility |
-|---|---|
-| `registry.ts` | Dynamic admission-gated Stock-Token registry — the fail-closed 12-check gate; `admitStockToken`, `buildStockTokenRegistry`. Address is identity. |
-| `premium.ts` | Amount-aware, direction-specific premium/discount; `computePremiumPoint`, `computePremiumCurve`, `simulateBuy`, `simulateSell`. Multiplier applied exactly once, feed side only. |
-| `ladder.ts` | One-sided v3 range ladders; `buildLadder`, tick/price helpers. Templates + postures. |
-| `pnl.ts` | The honest eight-line P&L; `computePnlBreakdown`, `pnlViewShowsNetWithGross`. |
-| `risk/` | The typed fuse family; context, bounds, engine, verdict (`PASS`/`WARN`/`DEGRADED`/`HALT`/`UNKNOWN`). |
-| `lp-adapter/` | The typed prepare-only Uniswap v3 `NonfungiblePositionManager` adapter, intent, signature review, deterministic receipts, replay protection, canary. |
-| `viewModels.ts` | The STABLE typed FE/tool view models. |
-| `fingerprint.ts` | `evidenceFingerprint` — deterministic evidence hashing behind every record. |
+| Module           | Responsibility                                                                                                                                                                   |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `registry.ts`    | Dynamic admission-gated Stock-Token registry — the fail-closed 12-check gate; `admitStockToken`, `buildStockTokenRegistry`. Address is identity.                                 |
+| `premium.ts`     | Amount-aware, direction-specific premium/discount; `computePremiumPoint`, `computePremiumCurve`, `simulateBuy`, `simulateSell`. Multiplier applied exactly once, feed side only. |
+| `ladder.ts`      | One-sided v3 range ladders; `buildLadder`, tick/price helpers. Templates + postures.                                                                                             |
+| `pnl.ts`         | The honest eight-line P&L; `computePnlBreakdown`, `pnlViewShowsNetWithGross`.                                                                                                    |
+| `risk/`          | The typed fuse family; context, bounds, engine, verdict (`PASS`/`WARN`/`DEGRADED`/`HALT`/`UNKNOWN`).                                                                             |
+| `lp-adapter/`    | The typed prepare-only Uniswap v3 `NonfungiblePositionManager` adapter, intent, signature review, deterministic receipts, replay protection, canary.                             |
+| `viewModels.ts`  | The STABLE typed FE/tool view models.                                                                                                                                            |
+| `fingerprint.ts` | `evidenceFingerprint` — deterministic evidence hashing behind every record.                                                                                                      |
 
 ## Web surface (live today)
 

@@ -3,7 +3,10 @@ import { startTestServer, mcpCall, toolsCall, type RunningHttp } from "./helpers
 import { callHissTool } from "../src/server.js";
 import { HISS_TOOLS } from "../src/tools.js";
 import { mockClient, VALID_VAULT_MANIFEST, VALID_COIL_MANIFEST } from "./helpers/mockClient.js";
+import { STOCK_PREMIUM_ARGS } from "./helpers/stockPremiumArgs.js";
 import type { JsonRecord } from "../src/lib/types.js";
+
+const TOOL_COUNT = HISS_TOOLS.length;
 
 const FIXED_NOW = "2026-07-24T00:00:00.000Z";
 const ADDR = "0x1111111111111111111111111111111111111111";
@@ -37,6 +40,7 @@ const ARGS: Record<string, JsonRecord> = {
   hiss_prepare_xhiss_redeem: { xShares: "25", receiver: ADDR },
   hiss_validate_coil: { manifest: VALID_COIL_MANIFEST },
   hiss_compile_coil: { manifest: VALID_COIL_MANIFEST, nowIso: FIXED_NOW },
+  ...STOCK_PREMIUM_ARGS,
 };
 
 let running: RunningHttp | undefined;
@@ -69,7 +73,7 @@ describe("stdio ≡ HTTP tool parity (hardening changed no tool behavior)", () =
 });
 
 describe("concurrent stateless requests", () => {
-  it("serves 25 concurrent tools/list calls, each with all 22 tools", async () => {
+  it("serves 25 concurrent tools/list calls, each with all TOOL_COUNT tools", async () => {
     running = await startTestServer();
     const calls = Array.from({ length: 25 }, (_, i) =>
       mcpCall(running!.origin, { jsonrpc: "2.0", id: i, method: "tools/list" }),
@@ -77,7 +81,7 @@ describe("concurrent stateless requests", () => {
     const results = await Promise.all(calls);
     for (const { status, body } of results) {
       expect(status).toBe(200);
-      expect((body.result as { tools: unknown[] }).tools).toHaveLength(22);
+      expect((body.result as { tools: unknown[] }).tools).toHaveLength(TOOL_COUNT);
     }
   });
 

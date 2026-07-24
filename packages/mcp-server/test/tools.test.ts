@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { callHissTool } from "../src/server.js";
-import { HISS_TOOLS } from "../src/tools.js";
+import { HISS_TOOLS, STOCK_PREMIUM_TOOLS } from "../src/tools.js";
 import { mockClient, VALID_VAULT_MANIFEST, VALID_COIL_MANIFEST } from "./helpers/mockClient.js";
+import { STOCK_PREMIUM_ARGS } from "./helpers/stockPremiumArgs.js";
 import type { JsonRecord } from "../src/lib/types.js";
 
 const deps = { client: mockClient(), nowIso: () => "2026-07-16T00:00:00.000Z" };
@@ -42,6 +43,7 @@ const ARGS: Record<string, JsonRecord> = {
   hiss_prepare_xhiss_redeem: { xShares: "25", receiver: "0x1111111111111111111111111111111111111111" },
   hiss_validate_coil: { manifest: VALID_COIL_MANIFEST },
   hiss_compile_coil: { manifest: VALID_COIL_MANIFEST },
+  ...STOCK_PREMIUM_ARGS,
 };
 
 const FORBIDDEN_NAME_FRAGMENTS = [
@@ -75,9 +77,18 @@ describe("tool registry is read/prepare only", () => {
     }
   });
 
-  it("exposes exactly 12 read + 10 prepare tools", () => {
-    expect(HISS_TOOLS.filter((t) => t.kind === "read")).toHaveLength(12);
-    expect(HISS_TOOLS.filter((t) => t.kind === "prepare")).toHaveLength(10);
+  it("classifies every tool and the count is dynamic (base 22 + Stock-Premium 11)", () => {
+    const read = HISS_TOOLS.filter((t) => t.kind === "read");
+    const prepare = HISS_TOOLS.filter((t) => t.kind === "prepare");
+    // Dynamic: no hard-coded total. read + prepare == the registry length.
+    expect(read.length + prepare.length).toBe(HISS_TOOLS.length);
+    // The Stock-Premium bridge contributes exactly 11 (6 read + 5 prepare).
+    expect(STOCK_PREMIUM_TOOLS).toHaveLength(11);
+    expect(STOCK_PREMIUM_TOOLS.filter((t) => t.kind === "read")).toHaveLength(6);
+    expect(STOCK_PREMIUM_TOOLS.filter((t) => t.kind === "prepare")).toHaveLength(5);
+    // Base 12 read + 10 prepare are still present alongside the 6 + 5 new ones.
+    expect(read).toHaveLength(18);
+    expect(prepare).toHaveLength(15);
   });
 });
 

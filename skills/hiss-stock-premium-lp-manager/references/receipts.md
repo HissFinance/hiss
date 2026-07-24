@@ -5,14 +5,14 @@ hash; a receipt that does not verify does not count. Status is proof-derived onl
 
 ## Lifecycle (`lp-adapter/receipts.ts`)
 
-| Receipt | Proves |
-|---|---|
-| compile | The ladder/plan compiled deterministically from evidence. |
-| preparation | A typed UNSIGNED position package was prepared. Prepare-only evidence — never execution. |
-| authorization | The user's bounded authorization for the package. |
-| submission | The user submitted the package from their own account. |
-| settlement | The on-chain result was observed. |
-| reconciliation | The submitted package reconciles to the on-chain receipt. |
+| Receipt        | Proves                                                                                   |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| compile        | The ladder/plan compiled deterministically from evidence.                                |
+| preparation    | A typed UNSIGNED position package was prepared. Prepare-only evidence — never execution. |
+| authorization  | The user's bounded authorization for the package.                                        |
+| submission     | The user submitted the package from their own account.                                   |
+| settlement     | The on-chain result was observed.                                                        |
+| reconciliation | The submitted package reconciles to the on-chain receipt.                                |
 
 ## Rules
 

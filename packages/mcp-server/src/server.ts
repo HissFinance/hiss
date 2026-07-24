@@ -14,6 +14,7 @@ import { HISS_TOOLS, getTool, assertToolInputClean, ToolInputError, type ToolCon
 import { assertNoExecutionClaim, ExecutionClaimError } from "./lib/guard.js";
 import { CredentialRejectedError } from "./lib/credentials.js";
 import type { HissClient, JsonRecord } from "./lib/types.js";
+import type { StockPremiumEngine } from "./lib/stock-premium.js";
 
 export const SERVER_NAME = "hiss-finance";
 export const SERVER_VERSION = "0.1.0";
@@ -33,6 +34,13 @@ export interface ServerDeps {
   client?: HissClient;
   /** Fixed clock for deterministic output (tests). */
   nowIso?: () => string;
+  /**
+   * Optional injected Stock-Premium engine. When omitted, the Stock-Premium
+   * tools use the deterministic DEMO `stockPremiumFixtureEngine` (shipped in
+   * this package). The private deployment injects the real `@hiss/core` engine
+   * so `mcp.hiss.finance` serves live-data Stock-Premium tools.
+   */
+  stockPremium?: StockPremiumEngine;
 }
 
 function makeContext(deps: ServerDeps): ToolContext {
@@ -42,6 +50,7 @@ function makeContext(deps: ServerDeps): ToolContext {
   return {
     client: deps.client,
     nowIso: (deps.nowIso ?? (() => new Date().toISOString()))(),
+    stockPremium: deps.stockPremium,
   };
 }
 

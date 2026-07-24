@@ -1,6 +1,9 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { startTestServer, mcpCall, rawGet, type RunningHttp } from "./helpers/httpHarness.js";
 import { computeToolsetHash } from "../src/lib/toolset-hash.js";
+import { HISS_TOOLS } from "../src/tools.js";
+
+const TOOL_COUNT = HISS_TOOLS.length;
 
 let running: RunningHttp | undefined;
 afterEach(async () => {
@@ -55,7 +58,7 @@ describe("GET /version", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.toolsetHash).toBe(computeToolsetHash().hash);
-    expect(body.toolCount).toBe(22);
+    expect(body.toolCount).toBe(TOOL_COUNT);
     expect(body.server.name).toBe("hiss-finance");
     expect(body.nodeVersion).toBe(process.version);
     expect(typeof body.mcpSdkVersion).toBe("string");
@@ -102,7 +105,7 @@ describe("Body size limit", () => {
     running = await startTestServer({ config: { maxBodyBytes: 262144 } });
     const { status, body } = await mcpCall(running.origin, { jsonrpc: "2.0", id: 1, method: "tools/list" });
     expect(status).toBe(200);
-    expect((body.result as { tools: unknown[] }).tools).toHaveLength(22);
+    expect((body.result as { tools: unknown[] }).tools).toHaveLength(TOOL_COUNT);
   });
 });
 

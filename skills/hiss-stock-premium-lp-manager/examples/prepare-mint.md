@@ -19,8 +19,7 @@
 **Good answer shape:**
 
 > Here is a typed, UNSIGNED mint package. HISS does not sign or submit — you
-> authorize and submit it in your own Safe. Target: the typed LP adapter on chain
-> 4663. Calldata hash: `0x…`. It uses only the pinned position-manager entrypoints
+> authorize and submit it in your own Safe. Target: the typed LP adapter on chain 4663. Calldata hash: `0x…`. It uses only the pinned position-manager entrypoints
 > and an exact approve. Please confirm the four acknowledgments in Signature
 > Review, then submit from your Safe. I'll reconcile the on-chain receipt after.
 

@@ -15,6 +15,7 @@ import { createHissClient } from "../src/lib/client.js";
 import { assertRealizableUnsignedTx } from "../src/lib/txguard.js";
 import { assertNoCredentials, CredentialRejectedError } from "../src/lib/credentials.js";
 import { mockClient } from "./helpers/mockClient.js";
+import { STOCK_PREMIUM_ARGS, STOCK_PREMIUM_NEGATIVE } from "./helpers/stockPremiumArgs.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { JsonRecord } from "../src/lib/types.js";
 
@@ -84,13 +85,15 @@ const NEGATIVE: Record<string, JsonRecord[]> = {
     { manifest: { schema: "coil-manifest-1.0.0" } },
     { manifest: {}, nowIso: "not-a-date" },
   ],
+  ...STOCK_PREMIUM_NEGATIVE,
 };
 
-describe("negative-vector coverage: all 22 tools reject bad input with typed errors", () => {
-  it("has a negative vector for every registered tool", () => {
+describe("negative-vector coverage: every registered tool rejects bad input with typed errors", () => {
+  it("has a negative vector for every registered tool (count is dynamic)", () => {
     const covered = new Set(Object.keys(NEGATIVE));
     for (const t of HISS_TOOLS) expect(covered.has(t.name)).toBe(true);
-    expect(HISS_TOOLS).toHaveLength(22);
+    // Dynamic: every registered tool is covered — no hard-coded total.
+    expect(Object.keys(NEGATIVE).length).toBe(HISS_TOOLS.length);
   });
 
   for (const [name, vectors] of Object.entries(NEGATIVE)) {
@@ -192,6 +195,7 @@ describe("execution-claim guard + unsigned invariant across all prepares", () =>
         fuses: { maxPositionBps: 2000, maxGrossExposureBps: 10000, allowShorting: false },
       },
     },
+    ...STOCK_PREMIUM_ARGS,
   };
 
   it("no prepare tool's summary reads like a completed on-chain action", async () => {

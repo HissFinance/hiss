@@ -8,7 +8,7 @@ replacements.
 The **canonical MCP tool set is generated from source**
 (`packages/mcp-server/src/tools.ts`) — the server's own `list_tools` response is
 authoritative, and `pnpm check:skill-tool-refs` fails CI if any skill or the docs
-drift from it. The current registry has **22 tools** (12 read, 10 prepare); see
+drift from it. The current registry has **33 tools** (18 read, 15 prepare); see
 [MCP server](../mcp.md).
 
 ## Keep the interfaces separate
