@@ -27,11 +27,19 @@ const ARGS: Record<string, JsonRecord> = {
   },
   hiss_validate_vault_candidate: { manifest: VALID_VAULT_MANIFEST },
   hiss_prepare_vault_creation: { manifest: VALID_VAULT_MANIFEST },
-  hiss_prepare_vault_deposit: { vault: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6", amount: "100" },
-  hiss_prepare_vault_withdrawal: { vault: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6", shares: "10" },
+  hiss_prepare_vault_deposit: {
+    vault: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    amount: "100",
+    receiver: "0x1111111111111111111111111111111111111111",
+  },
+  hiss_prepare_vault_withdrawal: {
+    vault: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    shares: "10",
+    receiver: "0x1111111111111111111111111111111111111111",
+  },
   hiss_prepare_hiss_stake: { amount: "500" },
   hiss_prepare_xhiss_cooldown: { xhissAmount: "50" },
-  hiss_prepare_xhiss_redeem: {},
+  hiss_prepare_xhiss_redeem: { xShares: "25", receiver: "0x1111111111111111111111111111111111111111" },
   hiss_validate_coil: { manifest: VALID_COIL_MANIFEST },
   hiss_compile_coil: { manifest: VALID_COIL_MANIFEST },
 };

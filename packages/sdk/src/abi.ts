@@ -178,6 +178,54 @@ export const VAULT_FACTORY_ABI = [
   },
 ] as const;
 
+/**
+ * VaultAssetRegistry read fragments — the on-chain allow-list of
+ * vault-holdable assets (enumerable via assetCount/assetList) plus per-asset
+ * policy. Authored from the verified interface `IVaultAssetRegistry`.
+ */
+export const VAULT_ASSET_REGISTRY_ABI = [
+  {
+    type: "function",
+    name: "assetCount",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "assetList",
+    stateMutability: "view",
+    inputs: [{ name: "index", type: "uint256" }],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "isEnabled",
+    stateMutability: "view",
+    inputs: [{ name: "token", type: "address" }],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "getAssetPolicy",
+    stateMutability: "view",
+    inputs: [{ name: "token", type: "address" }],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "enabled", type: "bool" },
+          { name: "liveRebalanceEnabled", type: "bool" },
+          { name: "maxAllocationBps", type: "uint16" },
+          { name: "oracleFeed", type: "address" },
+          { name: "stalenessLimitSeconds", type: "uint64" },
+          { name: "exists", type: "bool" },
+        ],
+      },
+    ],
+  },
+] as const;
+
 /** xHISS staking vault read + action fragments. */
 export const XHISS_ABI = [
   { type: "function", name: "name", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },

@@ -25,7 +25,7 @@ export * from "./constants";
 export { robinhoodChainMainnet, robinhoodChainTestnet, chainForId } from "./chains";
 
 // ABIs
-export { ERC20_ABI, VAULT_ABI, VAULT_FACTORY_ABI, XHISS_ABI } from "./abi";
+export { ERC20_ABI, VAULT_ABI, VAULT_FACTORY_ABI, VAULT_ASSET_REGISTRY_ABI, XHISS_ABI } from "./abi";
 
 // Types
 export type {

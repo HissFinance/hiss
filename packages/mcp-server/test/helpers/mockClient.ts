@@ -38,7 +38,12 @@ export function mockClient(): HissClient {
     getVaultContributorReward: () => Promise.resolve({ status: "not_yet_scored" }),
     getProviderReward: () => Promise.resolve({ status: "not_yet_scored" }),
     getReceipt: (id) => Promise.resolve({ id, kind: "state_read" }),
-    getSupportedAssets: () => Promise.resolve([{ symbol: "USDG" }, { symbol: "AAPL" }]),
+    getSupportedAssets: () =>
+      Promise.resolve({
+        source: "mock",
+        base: [{ symbol: "USDG" }],
+        assets: [{ symbol: "AAPL" }],
+      }),
     getFeeSchedule: () => Promise.resolve({ swapFeeBps: 70 }),
     prepareVaultCreation: () => Promise.resolve(unsigned("Create a USDG Creator Vault.")),
     prepareVaultDeposit: (v, a) => Promise.resolve(unsigned(`Deposit ${a} USDG into ${v}.`)),

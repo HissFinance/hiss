@@ -18,6 +18,7 @@ import { assertNoCredentials } from "./lib/credentials.js";
 import { validateVaultManifest, VAULT_MANIFEST_SCHEMA } from "./lib/validate.js";
 import { validateCoil, compileCoil, CoilCompileError } from "./lib/coil.js";
 import { verifyReceipt } from "./lib/receipt.js";
+import { isCompleteVaultCandidate } from "./lib/client.js";
 import type { HissClient, JsonRecord, UnsignedTx } from "./lib/types.js";
 
 export interface ToolContext {
@@ -271,8 +272,13 @@ const READ_TOOLS: ToolDefinition[] = [
     description: "List source-verified assets vaults may hold on Robinhood Chain.",
     inputSchema: { type: "object", properties: {} },
     handler: async (_args, ctx) => {
-      const assets = await ctx.client.getSupportedAssets();
-      return { summary: `${assets.length} supported asset(s) listed.`, structured: { assets } };
+      const result = await ctx.client.getSupportedAssets();
+      const registryAssets = Array.isArray(result.assets) ? result.assets.length : 0;
+      const baseAssets = Array.isArray(result.base) ? result.base.length : 0;
+      return {
+        summary: `${baseAssets} base + ${registryAssets} registry asset(s) listed (source: ${String(result.source ?? "unknown")}).`,
+        structured: result,
+      };
     },
   },
   {
@@ -359,20 +365,38 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     title: "Prepare vault creation",
     kind: "prepare",
     description:
-      "Prepare an UNSIGNED vault-creation transaction from a valid manifest. Refuses an invalid manifest.",
+      "Prepare an UNSIGNED VaultFactory.createVault transaction. Accepts a COMPLETE vault-kit VaultCandidate " +
+      "(with allocations, symbol, asset, minSkinBps, strategy, jurisdiction, feeRecipient) — the real deploy " +
+      "path. A simplified draft manifest is validated but declined, because it does not carry on-chain deploy " +
+      "parameters. Refuses an invalid manifest.",
     inputSchema: {
       type: "object",
       required: ["manifest"],
-      properties: { manifest: { type: "object" } },
+      properties: {
+        manifest: {
+          type: "object",
+          description:
+            "A complete vault-kit VaultCandidate (with `feeRecipient`), or `{ candidate, feeRecipient }`, to " +
+            "produce a real createVault package. A simplified draft manifest is validated then declined.",
+        },
+      },
     },
     handler: async (args, ctx) => {
       const manifest = requireRecord(args, "manifest");
-      const verdict = validateVaultManifest(manifest);
-      if (!verdict.ok) {
-        throw new ToolInputError(
-          "Refusing to prepare: manifest is invalid.",
-          verdict.issues.map((i) => ({ code: i.code, message: `${i.path}: ${i.message}` })),
-        );
+      const candidate = isCompleteVaultCandidate(manifest.candidate) ? manifest.candidate : manifest;
+      // A complete VaultCandidate goes straight to the real deploy path — the
+      // SDK validates deployment-readiness fail-closed and builds real calldata.
+      // A simplified draft is validated with the MCP manifest rules first, then
+      // handed to the SDK which returns an honest typed decline (a draft carries
+      // no on-chain deploy parameters, and we never fabricate them).
+      if (!isCompleteVaultCandidate(candidate)) {
+        const verdict = validateVaultManifest(manifest);
+        if (!verdict.ok) {
+          throw new ToolInputError(
+            "Refusing to prepare: manifest is invalid.",
+            verdict.issues.map((i) => ({ code: i.code, message: `${i.path}: ${i.message}` })),
+          );
+        }
       }
       const tx = await ctx.client.prepareVaultCreation(manifest);
       return {
@@ -388,16 +412,18 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     description: "Prepare an UNSIGNED USDG deposit transaction to a vault.",
     inputSchema: {
       type: "object",
-      required: ["vault", "amount"],
+      required: ["vault", "amount", "receiver"],
       properties: {
         vault: { type: "string", description: "Vault address." },
         amount: { type: "string", description: "USDG amount (decimal string)." },
+        receiver: { type: "string", description: "Address that receives the minted vault shares." },
       },
     },
     handler: async (args, ctx) => {
       const vault = requireAddress(args, "vault");
       const amount = requireString(args, "amount");
-      const tx = await ctx.client.prepareVaultDeposit(vault, amount);
+      const receiver = requireAddress(args, "receiver");
+      const tx = await ctx.client.prepareVaultDeposit(vault, amount, receiver);
       return {
         summary: `Prepared an unsigned deposit of ${amount} USDG to ${vault}. Nothing was sent.`,
         structured: unsignedStructured(tx),
@@ -411,16 +437,18 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     description: "Prepare an UNSIGNED withdrawal transaction from a vault.",
     inputSchema: {
       type: "object",
-      required: ["vault", "shares"],
+      required: ["vault", "shares", "receiver"],
       properties: {
         vault: { type: "string", description: "Vault address." },
         shares: { type: "string", description: "Share amount (decimal string)." },
+        receiver: { type: "string", description: "Address that receives the withdrawn USDG." },
       },
     },
     handler: async (args, ctx) => {
       const vault = requireAddress(args, "vault");
       const shares = requireString(args, "shares");
-      const tx = await ctx.client.prepareVaultWithdrawal(vault, shares);
+      const receiver = requireAddress(args, "receiver");
+      const tx = await ctx.client.prepareVaultWithdrawal(vault, shares, receiver);
       return {
         summary: `Prepared an unsigned withdrawal of ${shares} shares from ${vault}. Nothing was sent.`,
         structured: unsignedStructured(tx),
@@ -470,9 +498,18 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     title: "Prepare xHISS redeem",
     kind: "prepare",
     description: "Prepare an UNSIGNED xHISS redeem transaction within your open redeem window.",
-    inputSchema: { type: "object", properties: {} },
-    handler: async (_args, ctx) => {
-      const tx = await ctx.client.prepareXhissRedeem();
+    inputSchema: {
+      type: "object",
+      required: ["xShares", "receiver"],
+      properties: {
+        xShares: { type: "string", description: "xHISS share amount to redeem (decimal string)." },
+        receiver: { type: "string", description: "Address that receives the redeemed HISS." },
+      },
+    },
+    handler: async (args, ctx) => {
+      const xShares = requireString(args, "xShares");
+      const receiver = requireAddress(args, "receiver");
+      const tx = await ctx.client.prepareXhissRedeem(xShares, receiver);
       return {
         summary: "Prepared an unsigned xHISS redeem. Nothing was sent.",
         structured: unsignedStructured(tx),

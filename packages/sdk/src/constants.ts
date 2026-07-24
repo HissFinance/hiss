@@ -35,6 +35,8 @@ export const ADDRESSES = {
   flagshipVault: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
   /** VaultFactory — creates USDG Creator Vaults. */
   vaultFactory: "0x278d237c6890a5f7101296a9021ed9d26c821810",
+  /** VaultAssetRegistry — on-chain allow-list of vault-holdable assets. */
+  vaultAssetRegistry: "0xcf9609b30f565813b87d1998c8b3b2ad073a4ce1",
   /** xHISS staking vault (share token for staked $HISS). */
   xhissVault: "0x699861d2c546ab86a7f2ae97ffc7af89f3ff67be",
 } as const;

@@ -14,7 +14,7 @@
 
 import { createPublicClient, http } from "viem";
 import { verifyReceipt as vaultKitVerifyReceipt, type VaultKitReceipt } from "@hiss-finance/vault-kit";
-import { ERC20_ABI, VAULT_ABI, XHISS_ABI } from "./abi";
+import { ERC20_ABI, VAULT_ABI, VAULT_ASSET_REGISTRY_ABI, XHISS_ABI } from "./abi";
 import { chainForId } from "./chains";
 import {
   ADDRESSES,
@@ -115,6 +115,142 @@ export class HissClient {
   }
 
   // -------------------------------------------------------------------------
+  // Supported assets (on-chain VaultAssetRegistry allow-list)
+  // -------------------------------------------------------------------------
+
+  /** Enumerate the registry's allow-listed asset addresses (fail-soft). */
+  private async registryAssetAddresses(): Promise<ReadResult<`0x${string}`[]>> {
+    return soft(async () => {
+      const count = (await this.client.readContract({
+        address: ADDRESSES.vaultAssetRegistry,
+        abi: VAULT_ASSET_REGISTRY_ABI,
+        functionName: "assetCount",
+      })) as bigint;
+      const addrs: `0x${string}`[] = [];
+      for (let i = 0n; i < count; i += 1n) {
+        addrs.push(
+          (await this.client.readContract({
+            address: ADDRESSES.vaultAssetRegistry,
+            abi: VAULT_ASSET_REGISTRY_ABI,
+            functionName: "assetList",
+            args: [i],
+          })) as `0x${string}`,
+        );
+      }
+      return addrs;
+    });
+  }
+
+  /**
+   * The canonical supported-asset set: the USDG base settlement asset and the
+   * $HISS protocol token (from constants) plus the live VaultAssetRegistry
+   * stock-token allow-list read from chain 4663. Fail-soft: if the registry
+   * read degrades, the registry portion is labeled UNKNOWN and only the
+   * canonical base assets are returned — never a fabricated list.
+   */
+  async getSupportedAssets(): Promise<{
+    chainId: number;
+    registry: `0x${string}`;
+    source: "onchain_registry" | "degraded";
+    base: Array<{ symbol: string; address: `0x${string}`; decimals: number; category: string; note: string }>;
+    assets: Array<{
+      symbol: ReadResult<string>;
+      address: `0x${string}`;
+      decimals: ReadResult<string>;
+      category: string;
+      enabled: ReadResult<boolean>;
+      maxAllocationBps: ReadResult<string>;
+    }>;
+    count: number;
+    note: string;
+    registryError?: string;
+  }> {
+    const base = [
+      {
+        symbol: "USDG",
+        address: ADDRESSES.usdg,
+        decimals: DECIMALS.usdg,
+        category: "stablecoin",
+        note: "Vault base settlement asset.",
+      },
+      {
+        symbol: "HISS",
+        address: ADDRESSES.hiss,
+        decimals: DECIMALS.hiss,
+        category: "governance",
+        note: "Protocol / staking token — not a vault-holdable asset.",
+      },
+    ];
+    const addrs = await this.registryAssetAddresses();
+    if (addrs.state !== "live" || addrs.value == null) {
+      return {
+        chainId: this.chainId,
+        registry: ADDRESSES.vaultAssetRegistry,
+        source: "degraded",
+        base,
+        assets: [],
+        count: 0,
+        note: "VaultAssetRegistry read is degraded (UNKNOWN) — showing only the canonical base assets. Retry against chain 4663; a degraded read is never treated as an empty allow-list.",
+        ...(addrs.error ? { registryError: addrs.error } : {}),
+      };
+    }
+    const assets = await Promise.all(
+      addrs.value.map(async (address) => {
+        const [symbol, decimals, policy] = await Promise.all([
+          soft<string>(
+            () =>
+              this.client.readContract({
+                address,
+                abi: ERC20_ABI,
+                functionName: "symbol",
+              }) as Promise<string>,
+          ),
+          soft<number>(
+            () =>
+              this.client.readContract({
+                address,
+                abi: ERC20_ABI,
+                functionName: "decimals",
+              }) as Promise<number>,
+          ),
+          soft<{ enabled: boolean; maxAllocationBps: number }>(
+            () =>
+              this.client.readContract({
+                address: ADDRESSES.vaultAssetRegistry,
+                abi: VAULT_ASSET_REGISTRY_ABI,
+                functionName: "getAssetPolicy",
+                args: [address],
+              }) as Promise<{ enabled: boolean; maxAllocationBps: number }>,
+          ),
+        ]);
+        return {
+          address,
+          symbol: mapStr(symbol),
+          decimals: mapNum(decimals),
+          category: "stock-token",
+          enabled:
+            policy.state === "live" && policy.value != null
+              ? ({ state: "live", value: policy.value.enabled } as ReadResult<boolean>)
+              : ({ state: "degraded", value: null } as ReadResult<boolean>),
+          maxAllocationBps:
+            policy.state === "live" && policy.value != null
+              ? ({ state: "live", value: String(policy.value.maxAllocationBps) } as ReadResult<string>)
+              : ({ state: "degraded", value: null } as ReadResult<string>),
+        };
+      }),
+    );
+    return {
+      chainId: this.chainId,
+      registry: ADDRESSES.vaultAssetRegistry,
+      source: "onchain_registry",
+      base,
+      assets,
+      count: assets.length,
+      note: "USDG (base) + HISS (protocol) + the live VaultAssetRegistry stock-token allow-list on chain 4663. Enabled/allocation policy is a live per-asset read.",
+    };
+  }
+
+  // -------------------------------------------------------------------------
   // Vaults
   // -------------------------------------------------------------------------
 
@@ -151,31 +287,83 @@ export class HissClient {
   }
 
   /**
-   * Read a vault's ERC-20 holdings for a supplied set of asset addresses
-   * (balanceOf(vault) per asset). Holdings must be read live — a manifest's
-   * target weights are never a claim about current holdings. Without an asset
-   * list there is nothing to read on-chain, so the result is degraded.
+   * Read a vault's live ERC-20 holdings (balanceOf(vault) per asset). Holdings
+   * are always a live chain read — a manifest's target weights are never a
+   * claim about current holdings.
+   *
+   * When no asset list is supplied the set is resolved on-chain: the vault's
+   * own base `asset()` plus every token in the VaultAssetRegistry allow-list.
+   * Each holding is enriched with its live symbol/decimals. Fail-soft: if the
+   * registry read degrades the result is labeled `degraded` (UNKNOWN) and only
+   * the vault's base asset is read — never a fabricated or silently-empty set.
    */
   async getVaultHoldings(
     vault: `0x${string}`,
     assetAddresses: readonly `0x${string}`[] = [],
   ): Promise<{
     vault: `0x${string}`;
-    holdings: { asset: `0x${string}`; balance: ReadResult<string> }[];
+    source: "supplied" | "onchain_registry" | "degraded_base_only";
+    holdings: {
+      asset: `0x${string}`;
+      symbol: ReadResult<string>;
+      decimals: ReadResult<string>;
+      balance: ReadResult<string>;
+    }[];
     note?: string;
+    registryError?: string;
   }> {
-    if (assetAddresses.length === 0) {
-      return {
-        vault,
-        holdings: [],
-        note: "Supply the vault's asset addresses (e.g. from the asset registry) to read live holdings.",
-      };
+    let source: "supplied" | "onchain_registry" | "degraded_base_only" = "supplied";
+    let note: string | undefined;
+    let registryError: string | undefined;
+    let assets: `0x${string}`[] = [...assetAddresses];
+
+    if (assets.length === 0) {
+      const baseAsset = await soft<`0x${string}`>(
+        () =>
+          this.client.readContract({
+            address: vault,
+            abi: VAULT_ABI,
+            functionName: "asset",
+          }) as Promise<`0x${string}`>,
+      );
+      const registry = await this.registryAssetAddresses();
+      const set = new Map<string, `0x${string}`>();
+      if (baseAsset.state === "live" && baseAsset.value)
+        set.set(baseAsset.value.toLowerCase(), baseAsset.value);
+      if (registry.state === "live" && registry.value) {
+        for (const a of registry.value) set.set(a.toLowerCase(), a);
+        source = "onchain_registry";
+        note =
+          "Holdings over the vault's base asset plus the live VaultAssetRegistry allow-list on chain 4663.";
+      } else {
+        source = "degraded_base_only";
+        registryError = registry.error;
+        note =
+          "VaultAssetRegistry read is degraded (UNKNOWN); holdings cover only the vault's base asset. A degraded read is never treated as an empty allow-list.";
+      }
+      assets = [...set.values()];
     }
+
     const holdings = await Promise.all(
-      assetAddresses.map(async (asset) => ({
-        asset,
-        balance: mapBig(
-          await soft<bigint>(
+      assets.map(async (asset) => {
+        const [symbol, decimals, balance] = await Promise.all([
+          soft<string>(
+            () =>
+              this.client.readContract({
+                address: asset,
+                abi: ERC20_ABI,
+                functionName: "symbol",
+              }) as Promise<string>,
+          ),
+          soft<number>(
+            () =>
+              this.client.readContract({
+                address: asset,
+                abi: ERC20_ABI,
+                functionName: "decimals",
+              }) as Promise<number>,
+          ),
+          soft<bigint>(
             () =>
               this.client.readContract({
                 address: asset,
@@ -184,10 +372,17 @@ export class HissClient {
                 args: [vault],
               }) as Promise<bigint>,
           ),
-        ),
-      })),
+        ]);
+        return { asset, symbol: mapStr(symbol), decimals: mapNum(decimals), balance: mapBig(balance) };
+      }),
     );
-    return { vault, holdings };
+    return {
+      vault,
+      source,
+      holdings,
+      ...(note ? { note } : {}),
+      ...(registryError ? { registryError } : {}),
+    };
   }
 
   /**
@@ -409,5 +604,15 @@ export class HissClient {
 
 function mapBig(r: ReadResult<bigint>): ReadResult<string> {
   if (r.state === "live" && r.value != null) return { state: "live", value: r.value.toString() };
+  return { state: "degraded", value: null, ...(r.error ? { error: r.error } : {}) };
+}
+
+function mapStr(r: ReadResult<string>): ReadResult<string> {
+  if (r.state === "live" && r.value != null) return { state: "live", value: r.value };
+  return { state: "degraded", value: null, ...(r.error ? { error: r.error } : {}) };
+}
+
+function mapNum(r: ReadResult<number>): ReadResult<string> {
+  if (r.state === "live" && r.value != null) return { state: "live", value: String(r.value) };
   return { state: "degraded", value: null, ...(r.error ? { error: r.error } : {}) };
 }
