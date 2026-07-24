@@ -35,12 +35,12 @@ as the non-root `node` user.
 
 ## Endpoints
 
-| Method | Path       | Purpose | Codes |
-| ------ | ---------- | ------- | ----- |
-| GET    | `/healthz` | Liveness (no MCP, no RPC). | 200 |
-| GET    | `/readyz`  | Readiness — RPC reachable **and** chain id matches. | 200 ready · 503 not-ready |
-| GET    | `/version` | Deployment version, `toolsetHash`, tool count/names, MCP SDK version, Node version. | 200 |
-| POST   | `/mcp`     | MCP JSON-RPC (Streamable HTTP). | 200 · 413 body · 429 rate · 504 timeout |
+| Method | Path       | Purpose                                                                             | Codes                                   |
+| ------ | ---------- | ----------------------------------------------------------------------------------- | --------------------------------------- |
+| GET    | `/healthz` | Liveness (no MCP, no RPC).                                                          | 200                                     |
+| GET    | `/readyz`  | Readiness — RPC reachable **and** chain id matches.                                 | 200 ready · 503 not-ready               |
+| GET    | `/version` | Deployment version, `toolsetHash`, tool count/names, MCP SDK version, Node version. | 200                                     |
+| POST   | `/mcp`     | MCP JSON-RPC (Streamable HTTP).                                                     | 200 · 413 body · 429 rate · 504 timeout |
 
 Rejections applied before routing/work: **421** (Host not allowlisted),
 **429** (rate limit), **413** (oversized body), **504** (request deadline).
@@ -49,18 +49,18 @@ are never throttled.
 
 ## Runtime environment (names only — never commit a value)
 
-| Variable | Required | Default | Meaning |
-| --- | --- | --- | --- |
-| `HISS_RPC_URL` | **yes** | — | Approved Robinhood Chain JSON-RPC endpoint. Used for `/readyz` and reads. Never logged, never returned. |
-| `HISS_CHAIN_ID` | **yes** | `4663` (code default) | Expected chain id. `/readyz` fails on mismatch. Set to `4663` (mainnet). |
-| `HISS_MCP_HTTP_HOST` | recommended | `127.0.0.1` (image sets `0.0.0.0`) | Bind address. Containers use `0.0.0.0`. |
-| `PORT` / `HISS_MCP_HTTP_PORT` | recommended | `8730` | Listen port. `HISS_MCP_HTTP_PORT` wins if both set. |
-| `HISS_MCP_ALLOWED_HOSTS` | recommended | `mcp.hiss.finance,localhost,127.0.0.1,[::1]` | CSV Host allowlist. Must include the public hostname behind the TLS proxy plus the probe host. |
-| `HISS_MCP_MAX_BODY_BYTES` | no | `262144` | Max POST body bytes → 413. |
-| `HISS_MCP_REQUEST_TIMEOUT_MS` | no | `15000` | Per-request deadline → 504. |
-| `HISS_MCP_RATE_LIMIT_MAX` | no | `120` | Requests per window per client → 429. |
-| `HISS_MCP_RATE_LIMIT_WINDOW_MS` | no | `60000` | Rate-limit window (ms). |
-| `HISS_MCP_DEPLOY_VERSION` | recommended | package version | Release marker surfaced by `/version` (set to the deployed git SHA). |
+| Variable                        | Required    | Default                                      | Meaning                                                                                                 |
+| ------------------------------- | ----------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `HISS_RPC_URL`                  | **yes**     | —                                            | Approved Robinhood Chain JSON-RPC endpoint. Used for `/readyz` and reads. Never logged, never returned. |
+| `HISS_CHAIN_ID`                 | **yes**     | `4663` (code default)                        | Expected chain id. `/readyz` fails on mismatch. Set to `4663` (mainnet).                                |
+| `HISS_MCP_HTTP_HOST`            | recommended | `127.0.0.1` (image sets `0.0.0.0`)           | Bind address. Containers use `0.0.0.0`.                                                                 |
+| `PORT` / `HISS_MCP_HTTP_PORT`   | recommended | `8730`                                       | Listen port. `HISS_MCP_HTTP_PORT` wins if both set.                                                     |
+| `HISS_MCP_ALLOWED_HOSTS`        | recommended | `mcp.hiss.finance,localhost,127.0.0.1,[::1]` | CSV Host allowlist. Must include the public hostname behind the TLS proxy plus the probe host.          |
+| `HISS_MCP_MAX_BODY_BYTES`       | no          | `262144`                                     | Max POST body bytes → 413.                                                                              |
+| `HISS_MCP_REQUEST_TIMEOUT_MS`   | no          | `15000`                                      | Per-request deadline → 504.                                                                             |
+| `HISS_MCP_RATE_LIMIT_MAX`       | no          | `120`                                        | Requests per window per client → 429.                                                                   |
+| `HISS_MCP_RATE_LIMIT_WINDOW_MS` | no          | `60000`                                      | Rate-limit window (ms).                                                                                 |
+| `HISS_MCP_DEPLOY_VERSION`       | recommended | package version                              | Release marker surfaced by `/version` (set to the deployed git SHA).                                    |
 
 > `HISS_RPC_URL` may embed a key. It is treated as a secret: never logged,
 > never included in any response body, never printed by the structured logger

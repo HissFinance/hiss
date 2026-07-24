@@ -23,9 +23,7 @@ export async function startTestServer(overrides: HttpServerOverrides = {}): Prom
     origin: `http://127.0.0.1:${port}`,
     port,
     close: () =>
-      new Promise<void>((resolve, reject) =>
-        httpServer.close((err) => (err ? reject(err) : resolve())),
-      ),
+      new Promise<void>((resolve, reject) => httpServer.close((err) => (err ? reject(err) : resolve()))),
   };
 }
 
@@ -75,16 +73,13 @@ export function rawGet(
   headers: Record<string, string> = {},
 ): Promise<{ status: number; body: string }> {
   return new Promise((resolve, reject) => {
-    const req = httpRequest(
-      { host: "127.0.0.1", port, path, method: "GET", headers },
-      (res) => {
-        const chunks: Buffer[] = [];
-        res.on("data", (c) => chunks.push(c as Buffer));
-        res.on("end", () =>
-          resolve({ status: res.statusCode ?? 0, body: Buffer.concat(chunks).toString("utf8") }),
-        );
-      },
-    );
+    const req = httpRequest({ host: "127.0.0.1", port, path, method: "GET", headers }, (res) => {
+      const chunks: Buffer[] = [];
+      res.on("data", (c) => chunks.push(c as Buffer));
+      res.on("end", () =>
+        resolve({ status: res.statusCode ?? 0, body: Buffer.concat(chunks).toString("utf8") }),
+      );
+    });
     req.on("error", reject);
     req.end();
   });

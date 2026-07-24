@@ -254,8 +254,7 @@ export function createHttpServer(overrides: HttpServerOverrides = {}): HttpServe
   const toolset = computeToolsetHash();
 
   // One shared read/prepare client — it holds no keys and no per-request state.
-  const client =
-    overrides.client ?? createHissClient({ rpcUrl: config.rpcUrl, chainId: config.chainId });
+  const client = overrides.client ?? createHissClient({ rpcUrl: config.rpcUrl, chainId: config.chainId });
 
   const readiness =
     overrides.readiness ??
@@ -268,7 +267,12 @@ export function createHttpServer(overrides: HttpServerOverrides = {}): HttpServe
 
   const rateLimit = makeRateLimiter(config.rateLimitMax, config.rateLimitWindowMs, now);
 
-  function sendJson(res: ServerResponse, status: number, body: unknown, headers?: Record<string, string>): void {
+  function sendJson(
+    res: ServerResponse,
+    status: number,
+    body: unknown,
+    headers?: Record<string, string>,
+  ): void {
     if (res.headersSent || res.writableEnded) return;
     res.writeHead(status, { "content-type": "application/json", ...headers });
     res.end(JSON.stringify(body));
@@ -319,9 +323,14 @@ export function createHttpServer(overrides: HttpServerOverrides = {}): HttpServe
     // Everything below is rate-limited per client.
     const gate = rateLimit(key);
     if (!gate.allowed) {
-      sendJson(res, 429, { error: { code: "RATE_LIMITED", message: "Too many requests." } }, {
-        "retry-after": String(gate.retryAfterSec),
-      });
+      sendJson(
+        res,
+        429,
+        { error: { code: "RATE_LIMITED", message: "Too many requests." } },
+        {
+          "retry-after": String(gate.retryAfterSec),
+        },
+      );
       finish(429, "rate_limited");
       return;
     }
@@ -362,8 +371,7 @@ export function createHttpServer(overrides: HttpServerOverrides = {}): HttpServe
         void server.close();
       });
       try {
-        const body =
-          method === "POST" ? await readJsonBody(req, config.maxBodyBytes) : undefined;
+        const body = method === "POST" ? await readJsonBody(req, config.maxBodyBytes) : undefined;
         await server.connect(transport);
         const outcome = await withDeadline(transport.handleRequest(req, res, body), config.requestTimeoutMs);
         if (outcome === TIMEOUT) {
