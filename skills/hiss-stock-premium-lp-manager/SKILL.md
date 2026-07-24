@@ -140,8 +140,9 @@ never attributed to HISS, the external skill, or any observed result.
 
 ## MCP tools (read + prepare only)
 
-The intended read/prepare tool surface maps 1:1 onto the `@hiss/core`
-`stock-premium/*` engine:
+These 11 read/prepare tools are **live on the hosted MCP** at
+`mcp.hiss.finance` (33-tool deployment) and map 1:1 onto the `@hiss/core`
+`stock-premium/*` engine — the same canonical engine, no re-implementation:
 
 `hiss_stock_token_registry` · `hiss_stock_premium_scan` ·
 `hiss_stock_premium_explain` · `hiss_lp_ladder_preview` · `hiss_lp_position_read` ·
@@ -151,11 +152,13 @@ The intended read/prepare tool surface maps 1:1 onto the `@hiss/core`
 Every tool is read- or prepare-only: it returns evidence or a typed **unsigned**
 package and a deterministic receipt. No tool signs, submits, sends, or moves funds;
 no tool emits arbitrary calldata, an unbounded approval, a signed transaction, a
-private key, or a Bankr API key. A prepare tool refuses (fail-closed) when a fuse
+private key, or a Bankr API key. Prepared packages always carry
+`liveTransactionSent: false`; read tools returning fixture inputs are labelled
+`dataMode: "DEMO"` (hypothetical construction inputs run through the canonical
+engine — not observed performance). A prepare tool refuses (fail-closed) when a fuse
 HALTs, when capacity is UNKNOWN or exceeded, or when the jurisdiction gate is
-FALSE. Availability + the exact wiring path to `mcp.hiss.finance` are documented in
-`references/architecture.md` (the public `mcp.hiss.finance` currently serves a
-different package; exposing these there is a scoped follow-on, not implied live).
+FALSE. The exact wiring path to `mcp.hiss.finance` is documented in
+`references/architecture.md`.
 
 ## Risk fuses (typed, binding)
 

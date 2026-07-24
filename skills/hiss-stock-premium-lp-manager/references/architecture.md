@@ -4,7 +4,7 @@
 
 The entire Stock Premium LP Manager is driven by the `@hiss/core`
 `stock-premium/*` engine — one truth layer, consumed by the web product, the
-(intended) MCP tools, and this skill. It never builds a second pricing engine: it
+hosted MCP tools, and this skill. It never builds a second pricing engine: it
 CONSUMES the canonical HISS Price Mesh.
 
 | Module           | Responsibility                                                                                                                                                                   |
@@ -20,36 +20,37 @@ CONSUMES the canonical HISS Price Mesh.
 
 ## Web surface (live today)
 
-- Product routes under `apps/web/app/(product)/stock-premium-lp/**`: `page.tsx`
-  (overview), `scan/`, `learn/`, `status/`. Compat `apps/web/app/tools/stock-premium-lp/`
-  renders the same canonical surface.
+- Product routes under `apps/web/app/app/stock-premium-lp/**`: `page.tsx`
+  (overview), `scan/`, `learn/`, `status/` — served at `app.hiss.finance/stock-premium-lp`.
+  Compat `apps/web/app/app/tools/stock-premium-lp/` renders the same canonical surface.
 - The one landed API route: `GET /api/stock-premium/scan`
   (`apps/web/app/api/stock-premium/scan/route.ts`) — read-only, `force-dynamic`,
   `cache-control: no-store`, `dataSource: "DEMO"`. It prepares nothing, signs
   nothing, moves no funds. Prepare/live routes are later phases.
 
-## MCP integration path (assessment — scoped follow-on)
+## MCP integration path (live via dependency injection)
 
 The read/prepare tool surface (`hiss_stock_token_registry`,
 `hiss_stock_premium_scan`, `hiss_stock_premium_explain`, `hiss_lp_ladder_preview`,
 `hiss_lp_position_read`, `hiss_lp_prepare_mint` / `_increase` / `_withdraw` /
 `_collect` / `_close`, `hiss_lp_verify_receipt`) maps 1:1 to the engine functions
-above.
+above and is **live on `mcp.hiss.finance` (33-tool deployment)**.
 
-Two distinct MCP servers exist and must not be conflated:
+It ships through the public MCP without the public package importing the private
+engine, via a `StockPremiumEngine` interface (dependency injection):
 
-1. **Private `mcp-server` (`@hiss/mcp-server`)** — the local stdio HISS MCP that
-   already depends on `@hiss/core`. It can register these read/prepare tool
-   definitions cleanly (thin adapters over the engine), because the engine is
-   already in its dependency graph. This is the low-friction home for the tools.
-2. **Public `mcp.hiss.finance` (`@hiss-finance/mcp-server`)** — a SEPARATE public
-   package. It does NOT currently import the `stock-premium` engine, so exposing
-   these tools there requires either mirroring the engine functions into the public
-   package or wiring the public server to a read/prepare HTTP surface. That is a
-   deliberate follow-on and is NOT implied to be live.
+1. **Public `@hiss-finance/mcp-server`** declares the 11 tool definitions + a
+   deterministic DEMO fixture engine, so the open-source package is self-contained
+   and testable. On its own it answers with `dataMode: "DEMO"`.
+2. **Hosted deployment (`apps/web/app/mcp`)** injects the REAL `@hiss/core`
+   `stock-premium/*` engine into the same tool definitions — no engine
+   re-implementation, no second pricing model. `mcp.hiss.finance` therefore serves
+   the canonical engine behind the identical tool contract.
 
-Until wired, describe the tools as the intended read/prepare surface, never as live
-on `mcp.hiss.finance`. Every tool stays read- or prepare-only on both servers.
+The private stdio `@hiss/mcp-server` exposes the base HISS toolset; the hosted
+`mcp.hiss.finance` is the home for these 11 tools. Every tool stays read- or
+prepare-only on both paths (`liveTransactionSent: false`, credential-shaped fields
+rejected, fail-closed on HALT/UNKNOWN/jurisdiction).
 
 ## Boundary (custody + authority)
 
