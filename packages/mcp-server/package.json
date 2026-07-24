@@ -5,7 +5,8 @@
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "hiss-mcp": "dist/bin/server.js"
+    "hiss-mcp": "dist/bin/server.js",
+    "hiss-mcp-http": "dist/bin/http.js"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -24,10 +25,11 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "esbuild src/bin/server.ts --bundle --platform=node --format=esm --target=node18 --outfile=dist/bin/server.js",
-    "dev": "esbuild src/bin/server.ts --bundle --platform=node --format=esm --target=node18 --outfile=dist/bin/server.js --watch",
+    "build": "esbuild src/bin/server.ts src/bin/http.ts --bundle --platform=node --format=esm --target=node18 --outdir=dist/bin",
+    "dev": "esbuild src/bin/server.ts src/bin/http.ts --bundle --platform=node --format=esm --target=node18 --outdir=dist/bin --watch",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "start": "tsx src/bin/server.ts",
+    "start:http": "tsx src/bin/http.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
