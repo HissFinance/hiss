@@ -272,7 +272,13 @@ const READ_TOOLS: ToolDefinition[] = [
     inputSchema: { type: "object", properties: {} },
     handler: async (_args, ctx) => {
       const assets = await ctx.client.getSupportedAssets();
-      return { summary: `${assets.length} supported asset(s) listed.`, structured: { assets } };
+      return {
+        summary: `${assets.length} supported asset(s) listed.`,
+        structured: {
+          assets,
+          note: "Canonical public assets known to this SDK build. USDG is the base settlement asset; the full tradable stock-token registry is not enumerated here.",
+        },
+      };
     },
   },
   {
@@ -388,16 +394,18 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     description: "Prepare an UNSIGNED USDG deposit transaction to a vault.",
     inputSchema: {
       type: "object",
-      required: ["vault", "amount"],
+      required: ["vault", "amount", "receiver"],
       properties: {
         vault: { type: "string", description: "Vault address." },
         amount: { type: "string", description: "USDG amount (decimal string)." },
+        receiver: { type: "string", description: "Address that receives the minted vault shares." },
       },
     },
     handler: async (args, ctx) => {
       const vault = requireAddress(args, "vault");
       const amount = requireString(args, "amount");
-      const tx = await ctx.client.prepareVaultDeposit(vault, amount);
+      const receiver = requireAddress(args, "receiver");
+      const tx = await ctx.client.prepareVaultDeposit(vault, amount, receiver);
       return {
         summary: `Prepared an unsigned deposit of ${amount} USDG to ${vault}. Nothing was sent.`,
         structured: unsignedStructured(tx),
@@ -411,16 +419,18 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     description: "Prepare an UNSIGNED withdrawal transaction from a vault.",
     inputSchema: {
       type: "object",
-      required: ["vault", "shares"],
+      required: ["vault", "shares", "receiver"],
       properties: {
         vault: { type: "string", description: "Vault address." },
         shares: { type: "string", description: "Share amount (decimal string)." },
+        receiver: { type: "string", description: "Address that receives the withdrawn USDG." },
       },
     },
     handler: async (args, ctx) => {
       const vault = requireAddress(args, "vault");
       const shares = requireString(args, "shares");
-      const tx = await ctx.client.prepareVaultWithdrawal(vault, shares);
+      const receiver = requireAddress(args, "receiver");
+      const tx = await ctx.client.prepareVaultWithdrawal(vault, shares, receiver);
       return {
         summary: `Prepared an unsigned withdrawal of ${shares} shares from ${vault}. Nothing was sent.`,
         structured: unsignedStructured(tx),
@@ -470,9 +480,18 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     title: "Prepare xHISS redeem",
     kind: "prepare",
     description: "Prepare an UNSIGNED xHISS redeem transaction within your open redeem window.",
-    inputSchema: { type: "object", properties: {} },
-    handler: async (_args, ctx) => {
-      const tx = await ctx.client.prepareXhissRedeem();
+    inputSchema: {
+      type: "object",
+      required: ["xShares", "receiver"],
+      properties: {
+        xShares: { type: "string", description: "xHISS share amount to redeem (decimal string)." },
+        receiver: { type: "string", description: "Address that receives the redeemed HISS." },
+      },
+    },
+    handler: async (args, ctx) => {
+      const xShares = requireString(args, "xShares");
+      const receiver = requireAddress(args, "receiver");
+      const tx = await ctx.client.prepareXhissRedeem(xShares, receiver);
       return {
         summary: "Prepared an unsigned xHISS redeem. Nothing was sent.",
         structured: unsignedStructured(tx),

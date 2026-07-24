@@ -22,6 +22,16 @@ export interface UnsignedTx {
   description: string;
   /** Always false — HISS prepares, it never sends. */
   signed: false;
+  /** Human-readable function signature (optional; surfaced from the SDK plan). */
+  function?: string;
+  /** Decoded, human-readable arguments (optional; surfaced from the SDK plan). */
+  decodedArgs?: Record<string, string>;
+  /** Deterministic plan hash over the execution-relevant fields (optional). */
+  planHash?: string;
+  /** Non-fatal cautions to read before signing (optional). */
+  warnings?: string[];
+  /** Acknowledgements affirmed by signing (optional, verbatim). */
+  requiredAcknowledgments?: string[];
 }
 
 export type JsonRecord = Record<string, unknown>;
@@ -44,9 +54,9 @@ export interface HissClient {
   getFeeSchedule(): Promise<JsonRecord>;
   // ---- prepares (unsigned only) ----
   prepareVaultCreation(manifest: JsonRecord): Promise<UnsignedTx>;
-  prepareVaultDeposit(vault: string, amount: string): Promise<UnsignedTx>;
-  prepareVaultWithdrawal(vault: string, shares: string): Promise<UnsignedTx>;
+  prepareVaultDeposit(vault: string, amount: string, receiver?: string): Promise<UnsignedTx>;
+  prepareVaultWithdrawal(vault: string, shares: string, receiver?: string): Promise<UnsignedTx>;
   prepareHissStake(amount: string): Promise<UnsignedTx>;
   prepareXhissCooldown(xhissAmount: string): Promise<UnsignedTx>;
-  prepareXhissRedeem(): Promise<UnsignedTx>;
+  prepareXhissRedeem(xShares?: string, receiver?: string): Promise<UnsignedTx>;
 }
