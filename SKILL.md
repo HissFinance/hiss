@@ -1,8 +1,22 @@
 ---
 name: hiss-finance
-description: Public agent guide to HISS Finance — compilation and verification software for Robinhood Chain. Covers the CoilOps planning pipeline (Coils, risk fuses, receipts), USDG Creator Vaults, xHISS staking and the HISS Reward Method V2 50/15/15/10/10 reward split (xHISS stakers / vault providers / vault contributors / treasury / economic burn to the dead address; V1's 50/30/10/10 is historical), the Bankrbot → Robinhood MCP autonomy path, and tokenized stock-token trading — all under one rule set: HISS prepares and verifies; users' wallets, Safes, and their own broker/agent sessions sign and execute. The website and first-party app tools are free (packages open-source); HISS never takes custody, never stores credentials, and never places orders. Not affiliated with Robinhood, Bankr, or Chainlink. Not investment advice.
-tags: [hiss, coilops, usdg-vaults, xhiss, staking, reward-split, bankrbot, robinhood-mcp, stock-tokens, robinhood-chain, agents]
-version: 3
+description: >-
+  Public agent guide to HISS Finance — compilation and verification software for Robinhood Chain. Covers the CoilOps planning pipeline (Coils, risk fuses, receipts), USDG Creator Vaults, xHISS staking and the HISS Reward Method V2 50/15/15/10/10 reward split (xHISS stakers / vault providers / vault contributors / treasury / economic burn to the dead address; V1's 50/30/10/10 is historical), the Bankrbot → Robinhood MCP autonomy path, and tokenized stock-token trading. HISS-hosted services never hold unrestricted user private keys and never hold Robinhood brokerage credentials; users may authorize transactions through their own wallets, Safes, smart accounts, local runtimes, authenticated Agentic sessions, or contract-constrained protocol keepers, and compile artifacts remain distinct from submission and settlement receipts — HISS prepares and verifies, never implies hosted custody or an unrestricted hosted executor, never takes custody, never stores credentials, never places orders, and never claims guaranteed yield. The website and first-party app tools are free (packages open-source). Not affiliated with Robinhood, Bankr, or Chainlink. Not investment advice.
+tags:
+  [
+    hiss,
+    coilops,
+    usdg-vaults,
+    xhiss,
+    staking,
+    reward-split,
+    bankrbot,
+    robinhood-mcp,
+    stock-tokens,
+    robinhood-chain,
+    agents,
+  ]
+version: 4
 visibility: public
 metadata:
   clawdbot:
