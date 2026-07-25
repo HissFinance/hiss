@@ -14,7 +14,8 @@
     "Addresses are the canonical on-chain deployments. Deposit state, ownership, balances, and readiness are always live chain reads — never copy a status from this file.",
     "bytecodeHash values are keccak256 of the on-chain deployed bytecode, re-checked on chain 4663.",
     "VaultLegalReadinessRegistry is a predecessor deposit gate, SUPERSEDED as the factory's active gate by VaultDepositReadinessRegistry; it remains live on-chain but is no longer consulted.",
-    "VaultDepositReadinessRegistry is the active deposit-readiness gate and ships CLOSED (defaultReady=false, zero vaults marked ready)."
+    "VaultDepositReadinessRegistry is the active deposit-readiness gate and ships CLOSED (defaultReady=false, zero vaults marked ready).",
+    "HissLpManagerV1 (Stock-Premium LP manager) LAUNCHED PAUSED: inert, no positions enrollable, nothing charged. Its management fee applies to realized LP fees only (feeBps 500, immutable MAX_FEE_BPS 500); current paused()/feeBps()/owner()/treasury() are always live chain reads."
   ],
   "contracts": [
     {
@@ -117,6 +118,15 @@
       "decimals": 18,
       "sourceVerification": "verified",
       "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3"
+    },
+    {
+      "name": "HissLpManagerV1",
+      "address": "0xBE5989a38953D8148B74d45eE6DEB127a32567E0",
+      "bytecodeHash": "0x93914e208a5a8ec7b78ac35a573867d1c3f8b745a6d4b25b88add491e309da89",
+      "sourceVerification": "verified",
+      "status": "deployed, launched paused (inert)",
+      "kind": "Stock-Premium LP manager; owner + treasury = HISS Treasury Safe",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xBE5989a38953D8148B74d45eE6DEB127a32567E0"
     },
     {
       "name": "HISS Treasury Safe (2-of-3)",

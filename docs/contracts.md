@@ -23,6 +23,7 @@ Full addresses only — never abbreviate a load-bearing address.
 | VaultFeeDistributor         | `0x354686dD8480aF9bBa590dbA8D900C9b8055C71B` | Fee routing                                   |
 | HissOracleAdapter           | `0x8461a6137Da8064D7Eb3a13dB674af2eDf05A2c0` | Oracle/price feeds                            |
 | Rebalance adapter           | `0xd9a097d2e119FDcd7A22E6F4b85C26E437419A15` | Registry-approved venue adapter               |
+| HissLpManagerV1             | `0xBE5989a38953D8148B74d45eE6DEB127a32567E0` | Stock-Premium LP manager — launched paused    |
 
 Additional registries (readiness, legal, deposit) and the vault contract instance are
 listed in the generated snapshot. ABIs for each are under `contracts/abi/`.
@@ -58,6 +59,25 @@ deposit page reflects the same state. See
 [Deposits](./vaults/deposit.md) for the user-facing behavior and
 [SECURITY.md](../SECURITY.md#trust-boundaries-and-security-model) for the
 boundary treatment.
+
+### HissLpManagerV1 (Stock-Premium LP manager — deployed, launched paused)
+
+The managed-lifecycle contract for Stock-Premium LP positions. It holds an
+enrolled Uniswap v3 position NFT on-chain while it is under management (with an
+emergency path returning it to its beneficiary), enforces the
+[Stock-Premium LP management fee](./fees/stock-premium-lp-management-fee.md) — 5%
+of **realized LP fees only** (never principal, never P&L; `MAX_FEE_BPS` is an
+immutable 500) — and routes every protocol fee to the Treasury Safe. Deployed and
+source-verified at `0xBE5989a38953D8148B74d45eE6DEB127a32567E0` (chain 4663);
+owner and treasury are both the HISS Treasury Safe.
+
+**Status: launched paused — inert.** No positions are enrollable and nothing is
+charged. Current `paused()` / `feeBps()` / `owner()` / `treasury()` state is
+always a live chain read: a failed read is "unknown", never "live" and never
+"not deployed". Any unpause is a separate, owner-gated protocol action.
+Self-managed positions prepared via the
+[Stock Premium LP skill](../skills/hiss-stock-premium-lp-manager/SKILL.md) and
+executed by the user's own authority never touch this contract.
 
 ### XHissVault (staking)
 

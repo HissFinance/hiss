@@ -13,6 +13,25 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **Stock-Premium LP protocol revenue — `HissLpManagerV1` deployed (launched
+  paused) + management-fee SSOT.** The managed-lifecycle contract for
+  Stock-Premium LP positions is deployed and source-verified on Robinhood Chain
+  mainnet (4663) at `0xBE5989a38953D8148B74d45eE6DEB127a32567E0`, with owner and
+  treasury both the HISS Treasury Safe (2-of-3). **Launched paused — inert:** no
+  positions enrollable, nothing charged; any unpause is a separate owner-gated
+  action, and live `paused()`/`feeBps()` state is always a fresh chain read.
+  `@hiss-finance/core` gains the `stock-premium` module: the frozen
+  `HISS_LP_MANAGEMENT_FEE_V1` policy (500 bps of **realized LP fees only** —
+  never principal, never P&L; immutable `MAX_FEE_BPS` 500; 100% to the Treasury
+  Safe; independent of the reward split), the `computeManagementFee` arithmetic
+  SSOT with committed Solidity parity vectors, the canonical deployment record,
+  and the `lpManagerV1` registry entry. Ships the verified contract ABI
+  (`contracts/abi/HissLpManagerV1.json`), the deployments-registry entry with
+  the live-read bytecode hash, and the new
+  [Stock-Premium LP management fee](./docs/fees/stock-premium-lp-management-fee.md)
+  guide. Self-managed positions executed by the user's own authority are never
+  charged this fee.
+
 - **Stock Premium LP — user-signed execution lifecycle (skill v2).** The
   `hiss-stock-premium-lp-manager` skill advances from `prepare_only` to
   `user_signed`: it now ORCHESTRATES the full LP lifecycle (scan → build →

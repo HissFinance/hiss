@@ -11,6 +11,13 @@ hidden**. There are two independent fee systems, and they must never be conflate
    the $HISS token itself on its launch liquidity pool, accruing in **$HISS** and
    **WETH**. A verified portion of these funds the **[reward flywheel](./reward-flywheel.md)**.
 
+A third, standalone service-revenue stream exists for **managed** Stock-Premium LP
+positions only: the
+**[Stock-Premium LP management fee](./stock-premium-lp-management-fee.md)** — 5% of
+**realized LP fees only** (never principal, never P&L), enforced by the deployed
+`HissLpManagerV1` contract (launched **paused** — inert, nothing charged). It is
+independent of both systems above and never feeds the reward flywheel.
+
 ## How to read every fee in these docs
 
 Each fee is documented with the same fields so you can verify it independently:
@@ -32,17 +39,18 @@ Each fee is documented with the same fields so you can verify it independently:
 
 ## The short version
 
-| Fee                     | Value (launch)                          | Enforced by                               | Denomination |
-| ----------------------- | --------------------------------------- | ----------------------------------------- | ------------ |
-| Vault candidate save    | **0** (free)                            | Policy                                    | —            |
-| Public vault creation   | **50 USDG**                             | Factory (candidate value)                 | USDG         |
-| Creator performance fee | **10%** of profit above high-water mark | Contract (bounded 0–10% / 0–20% verified) | USDG         |
-| HISS protocol share     | **10%** of the creator performance fee  | Contract (bounded 0–20%)                  | USDG         |
-| Deposit fee             | **0**                                   | Contract                                  | USDG         |
-| Withdrawal fee          | **0**                                   | Contract                                  | USDG         |
-| Routing fee             | **0** (routing disabled)                | Contract (0.5–2 bps once live)            | USDG         |
-| Creator skin-in-game    | **5%** minimum before public deposits   | Policy/contract gate                      | Vault shares |
-| $HISS pool swap fee     | **0.7%** on the launch pool             | External pool (Bankr/Doppler)             | $HISS + WETH |
+| Fee                     | Value (launch)                          | Enforced by                               | Denomination  |
+| ----------------------- | --------------------------------------- | ----------------------------------------- | ------------- |
+| Vault candidate save    | **0** (free)                            | Policy                                    | —             |
+| Public vault creation   | **50 USDG**                             | Factory (candidate value)                 | USDG          |
+| Creator performance fee | **10%** of profit above high-water mark | Contract (bounded 0–10% / 0–20% verified) | USDG          |
+| HISS protocol share     | **10%** of the creator performance fee  | Contract (bounded 0–20%)                  | USDG          |
+| Deposit fee             | **0**                                   | Contract                                  | USDG          |
+| Withdrawal fee          | **0**                                   | Contract                                  | USDG          |
+| Routing fee             | **0** (routing disabled)                | Contract (0.5–2 bps once live)            | USDG          |
+| Creator skin-in-game    | **5%** minimum before public deposits   | Policy/contract gate                      | Vault shares  |
+| $HISS pool swap fee     | **0.7%** on the launch pool             | External pool (Bankr/Doppler)             | $HISS + WETH  |
+| Managed SPL mgmt fee    | **5%** of realized LP fees (paused)     | Contract (immutable max, launched paused) | Per fee token |
 
 ## Copy rules these docs follow
 
@@ -62,4 +70,5 @@ Each fee is documented with the same fields so you can verify it independently:
   carved from the _creator's_ fee, never from principal.
 
 Continue to: [Fee model](./fee-model.md) · [Vault fees](./vault-fees.md) ·
-[$HISS token fees](./hiss-token-fees.md) · [Reward flywheel](./reward-flywheel.md).
+[$HISS token fees](./hiss-token-fees.md) · [Reward flywheel](./reward-flywheel.md) ·
+[Stock-Premium LP management fee](./stock-premium-lp-management-fee.md).

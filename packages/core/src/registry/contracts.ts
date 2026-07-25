@@ -28,14 +28,15 @@ export type ContractKey =
   | "vaultAccessPolicy"
   | "vaultLegalReadinessRegistry"
   | "vaultDepositReadinessRegistry"
-  | "rebalanceAdapter";
+  | "rebalanceAdapter"
+  | "lpManagerV1";
 
 export type ContractEntry = {
   key: ContractKey;
   address: Address;
   chainId: RobinhoodChainId;
   label: string;
-  category: "token" | "governance" | "staking" | "vault-core" | "vault-registry" | "adapter";
+  category: "token" | "governance" | "staking" | "vault-core" | "vault-registry" | "adapter" | "lp";
 };
 
 /** Canonical registry, chain 4663. Addresses are EIP-55 checksummed. */
@@ -151,6 +152,13 @@ export const CONTRACT_REGISTRY: Readonly<Record<ContractKey, ContractEntry>> = O
     chainId: ROBINHOOD_CHAIN_MAINNET_ID,
     label: "Rebalance adapter (registry-approved)",
     category: "adapter",
+  },
+  lpManagerV1: {
+    key: "lpManagerV1",
+    address: "0xBE5989a38953D8148B74d45eE6DEB127a32567E0",
+    chainId: ROBINHOOD_CHAIN_MAINNET_ID,
+    label: "HissLpManagerV1 (Stock-Premium LP manager; launched paused)",
+    category: "lp",
   },
 });
 

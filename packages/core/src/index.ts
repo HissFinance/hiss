@@ -80,6 +80,9 @@ export * from "./rewards/lifecycle.js";
 // Staking
 export * from "./staking/xhiss.js";
 
+// Stock-Premium LP (management-fee SSOT + HissLpManagerV1 deployment record)
+export * from "./stock-premium/index.js";
+
 // Status + errors
 export * from "./status/public.js";
 export * from "./errors/codes.js";
