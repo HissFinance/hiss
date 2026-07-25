@@ -13,6 +13,19 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **Stock Premium LP — user-signed execution lifecycle (skill v2).** The
+  `hiss-stock-premium-lp-manager` skill advances from `prepare_only` to
+  `user_signed`: it now ORCHESTRATES the full LP lifecycle (scan → build →
+  eligibility → prepare → user authorization → sign/submit → verify → monitor →
+  manage → close/reconcile) across four **user-owned** execution surfaces —
+  browser wallet, Safe multisig, authenticated Bankr session, and local runtime
+  (see `references/execution-orchestration.md`). HISS remains NONCUSTODIAL: it
+  measures, verifies, and prepares typed UNSIGNED operations; it never holds
+  keys, signs, or submits. The hosted MCP stays read/prepare-only. Signing is
+  fail-closed — DEMO/SHADOW data and UNKNOWN eligibility never unlock a live
+  action, and the activation ladder is owner-gated. Returns
+  `EXECUTION_AUTHORITY_REQUIRED` when no compatible authority is connected.
+
 - **24/7 vault architecture — designed, tested, undeployed (MAJOR).** Documents
   the designed continuous around-the-clock valuation + settlement architecture:
   the **five execution modes** (`MULTI_VENUE_EXECUTABLE`, `SINGLE_VENUE_BOUNDED`,

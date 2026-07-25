@@ -1,10 +1,10 @@
 ---
 name: hiss-stock-premium-lp-manager
-description: Scan Robinhood Chain Stock-Token premium/discount by canonical address, read amount-aware direction-specific premium evidence, preview one-sided Uniswap v3 USDG range-ladders, and compile typed UNSIGNED LP position packages (mint / increase / decrease / collect / close) the user signs in their own wallet, Safe, smart account, or authenticated Bankr session — plus position monitoring, fee collection, withdrawal, and deterministic receipt verification. HISS measures, verifies, and prepares; it never holds keys, never signs, never custodies, never hedges, and never places orders. A one-sided USDG range below pool price is a bounded buy ladder, never guaranteed arbitrage: fees are not profit and inventory value can fall. Use when a user wants to analyze Stock-Token premium or prepare/monitor a single-sided USDG LP position on Robinhood Chain. Do NOT use for generic LP dashboards, unrelated Uniswap questions, guaranteed/risk-free-profit claims, borrowing/shorting Stock Tokens, unrestricted wallet execution, arbitrary contract calls, or bypassing jurisdiction gates.
-tags: [stock-premium, uniswap-v3, robinhood-chain, usdg, lp-position, prepare-only, receipts, price-mesh, bankr]
-version: 1
+description: Orchestrate the full Stock-Token LP lifecycle on Robinhood Chain — scan premium/discount by canonical address, read amount-aware direction-specific premium evidence, preview one-sided Uniswap v3 USDG range-ladders, resolve per-user per-surface eligibility, compile typed UNSIGNED LP position packages (mint / increase / decrease / collect / close), then hand each package off for the USER to sign in their own browser wallet, Safe, authenticated Bankr session, or local runtime, verify the on-chain receipt, monitor, and reconcile the eight-line net P&L. HISS measures, verifies, prepares, and coordinates; it never holds keys, never signs, never submits, never custodies, never hedges, and never places orders — a compatible USER execution authority is required (returns EXECUTION_AUTHORITY_REQUIRED when none is connected). A one-sided USDG range below pool price is a bounded buy ladder, never guaranteed arbitrage: fees are not profit and inventory value can fall. Use when a user wants to analyze Stock-Token premium or prepare, execute-through-their-own-authority, and monitor a single-sided USDG LP position on Robinhood Chain. Do NOT use for generic LP dashboards, unrelated Uniswap questions, guaranteed/risk-free-profit claims, borrowing/shorting Stock Tokens, HISS-side execution, arbitrary contract calls, or bypassing jurisdiction gates.
+tags: [stock-premium, uniswap-v3, robinhood-chain, usdg, lp-position, user-signed, orchestration, receipts, price-mesh, bankr]
+version: 2
 visibility: public
-write_risk: prepare_only
+write_risk: user_signed
 runtime_requirement: none
 local_only_data: false
 required_hiss_skills: [hiss-price-mesh, hiss-receipts, hiss-risk-fuses, hiss-security-boundaries]
@@ -128,6 +128,81 @@ never attributed to HISS, the external skill, or any observed result.
    net P&L marked at the real price. Prepare collect / withdraw / close as further
    unsigned packages. Never auto-retry — reconcile first, retry only after.
 
+## Execution orchestration (the lifecycle you run)
+
+This skill ORCHESTRATES — it does not merely describe or prepare. HISS never
+signs; a compatible USER execution authority does. The end-to-end flow:
+
+1. **Discover the HISS MCP.** Confirm the read/prepare MCP (`mcp.hiss.finance`,
+   33 tools) is reachable. It ALWAYS prepares and NEVER executes
+   (`hissMcpPrepares: true`).
+2. **Discover a user execution authority.** Read the capability advert
+   (`buildSplCapabilityAdvert`): browser wallet / Safe / authenticated Bankr
+   session / local runtime. If NONE is available, STOP and return
+   `EXECUTION_AUTHORITY_REQUIRED` — never claim you can execute without one.
+3. **Detect the authority type** and bind the recipient to the connected owner
+   (recipient MUST equal the signer).
+4. **Resolve eligibility** for that exact (user, surface, asset) triple. UNKNOWN
+   or ineligible → live execution stays blocked for THIS user; read/preview
+   continues.
+5. **Scan** the admitted universe and pick the asset + direction.
+6. **Build the ladder** (one-sided USDG range) at the requested size, bounded by
+   probed usable depth.
+7. **Evaluate the fuses** — a HALT/UNKNOWN blocks NEW positions (exit stays open).
+8. **Prepare the approval + operation** as typed UNSIGNED packages
+   (`liveTransactionSent: false`), exact allowance + revoke.
+9. **Obtain user authorization** — present the Signature Review; the user
+   consents in their own surface.
+10. **Hand off / submit through the user's surface** — browser wallet signs,
+    Safe collects threshold signatures, Bankr session submits, or the local
+    runtime signs. HISS transmits nothing signed.
+11. **Verify the receipt** — reconcile the on-chain tx deterministically; recompute
+    the hash. `job_completed_unconfirmed` ≠ settled; only the reconciled on-chain
+    receipt counts.
+12. **Monitor** fill progress, fuse status, and the eight-line net marked at the
+    real price.
+13. **Prepare / execute management** — collect, increase, decrease, or the ordered
+    close (decrease → collect → burn, burn hard-guarded) as further UNSIGNED
+    packages the user signs.
+14. **Reconcile + report P&L** — the signed eight-line net headline, never gross
+    fees alone.
+
+The live-signing gate is fail-closed (§10): DEMO/SHADOW data can NEVER unlock a
+wallet action, and every §10 precondition (canonical token, verified pool +
+position manager, fresh reference + TWAP, current multiplier, no unresolved
+corporate action, liveness, USDG peg, exact-size probe, dynamic capacity,
+per-user eligibility, current simulation) must be genuinely LIVE and true. In the
+current build the reference/TWAP producer is not wired, so the primary state is
+LIVE_READ / LIVE_SHADOW / LIVE_PREPARE and signing remains gated — this is
+correct, truthful behavior, not a bug.
+
+## The four execution models (user-owned; HISS signs none)
+
+1. **Browser wallet** — an injected EIP-1193 provider / wagmi connector on chain 4663. The user signs each tx (approve → op → revoke) in their wallet. HISS
+   prepares; the wallet submits.
+2. **Safe (multisig)** — HISS prepares a Safe-importable transaction batch
+   (`SplTxHandoff`, no signature). Owners collect the threshold and execute in
+   the Safe. A proposal is NOT an execution until on-chain.
+3. **Authenticated Bankr user session** — the user's OWN Bankr session (Rail C
+   style) submits the prepared package after Bankr location verification. HISS
+   never uses its own Bankr key for a user's LP position; a session that is not
+   authenticated + location-verified is ineligible.
+4. **Local runtime** — the user runs a local signer/keeper against the prepared
+   package; keys never leave the user's machine. HISS hosts nothing.
+
+For every model the handoff is an UNSIGNED, decodable typed package: chainId 4663,
+the pinned NonfungiblePositionManager target, the user's own recipient, an exact
+(never unbounded) approval, and explicit verification instructions. Full model
+detail + the live-signing gate is in `references/execution-orchestration.md`.
+
+## EXECUTION_AUTHORITY_REQUIRED (the honest stop)
+
+When no compatible authority is connected, or the connected authority is on the
+wrong chain / not location-verified (Bankr) / below the Safe threshold, the skill
+returns `EXECUTION_AUTHORITY_REQUIRED` and offers read / explain / shadow /
+prepare only. It NEVER fabricates an execution path, NEVER offers to sign on the
+user's behalf, and NEVER implies the hosted MCP can execute.
+
 ## Live surface vs. staged surface (be honest)
 
 - **Live today:** the read-only scan route `GET /api/stock-premium/scan` and the
@@ -218,7 +293,17 @@ everywhere and enforced by the copy guards.
 - "What's the amount-aware premium on GME for a $250 USDG buy, and its confidence?"
 - "Preview a one-sided USDG buy ladder below the pool price and show the eight-line
   net, not just fees."
-- "Prepare an unsigned LP mint I can authorize in my own Safe."
+- "Open a $400 USDG buy-ladder LP on AAPL and walk me through executing it in my
+  own wallet." (Orchestrate: discover authority → eligibility → prepare → the user
+  signs approve/mint/revoke → verify → monitor.)
+- "Prepare an unsigned LP mint I can authorize in my own Safe, then tell me exactly
+  what to import and how many signatures it needs."
+- "Execute this LP through my authenticated Bankr session." (Only if the session is
+  authenticated + location-verified; otherwise return the honest block.)
+- "Close my AAPL LP position." (Ordered decrease → collect → burn; re-verify
+  liquidity == 0 before the guarded burn; the user signs each step.)
+- "I don't have a wallet connected — can HISS just execute it for me?" (No —
+  `EXECUTION_AUTHORITY_REQUIRED`; HISS never signs. Read/shadow/prepare only.)
 - "Reconcile this position's receipt and tell me the net P&L marked at the real
   price."
 - "Is this guaranteed arbitrage?" (No — bounded buy ladder; fees are not profit.)
