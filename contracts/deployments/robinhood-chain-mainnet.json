@@ -15,7 +15,7 @@
     "bytecodeHash values are keccak256 of the on-chain deployed bytecode, re-checked on chain 4663.",
     "VaultLegalReadinessRegistry is a predecessor deposit gate, SUPERSEDED as the factory's active gate by VaultDepositReadinessRegistry; it remains live on-chain but is no longer consulted.",
     "VaultDepositReadinessRegistry is the active deposit-readiness gate and ships CLOSED (defaultReady=false, zero vaults marked ready).",
-    "HissLpManagerV1 (Stock-Premium LP manager) LAUNCHED PAUSED: inert, no positions enrollable, nothing charged. Its management fee applies to realized LP fees only (feeBps 500, immutable MAX_FEE_BPS 500); current paused()/feeBps()/owner()/treasury() are always live chain reads."
+    "HissLpManagerV1 (Stock-Premium LP manager) LAUNCHED PAUSED as its immutable initial state; the owner-gated Safe unpause has since executed on-chain, so its pause state is never assumed — current paused()/feeBps()/owner()/treasury() are always live chain reads (unknown on a failed read, never inferred). Its management fee applies to realized LP fees only (feeBps 500, immutable MAX_FEE_BPS 500). Unpaused alone opens nothing: enrollment and every managed action stay owner/beneficiary-gated."
   ],
   "contracts": [
     {
@@ -124,7 +124,7 @@
       "address": "0xBE5989a38953D8148B74d45eE6DEB127a32567E0",
       "bytecodeHash": "0x93914e208a5a8ec7b78ac35a573867d1c3f8b745a6d4b25b88add491e309da89",
       "sourceVerification": "verified",
-      "status": "deployed, launched paused (inert)",
+      "status": "deployed; launched-paused initial state (immutable); current pause state is a live chain read",
       "kind": "Stock-Premium LP manager; owner + treasury = HISS Treasury Safe",
       "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xBE5989a38953D8148B74d45eE6DEB127a32567E0"
     },

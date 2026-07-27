@@ -15,7 +15,7 @@ A third, standalone service-revenue stream exists for **managed** Stock-Premium 
 positions only: the
 **[Stock-Premium LP management fee](./stock-premium-lp-management-fee.md)** — 5% of
 **realized LP fees only** (never principal, never P&L), enforced by the deployed
-`HissLpManagerV1` contract (launched **paused** — inert, nothing charged). It is
+`HissLpManagerV1` contract (launched **paused** as its immutable initial state; pause state is always a live read). It is
 independent of both systems above and never feeds the reward flywheel.
 
 ## How to read every fee in these docs
@@ -39,18 +39,18 @@ Each fee is documented with the same fields so you can verify it independently:
 
 ## The short version
 
-| Fee                     | Value (launch)                          | Enforced by                               | Denomination  |
-| ----------------------- | --------------------------------------- | ----------------------------------------- | ------------- |
-| Vault candidate save    | **0** (free)                            | Policy                                    | —             |
-| Public vault creation   | **50 USDG**                             | Factory (candidate value)                 | USDG          |
-| Creator performance fee | **10%** of profit above high-water mark | Contract (bounded 0–10% / 0–20% verified) | USDG          |
-| HISS protocol share     | **10%** of the creator performance fee  | Contract (bounded 0–20%)                  | USDG          |
-| Deposit fee             | **0**                                   | Contract                                  | USDG          |
-| Withdrawal fee          | **0**                                   | Contract                                  | USDG          |
-| Routing fee             | **0** (routing disabled)                | Contract (0.5–2 bps once live)            | USDG          |
-| Creator skin-in-game    | **5%** minimum before public deposits   | Policy/contract gate                      | Vault shares  |
-| $HISS pool swap fee     | **0.7%** on the launch pool             | External pool (Bankr/Doppler)             | $HISS + WETH  |
-| Managed SPL mgmt fee    | **5%** of realized LP fees (paused)     | Contract (immutable max, launched paused) | Per fee token |
+| Fee                     | Value (launch)                          | Enforced by                                             | Denomination  |
+| ----------------------- | --------------------------------------- | ------------------------------------------------------- | ------------- |
+| Vault candidate save    | **0** (free)                            | Policy                                                  | —             |
+| Public vault creation   | **50 USDG**                             | Factory (candidate value)                               | USDG          |
+| Creator performance fee | **10%** of profit above high-water mark | Contract (bounded 0–10% / 0–20% verified)               | USDG          |
+| HISS protocol share     | **10%** of the creator performance fee  | Contract (bounded 0–20%)                                | USDG          |
+| Deposit fee             | **0**                                   | Contract                                                | USDG          |
+| Withdrawal fee          | **0**                                   | Contract                                                | USDG          |
+| Routing fee             | **0** (routing disabled)                | Contract (0.5–2 bps once live)                          | USDG          |
+| Creator skin-in-game    | **5%** minimum before public deposits   | Policy/contract gate                                    | Vault shares  |
+| $HISS pool swap fee     | **0.7%** on the launch pool             | External pool (Bankr/Doppler)                           | $HISS + WETH  |
+| Managed SPL mgmt fee    | **5%** of realized LP fees              | Contract (immutable max; launched-paused initial state) | Per fee token |
 
 ## Copy rules these docs follow
 

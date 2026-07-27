@@ -460,8 +460,9 @@ The full, worked-through fee guide — including $HISS token trading fees — is
 For **managed** Stock-Premium LP positions there is one additional, standalone
 service fee: **5% of realized LP fees only** (never principal, never P&L),
 enforced on-chain by the deployed `HissLpManagerV1`
-(`0xBE5989a38953D8148B74d45eE6DEB127a32567E0`, chain 4663 — source-verified,
-**launched paused**: inert, nothing charged). See the
+(`0xBE5989a38953D8148B74d45eE6DEB127a32567E0`, chain 4663 — source-verified;
+**launched paused** as its immutable initial state, and the owner-gated unpause
+has since executed on-chain, so pause state is always a live chain read). See the
 [Stock-Premium LP management fee](./docs/fees/stock-premium-lp-management-fee.md).
 
 ## The HISS flywheel

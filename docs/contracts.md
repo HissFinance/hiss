@@ -60,7 +60,7 @@ deposit page reflects the same state. See
 [SECURITY.md](../SECURITY.md#trust-boundaries-and-security-model) for the
 boundary treatment.
 
-### HissLpManagerV1 (Stock-Premium LP manager — deployed, launched paused)
+### HissLpManagerV1 (Stock-Premium LP manager — deployed; launched-paused initial state)
 
 The managed-lifecycle contract for Stock-Premium LP positions. It holds an
 enrolled Uniswap v3 position NFT on-chain while it is under management (with an
@@ -71,10 +71,11 @@ immutable 500) — and routes every protocol fee to the Treasury Safe. Deployed 
 source-verified at `0xBE5989a38953D8148B74d45eE6DEB127a32567E0` (chain 4663);
 owner and treasury are both the HISS Treasury Safe.
 
-**Status: launched paused — inert.** No positions are enrollable and nothing is
-charged. Current `paused()` / `feeBps()` / `owner()` / `treasury()` state is
-always a live chain read: a failed read is "unknown", never "live" and never
-"not deployed". Any unpause is a separate, owner-gated protocol action.
+**Initial state: launched paused (immutable).** The owner-gated Safe unpause has
+since executed on-chain, so current `paused()` / `feeBps()` / `owner()` /
+`treasury()` state is always a live chain read: a failed read is "unknown", never
+"live" and never "not deployed". Unpaused alone opens nothing — enrollment and
+every managed action stay owner/beneficiary-gated.
 Self-managed positions prepared via the
 [Stock Premium LP skill](../skills/hiss-stock-premium-lp-manager/SKILL.md) and
 executed by the user's own authority never touch this contract.

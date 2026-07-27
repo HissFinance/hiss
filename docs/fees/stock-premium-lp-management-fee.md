@@ -53,21 +53,23 @@ properties, asserted in tests and mirrored by the contract:
 
 ## The deployed contract
 
-| Fact                         | Value                                                                                                              |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Contract                     | `HissLpManagerV1`                                                                                                  |
-| Address (chain 4663)         | `0xBE5989a38953D8148B74d45eE6DEB127a32567E0`                                                                       |
-| Source verification          | Verified on [Blockscout](https://robinhoodchain.blockscout.com/address/0xBE5989a38953D8148B74d45eE6DEB127a32567E0) |
-| Owner                        | HISS Treasury Safe (2-of-3) `0xF100Fc28dd1721C698046Dbd60408c523b69e36c`                                           |
-| Fee recipient (`treasury()`) | HISS Treasury Safe (same address)                                                                                  |
-| `feeBps()`                   | 500                                                                                                                |
-| `MAX_FEE_BPS()` (immutable)  | 500                                                                                                                |
-| Launch posture               | **Launched paused — inert.** No positions enrollable, nothing charged.                                             |
+| Fact                         | Value                                                                                                                                              |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Contract                     | `HissLpManagerV1`                                                                                                                                  |
+| Address (chain 4663)         | `0xBE5989a38953D8148B74d45eE6DEB127a32567E0`                                                                                                       |
+| Source verification          | Verified on [Blockscout](https://robinhoodchain.blockscout.com/address/0xBE5989a38953D8148B74d45eE6DEB127a32567E0)                                 |
+| Owner                        | HISS Treasury Safe (2-of-3) `0xF100Fc28dd1721C698046Dbd60408c523b69e36c`                                                                           |
+| Fee recipient (`treasury()`) | HISS Treasury Safe (same address)                                                                                                                  |
+| `feeBps()`                   | 500                                                                                                                                                |
+| `MAX_FEE_BPS()` (immutable)  | 500                                                                                                                                                |
+| Launch posture               | **Launched paused** — the immutable initial state; the owner-gated unpause has since executed on-chain. Current pause state is always a live read. |
 
-> **Deployed ≠ active.** The contract launched paused. Current
+> **Deployed ≠ active.** The contract launched paused (its immutable initial
+> state) and the owner-gated unpause has since executed on-chain. Current
 > `paused()` / `feeBps()` / `owner()` / `treasury()` state is always a **live
 > chain read** — a failed read is "unknown", never "live" and never "not
-> deployed". Any unpause is a separate, owner-gated protocol action.
+> deployed". Unpaused alone opens nothing: enrollment and every managed action
+> stay owner/beneficiary-gated.
 
 ## What this fee is not
 
