@@ -11,21 +11,21 @@
 
 ## Deployed and verified (chain 4663)
 
-| Contract / account          | Address                                      | Status                            |
-| --------------------------- | -------------------------------------------- | --------------------------------- |
-| USDG (base asset, 6dp)      | `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` | base asset                        |
-| $HISS token (18dp)          | `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` | verified                          |
-| HISS Treasury Safe (2-of-3) | `0xF100Fc28dd1721C698046Dbd60408c523b69e36c` | verified on-chain                 |
-| VaultFactory                | `0x278d237c6890a5f7101296a9021ed9D26c821810` | deployed                          |
-| HISS Vault (flagship)       | `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` | live                              |
-| xHISS staking vault         | `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be` | deployed                          |
-| VaultAssetRegistry          | `0xcf9609B30f565813b87d1998c8b3b2aD073a4cE1` | deployed                          |
-| VaultReceiptRegistry        | `0x379dAaA0B7bb172A67f37a9bC53E42Ec8C9af170` | deployed                          |
-| VaultAccessPolicy           | `0x7e292bCD2C7A3420dA4a7036B99CFf32BcF9B663` | deployed                          |
-| VaultFeeDistributor         | `0x354686dD8480aF9bBa590dbA8D900C9b8055C71B` | deployed                          |
-| HissOracleAdapter           | `0x8461a6137Da8064D7Eb3a13dB674af2eDf05A2c0` | deployed                          |
-| Rebalance adapter           | `0xd9a097d2e119FDcd7A22E6F4b85C26E437419A15` | deployed, registry-approved       |
-| HissLpManagerV1 (SPL)       | `0xBE5989a38953D8148B74d45eE6DEB127a32567E0` | deployed, launched paused (inert) |
+| Contract / account          | Address                                      | Status                                                                |
+| --------------------------- | -------------------------------------------- | --------------------------------------------------------------------- |
+| USDG (base asset, 6dp)      | `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` | base asset                                                            |
+| $HISS token (18dp)          | `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` | verified                                                              |
+| HISS Treasury Safe (2-of-3) | `0xF100Fc28dd1721C698046Dbd60408c523b69e36c` | verified on-chain                                                     |
+| VaultFactory                | `0x278d237c6890a5f7101296a9021ed9D26c821810` | deployed                                                              |
+| HISS Vault (flagship)       | `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` | live                                                                  |
+| xHISS staking vault         | `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be` | deployed                                                              |
+| VaultAssetRegistry          | `0xcf9609B30f565813b87d1998c8b3b2aD073a4cE1` | deployed                                                              |
+| VaultReceiptRegistry        | `0x379dAaA0B7bb172A67f37a9bC53E42Ec8C9af170` | deployed                                                              |
+| VaultAccessPolicy           | `0x7e292bCD2C7A3420dA4a7036B99CFf32BcF9B663` | deployed                                                              |
+| VaultFeeDistributor         | `0x354686dD8480aF9bBa590dbA8D900C9b8055C71B` | deployed                                                              |
+| HissOracleAdapter           | `0x8461a6137Da8064D7Eb3a13dB674af2eDf05A2c0` | deployed                                                              |
+| Rebalance adapter           | `0xd9a097d2e119FDcd7A22E6F4b85C26E437419A15` | deployed, registry-approved                                           |
+| HissLpManagerV1 (SPL)       | `0xBE5989a38953D8148B74d45eE6DEB127a32567E0` | deployed; launched-paused initial state; current state is a live read |
 
 ## Not yet deployed
 

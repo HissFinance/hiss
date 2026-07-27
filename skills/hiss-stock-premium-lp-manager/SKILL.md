@@ -2,7 +2,7 @@
 name: hiss-stock-premium-lp-manager
 description: Orchestrate the full Stock-Token LP lifecycle on Robinhood Chain — scan premium/discount by canonical address, read amount-aware direction-specific premium evidence, preview one-sided Uniswap v3 USDG range-ladders, resolve per-user per-surface eligibility, compile typed UNSIGNED LP position packages (mint / increase / decrease / collect / close), then hand each package off for the USER to sign in their own browser wallet, Safe, authenticated Bankr session, or local runtime, verify the on-chain receipt, monitor, and reconcile the eight-line net P&L. HISS measures, verifies, prepares, and coordinates; it never holds keys, never signs, never submits, never custodies, never hedges, and never places orders — a compatible USER execution authority is required (returns EXECUTION_AUTHORITY_REQUIRED when none is connected). A one-sided USDG range below pool price is a bounded buy ladder, never guaranteed arbitrage: fees are not profit and inventory value can fall. Use when a user wants to analyze Stock-Token premium or prepare, execute-through-their-own-authority, and monitor a single-sided USDG LP position on Robinhood Chain. Do NOT use for generic LP dashboards, unrelated Uniswap questions, guaranteed/risk-free-profit claims, borrowing/shorting Stock Tokens, HISS-side execution, arbitrary contract calls, or bypassing jurisdiction gates.
 tags: [stock-premium, uniswap-v3, robinhood-chain, usdg, lp-position, user-signed, orchestration, receipts, price-mesh, bankr]
-version: 3
+version: 4
 visibility: public
 write_risk: user_signed
 runtime_requirement: none
@@ -124,9 +124,13 @@ management fee routes to the **HISS Treasury Safe (2-of-3)**
 `treasury()` are both that Safe. The fee is charged **only when a managed action
 collects realized fees** — nothing is charged on principal, on an open position,
 or on unrealized value. Current `paused()` / `feeBps()` / `owner()` /
-`treasury()` are **always live chain reads**; `HissLpManagerV1` is deployed +
-Blockscout-verified + LAUNCHED PAUSED at
-`0xBE5989a38953D8148B74d45eE6DEB127a32567E0` on chain 4663. The fee SSOT is
+`treasury()` are **always live chain reads** — never copied from any artifact
+or from this skill; `HissLpManagerV1` is deployed + Blockscout-verified at
+`0xBE5989a38953D8148B74d45eE6DEB127a32567E0` on chain 4663. It LAUNCHED PAUSED
+(immutable initial state) and the owner-gated Safe unpause has since EXECUTED
+on-chain (Safe nonce 81, tx
+`0x6a93479c8ae6037bb92c237fb85ee67cb5d50a9a096ac0fcbc697126b65941cb`) — still
+render pause state only from a fresh read (unknown on failure). The fee SSOT is
 `@hiss/core` `stock-premium/fee`; verified Treasury receipts are shown only from
 reconciled on-chain evidence, never asserted.
 
@@ -342,9 +346,11 @@ settlement is proven only by the reconciled on-chain receipt. See
 
 ## Frontend deep links
 
-- Product: `https://www.hiss.finance/stock-premium-lp` (one click from the
-  homepage; also in desktop + mobile nav, the dashboard, and the Tools / Agents
-  catalogs). Compat `/tools/stock-premium-lp` renders the same surface.
+- Product: `https://app.hiss.finance/stock-premium-lp` (canonical; one click
+  from the homepage; also in desktop + mobile nav, the dashboard, and the
+  Tools / Agents catalogs). Compat `/tools/stock-premium-lp` permanently
+  redirects there (query preserved); legacy `/app/stock-premium-lp/*` shapes
+  308 to the canonical route in one hop.
 - Discover/scanner `…/stock-premium-lp` · Pools `…/stock-premium-lp/pools` ·
   Pool detail `…/stock-premium-lp/pools/[address]` · Build (range builder)
   `…/stock-premium-lp/build` · Positions (managed book)

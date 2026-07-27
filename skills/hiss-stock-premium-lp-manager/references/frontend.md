@@ -2,11 +2,13 @@
 
 ## Canonical surface
 
-- Canonical route: `https://www.hiss.finance/stock-premium-lp` — reachable from the
-  homepage in one click; top-level in desktop and mobile nav; featured in the
-  dashboard and the Tools / Agents catalogs; wired into the command palette.
-- Compat route: `/tools/stock-premium-lp` renders the SAME canonical surface. One
-  product, not two.
+- Canonical route: `https://app.hiss.finance/stock-premium-lp` — reachable from
+  the homepage in one click; top-level in desktop and mobile nav; featured in
+  the dashboard and the Tools / Agents catalogs; wired into the command palette.
+- Compat route: `/tools/stock-premium-lp` (and its sub-paths) permanently
+  redirects to the canonical surface, preserving sub-path and query. Legacy
+  `/app/stock-premium-lp/*` shapes 308 to the canonical route in one hop. One
+  product, not two — no alias presents as canonical.
 - Cockpit tabs: **Discover** (`/stock-premium-lp`, scanner) · **Pools**
   (`/stock-premium-lp/pools`) · **Build** (`/stock-premium-lp/build`) ·
   **Positions** (`/stock-premium-lp/positions`, managed book) · **Activity**

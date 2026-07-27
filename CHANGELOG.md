@@ -13,13 +13,26 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **Stock-Premium LP manager — launched-paused is the immutable initial state,
+  current state is a live read (skill v4).** `HissLpManagerV1` launched paused as
+  its **immutable initial state**; the owner-gated Safe unpause has since
+  **executed on-chain**, so `paused()` / `feeBps()` / `owner()` / `treasury()` are
+  always fresh chain reads (unknown on failure, never assumed). Unpaused alone
+  opens nothing — enrollment and every managed action stay owner/beneficiary-
+  gated. The deployment registry and the `hiss-stock-premium-lp-manager` skill
+  (v3 → **v4**) now separate the immutable launch state from live state and record
+  the executed activation reference; the canonical product URL is
+  `app.hiss.finance/stock-premium-lp` (the `/tools/stock-premium-lp` compat path
+  permanently redirects there, sub-path and query preserved).
+
 - **Stock-Premium LP protocol revenue — `HissLpManagerV1` deployed (launched
   paused) + management-fee SSOT.** The managed-lifecycle contract for
   Stock-Premium LP positions is deployed and source-verified on Robinhood Chain
   mainnet (4663) at `0xBE5989a38953D8148B74d45eE6DEB127a32567E0`, with owner and
-  treasury both the HISS Treasury Safe (2-of-3). **Launched paused — inert:** no
-  positions enrollable, nothing charged; any unpause is a separate owner-gated
-  action, and live `paused()`/`feeBps()` state is always a fresh chain read.
+  treasury both the HISS Treasury Safe (2-of-3). **Launched paused** (its
+  immutable initial state; see the state-model entry above — the unpause has
+  since executed on-chain): live `paused()`/`feeBps()` state is always a fresh
+  chain read.
   `@hiss-finance/core` gains the `stock-premium` module: the frozen
   `HISS_LP_MANAGEMENT_FEE_V1` policy (500 bps of **realized LP fees only** —
   never principal, never P&L; immutable `MAX_FEE_BPS` 500; 100% to the Treasury
