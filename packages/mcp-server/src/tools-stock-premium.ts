@@ -276,7 +276,7 @@ const READ: ToolDefinition[] = [
     title: "Read LP position",
     kind: "read",
     description:
-      "Read a Uniswap v3 LP position by tokenId (owner, pool, ticks, liquidity, owed fees). A live deployment reads the NonfungiblePositionManager on chain 4663; a value that cannot be read is null, never zero.",
+      "Read a Uniswap v3 LP position by tokenId (owner, pool, ticks, liquidity, owed fees) — including positions held by HissLpManagerV1 (the managed book). Backs the on-chain position-structure explorer: structure and chain-verifiable facts only, third-party performance is never invented. A live deployment reads the NonfungiblePositionManager on chain 4663; a value that cannot be read is null, never zero.",
     inputSchema: {
       type: "object",
       required: ["tokenId"],
