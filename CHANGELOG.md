@@ -13,6 +13,17 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **OpenClaw operator safety model (sanitized reference).** A public-safe
+  description of how HISS runs its always-on local operator and its governed
+  scheduled jobs — the safety contract an autonomous scheduler runs under: no
+  scheduled job signs, Treasury actions are human-signed via the 2-of-3 Safe,
+  the operator may autonomously manage only read/monitor/report/prepare jobs,
+  and every financial-action job requires all eight controls (typed method,
+  owner policy flag, bounded grant, simulation, risk fuses, idempotency,
+  receipt, kill switch). Contains no host paths, credentials, channel
+  identifiers, wallet addresses, or private infrastructure detail. See
+  [docs/openclaw-operator.md](./docs/openclaw-operator.md).
+
 - **Stock-Premium LP protocol revenue — `HissLpManagerV1` deployed (launched
   paused) + management-fee SSOT.** The managed-lifecycle contract for
   Stock-Premium LP positions is deployed and source-verified on Robinhood Chain
