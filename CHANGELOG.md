@@ -13,6 +13,20 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **Vault verified history & USDG accounting guide.** New
+  [docs/vaults/verified-history-and-usdg-accounting.md](./docs/vaults/verified-history-and-usdg-accounting.md):
+  how vault history is served as **real, block-pinned observations only** (gaps
+  are `MISSING` and never bridged/interpolated; buckets before verified history
+  begins are omitted and labeled; net flows come from the on-chain event ledger
+  and are **never inferred from NAV changes**; every value is an exact
+  decimal-string integer), and how the vault's USDG reserve is valued by the
+  **accounting identity** (`1.000000` USDG — a unit conversion, never a USD
+  claim) with the **market peg reference** observed and reported separately
+  (`LIVE / DEGRADED / DEPEG_WARNING / DEPEG_TRIPPED / UNKNOWN`; unknown fails
+  closed for execution and never erases the displayed reserve; custody scopes
+  are never double-counted). Linked from the vaults overview and the README
+  documentation map.
+
 - **Stock-Premium LP manager — launched-paused is the immutable initial state,
   current state is a live read (skill v4).** `HissLpManagerV1` launched paused as
   its **immutable initial state**; the owner-gated Safe unpause has since
