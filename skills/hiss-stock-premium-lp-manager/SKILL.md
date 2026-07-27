@@ -2,7 +2,7 @@
 name: hiss-stock-premium-lp-manager
 description: Orchestrate the full Stock-Token LP lifecycle on Robinhood Chain — scan premium/discount by canonical address, read amount-aware direction-specific premium evidence, preview one-sided Uniswap v3 USDG range-ladders, resolve per-user per-surface eligibility, compile typed UNSIGNED LP position packages (mint / increase / decrease / collect / close), then hand each package off for the USER to sign in their own browser wallet, Safe, authenticated Bankr session, or local runtime, verify the on-chain receipt, monitor, and reconcile the eight-line net P&L. HISS measures, verifies, prepares, and coordinates; it never holds keys, never signs, never submits, never custodies, never hedges, and never places orders — a compatible USER execution authority is required (returns EXECUTION_AUTHORITY_REQUIRED when none is connected). A one-sided USDG range below pool price is a bounded buy ladder, never guaranteed arbitrage: fees are not profit and inventory value can fall. Use when a user wants to analyze Stock-Token premium or prepare, execute-through-their-own-authority, and monitor a single-sided USDG LP position on Robinhood Chain. Do NOT use for generic LP dashboards, unrelated Uniswap questions, guaranteed/risk-free-profit claims, borrowing/shorting Stock Tokens, HISS-side execution, arbitrary contract calls, or bypassing jurisdiction gates.
 tags: [stock-premium, uniswap-v3, robinhood-chain, usdg, lp-position, user-signed, orchestration, receipts, price-mesh, bankr]
-version: 2
+version: 3
 visibility: public
 write_risk: user_signed
 runtime_requirement: none
@@ -55,6 +55,81 @@ appears, the real-price-marked net appears beside it (`pnlViewShowsNetWithGross`
 The teaching illustration "fees positive, net negative" is a hypothetical only —
 never attributed to HISS, the external skill, or any observed result.
 
+## Product surfaces (what exists on-surface today)
+
+The product is one cockpit with seven section tabs — **Discover, Pools, Build,
+Positions, Activity, Fees, Learn** — plus dynamic detail routes. Describe only
+what is actually rendered:
+
+- **Discover** (`/stock-premium-lp`) — the admitted-universe scanner board.
+- **Pools** (`/stock-premium-lp/pools`) — the verified Stock-Token/USDG pool
+  explorer: probed usable depth **both ways**, fee tier, and venue verification
+  (factory derivation + pool code-hash both verified in the registry). Pools are
+  **ranked by measured usability, never by TVL and never by a rate.**
+- **Pool detail** (`/stock-premium-lp/pools/[address]`) — one pool by canonical
+  **address** (address is identity): registry verification, probed depth, and a
+  price-vs-reference history that begins accruing from verified reads. An
+  unverified address renders as not-in-registry — nothing about it is assumed.
+- **Build** (`/stock-premium-lp/build`) — the one-sided USDG range **builder**:
+  an accessible price-range control (a WAI-ARIA `role="slider"` with
+  `aria-valuemin/‑valuemax/‑valuenow/‑valuetext`) that lets the user propose a
+  range boundary, previewed against the canonical `@hiss/core` engine. The
+  slider is **presentation-only** — it never tick-snaps, never computes rungs or
+  amounts; the ENGINE returns the snapped executable geometry and any shift is
+  reconciled **visibly** as "proposed \$X → engine snapped \$Y (tick spacing)".
+  Build **previews then prepares** a typed UNSIGNED package the user signs.
+- **Positions** (`/stock-premium-lp/positions`) — the **live managed book**
+  (`HissLpManagerV1`): positions the manager holds under an enrollment. The 5%
+  management fee is charged **only when a managed action actually collects** —
+  read `references/managed-book.md`.
+- **Position structure explorer** (`/stock-premium-lp/explorer`,
+  `…/positions/[tokenId]`) — the **chain-public STRUCTURE** of indexed LP
+  positions: range, in/out-of-range state (from a live `slot0` read),
+  composition, and fee amounts **in kind**. Structure is public; **third-party
+  performance is never invented** — only structure and chain-verifiable facts.
+- **Activity / Fees / Learn** — reconciled activity, the fee-policy + Treasury
+  ledger (below), and the methodology.
+
+**Managed book vs. self-signed (both real, kept distinct).** A _managed_ position
+is one the `HissLpManagerV1` contract holds under an enrollment (beneficiary is
+chain-verifiable); a _self-signed_ position is one the user prepares in **Build**
+and signs + holds in their own wallet/Safe/Bankr session/local runtime. HISS
+signs neither. There is no HISS-custodied middle path.
+
+**Honestly-unknown reads (not yet wired — never estimated).** Some columns render
+`unknown` by design because no reader exists on this deployment yet: 24h swapped
+volume (no swap-log reader) and in-range liquidity share (no in-window
+distribution read). Render these `unknown`, never a guess or a zero.
+
+**What the builder does and does not do.** The on-surface builder is a **single,
+contiguous one-sided range** (below pool price for a BUY, above for a SELL) whose
+boundary the user proposes on the slider and the engine snaps. That one range is
+subdivided into a user-chosen number of **rungs** — a ladder — from **1 to 20**
+(default 4), settable in Build and via the MCP `rungs` parameter. It does **not**
+offer: multiple _disjoint_ range segments (only the one contiguous range), custom
+per-rung **weighting profiles** (the engine distributes across rungs; the user
+does not hand-weight them), a user-facing **inventory-cap allocation** control,
+or a distinct **"allocation-preview"** engine feature — none of these exist
+on-surface today; do not describe or imply them. (An inventory-**headroom** _risk
+fuse_ does exist and is listed under Risk fuses — that is a bound, not an
+allocation feature.)
+
+## Fee policy + Treasury (SSOT)
+
+The management fee is `HISS_LP_MANAGEMENT_FEE_V1`: **500 bps (5%) of realized LP
+fees only** — never principal, never P&L, never gross notional — with the
+remaining **95% to the user**. `MAX_FEE_BPS` is an immutable 500. 100% of the
+management fee routes to the **HISS Treasury Safe (2-of-3)**
+`0xF100Fc28dd1721C698046Dbd60408c523b69e36c`; the manager `owner()` and
+`treasury()` are both that Safe. The fee is charged **only when a managed action
+collects realized fees** — nothing is charged on principal, on an open position,
+or on unrealized value. Current `paused()` / `feeBps()` / `owner()` /
+`treasury()` are **always live chain reads**; `HissLpManagerV1` is deployed +
+Blockscout-verified + LAUNCHED PAUSED at
+`0xBE5989a38953D8148B74d45eE6DEB127a32567E0` on chain 4663. The fee SSOT is
+`@hiss/core` `stock-premium/fee`; verified Treasury receipts are shown only from
+reconciled on-chain evidence, never asserted.
+
 ## Hard rules
 
 1. **Prepare, never execute.** HISS compiles typed unsigned LP-position packages
@@ -102,19 +177,27 @@ never attributed to HISS, the external skill, or any observed result.
 
 ## Workflow (agent)
 
-1. **Scan.** `GET /api/stock-premium/scan` (read-only) → the JSON-safe scan payload
-   over the admitted universe. Query params `?sort=&dir=&symbol=&state=&size=`. The
-   payload is labeled `dataSource: "DEMO"` at its own boundary — never a global live
-   badge; each row carries a source stamp and freshness state.
+1. **Scan / discover pools.** `GET /api/stock-premium/scan` (read-only) → the
+   JSON-safe scan payload over the admitted universe. Query params
+   `?sort=&dir=&symbol=&state=&size=` — `size` is the **probe size in USDG**
+   (default 100), so scans are amount-aware (each row reports `exactSizeImpactBps`
+   at that notional). The **Pools** explorer lists the verified pools ranked by
+   probed usable depth (never TVL); **Pool detail** opens one pool by canonical
+   address. The payload is labeled `dataSource: "DEMO"` at its own boundary —
+   never a global live badge; each row carries a source stamp and freshness state.
 2. **Explain premium.** For a chosen asset + direction (`USDG_TO_TOKEN` or
    `TOKEN_TO_USDG`) and an exact notional, read the amount-aware premium point:
    signed premium bps, executable price, expected impact bps, dynamic capacity, and
    a `confidence` of `EXECUTION_GRADE` / `DISPLAY_ONLY` / `OVER_CAPACITY` /
    `UNKNOWN` / `HALTED`. See `references/premium-math.md`.
-3. **Preview the ladder.** Build a one-sided v3 range ladder
+3. **Preview the ladder (Build).** Construct a **single one-sided** v3 range
    (`PREMIUM_USDG_BUY_LADDER` or `DISCOUNT_TOKEN_SELL_LADDER`) at posture
    `OBSERVE_ONLY` / `SHADOW` / `PREPARE_ONLY`; capacity is bounded by usable depth.
-   See `references/range-ladders.md`.
+   In the UI the accessible range slider proposes a boundary and the engine
+   returns the **snapped** executable geometry, shown as "proposed → engine
+   snapped (tick spacing)". One contiguous one-sided range, subdivided into 1..20
+   rungs (default 4); no disjoint multi-segment ranges and no custom per-rung
+   weighting profiles. See `references/range-ladders.md`.
 4. **Simulate the accounting.** Compute the eight-line breakdown; show the signed
    net headline first.
 5. **Prepare (typed, unsigned).** For a prepare-only ladder, compile the typed LP
@@ -262,8 +345,14 @@ settlement is proven only by the reconciled on-chain receipt. See
 - Product: `https://www.hiss.finance/stock-premium-lp` (one click from the
   homepage; also in desktop + mobile nav, the dashboard, and the Tools / Agents
   catalogs). Compat `/tools/stock-premium-lp` renders the same surface.
-- Scanner `…/stock-premium-lp/scan` · Methodology `…/stock-premium-lp/learn` ·
-  Risk & system status `…/stock-premium-lp/status`.
+- Discover/scanner `…/stock-premium-lp` · Pools `…/stock-premium-lp/pools` ·
+  Pool detail `…/stock-premium-lp/pools/[address]` · Build (range builder)
+  `…/stock-premium-lp/build` · Positions (managed book)
+  `…/stock-premium-lp/positions` · Position structure explorer
+  `…/stock-premium-lp/explorer` (+ `…/positions/[tokenId]`) · Activity
+  `…/stock-premium-lp/activity` · Fees `…/stock-premium-lp/fees` · Methodology
+  `…/stock-premium-lp/learn` · Risk & system status
+  `…/stock-premium-lp/status` · Asset detail `…/stock-premium-lp/a/[symbol]`.
 - Docs: Stock Tokens `/docs/tokenized-assets` · Bankr lane
   `/docs/bankrbot-robinhood` · MCP server `/docs/mcp-server` · Agent tools
   `/docs/agent-tools`.
@@ -290,6 +379,17 @@ everywhere and enforced by the copy guards.
 ## Example prompts
 
 - "Scan Robinhood Chain Stock-Token premium and show usable depth per asset."
+- "Show me the verified Stock-Token/USDG pools ranked by usable depth, then open
+  the AAPL pool by address." (Pools explorer → pool detail; ranked by measured
+  usability, never TVL.)
+- "In the builder, set a one-sided USDG range under the pool price and show me the
+  engine-snapped boundary before I prepare anything." (Build slider → engine snap
+  "proposed → snapped"; one contiguous one-sided range subdivided into 1..20
+  rungs — no disjoint multi-segment ranges and no custom per-rung weighting.)
+- "What's in the live managed book, and when does the 5% fee actually apply?" (The
+  HissLpManagerV1 managed positions; the fee is 5% of realized LP fees, charged
+  only when a managed action collects — 95% to the user, 100% of the fee to the
+  Treasury Safe.)
 - "What's the amount-aware premium on GME for a $250 USDG buy, and its confidence?"
 - "Preview a one-sided USDG buy ladder below the pool price and show the eight-line
   net, not just fees."
