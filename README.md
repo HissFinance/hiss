@@ -500,8 +500,7 @@ mechanism in [Reward flywheel](./docs/fees/reward-flywheel.md).
   the audited contracts and never places brokerage orders.
 
 See [Security](./docs/security.md), [Trust boundaries](./docs/trust-boundaries.md),
-the [OpenClaw operator safety model](./docs/openclaw-operator.md), and
-[SECURITY.md](./SECURITY.md).
+and [SECURITY.md](./SECURITY.md).
 
 ## Current protocol lifecycle
 
@@ -542,7 +541,7 @@ deposit, and driving the MCP server.
 | Staking           | [Overview](./docs/staking/index.md) · [xHISS](./docs/staking/xhiss.md) · [Cooldown & redeem](./docs/staking/cooldown-and-redeem.md)                                                                                                                                     |
 | Rewards           | [Overview](./docs/rewards/index.md) · [Vault contributors](./docs/rewards/depositor-rewards.md) · [Vault providers](./docs/rewards/provider-rewards.md) · [Epochs & vesting](./docs/rewards/epochs-and-vesting.md)                                                      |
 | Agents            | [Agent skills](./docs/agent-skills.md) · [Bankrbot](./docs/bankrbot.md) · [x402](./docs/x402.md) · [CoilOps](./docs/coilops.md)                                                                                                                                         |
-| Safety            | [Security](./docs/security.md) · [Trust boundaries](./docs/trust-boundaries.md) · [OpenClaw operator](./docs/openclaw-operator.md) · [Receipts](./docs/receipts.md) · [Data freshness](./docs/status-and-data-freshness.md)                                             |
+| Safety            | [Security](./docs/security.md) · [Trust boundaries](./docs/trust-boundaries.md) · [Receipts](./docs/receipts.md) · [Data freshness](./docs/status-and-data-freshness.md)                                                                                                |
 
 ## Contributing
 
