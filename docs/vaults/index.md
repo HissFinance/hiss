@@ -21,6 +21,9 @@ strategy updates (7-day notice) ──▶ performance fees at high-water mark
 - **[Strategy updates](./strategy-updates.md)** — the disclosed change process.
 - **[Receipts](./receipts.md)** — verifiable records of on-chain actions.
 - **[Performance](./performance.md)** — share price, high-water mark, and fees.
+- **[Verified history & USDG accounting](./verified-history-and-usdg-accounting.md)** —
+  block-pinned history (gaps never bridged) and the USDG accounting identity vs
+  market-peg separation.
 - **[24/7 architecture](./24-7-architecture.md)** — the designed (undeployed,
   activation-gated) continuous valuation + settlement model.
 
