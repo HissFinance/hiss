@@ -12,7 +12,7 @@
  * key, and never calls a credentialed endpoint.
  */
 
-import { createPublicClient, http } from "viem";
+import { createPublicClient, http, keccak256, type Hex } from "viem";
 import { verifyReceipt as vaultKitVerifyReceipt, type VaultKitReceipt } from "@hiss-finance/vault-kit";
 import { ERC20_ABI, VAULT_ABI, VAULT_ASSET_REGISTRY_ABI, XHISS_ABI } from "./abi";
 import { chainForId } from "./chains";
@@ -25,6 +25,8 @@ import {
 } from "./constants";
 import type {
   ContractRegistryEntry,
+  ContractRegistryReport,
+  ContractRegistryReportEntry,
   ProtocolStatus,
   ReadResult,
   StakingPosition,
@@ -112,6 +114,31 @@ export class HissClient {
       },
       { key: "xhissVault", address: ADDRESSES.xhissVault, description: "xHISS staking vault" },
     ];
+  }
+
+  /**
+   * The contract registry as a canonical OBJECT report: the chain id, an
+   * observation timestamp, and each entry enriched with a live runtime-bytecode
+   * observation (`keccak256(eth_getCode)` + a deployment status). This is the
+   * object shape MCP `structuredContent` requires — never a bare array.
+   *
+   * Fail-soft per entry: a degraded `eth_getCode` read yields
+   * `status: "unknown"` with a null hash (UNKNOWN, never a fabricated hash and
+   * never a false "no_bytecode"). An address with empty code is `no_bytecode`.
+   */
+  async getContractRegistryDetailed(
+    observedAt: string = new Date().toISOString(),
+  ): Promise<ContractRegistryReport> {
+    const base = this.getContractRegistry();
+    const entries = await Promise.all(
+      base.map(async (e) => {
+        const code = await soft<Hex | undefined>(
+          () => this.client.getCode({ address: e.address }) as Promise<Hex | undefined>,
+        );
+        return mapRegistryEntry(e.key, e.address, code);
+      }),
+    );
+    return { chainId: this.chainId, observedAt, entries };
   }
 
   // -------------------------------------------------------------------------
@@ -600,6 +627,23 @@ export class HissClient {
   get decimals() {
     return DECIMALS;
   }
+}
+
+/**
+ * Pure mapping from a fail-soft `eth_getCode` read to an enriched registry
+ * entry. Exported for deterministic unit testing (no network). Degraded read →
+ * `unknown` + null hash; empty code (`0x`/absent) → `no_bytecode` + null hash;
+ * non-empty runtime code → `deployed` + `keccak256(code)`.
+ */
+export function mapRegistryEntry(
+  name: string,
+  address: `0x${string}`,
+  code: ReadResult<Hex | undefined>,
+): ContractRegistryReportEntry {
+  if (code.state !== "live") return { name, address, runtimeCodeHash: null, status: "unknown" };
+  const hex = code.value;
+  if (!hex || hex === "0x") return { name, address, runtimeCodeHash: null, status: "no_bytecode" };
+  return { name, address, runtimeCodeHash: keccak256(hex), status: "deployed" };
 }
 
 function mapBig(r: ReadResult<bigint>): ReadResult<string> {

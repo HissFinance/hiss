@@ -37,7 +37,15 @@ import type { JsonRecord } from "./types.js";
 // Shared vocabulary
 // ---------------------------------------------------------------------------
 
-export type StockPremiumDataMode = "DEMO" | "LIVE";
+/**
+ * Data plane behind a response.
+ *  - "LIVE": a real chain-4663 read (a genuine observedBlock proves it).
+ *  - "DEGRADED": a partial/failed live read — carries precise reasons + null
+ *     fields, NEVER a fabricated value and NEVER a demo substitute.
+ *  - "DEMO": the deterministic fixture engine (tests / local / ?dataMode=demo).
+ *     Production read tools must NEVER report DEMO.
+ */
+export type StockPremiumDataMode = "DEMO" | "LIVE" | "DEGRADED";
 export type PremiumDirection = "USDG_TO_TOKEN" | "TOKEN_TO_USDG";
 export type StockPremiumFuseState = "PASS" | "WARN" | "DEGRADED" | "HALT" | "UNKNOWN";
 export type StockPremiumConfidence =

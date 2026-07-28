@@ -13,6 +13,45 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **MCP contract-registry object shape, `DEGRADED` read mode, and `/version`
+  chain identity.** `hiss_get_contract_registry` now returns a JSON **object**
+  (`{ chainId, observedAt, entries }` — never a bare array), with each entry
+  carrying a live, fail-soft runtime-bytecode observation
+  (`{ name, address, runtimeCodeHash, status }`). The Stock-Premium data-mode
+  vocabulary gains **`DEGRADED`** (a partial/failed live read with precise
+  reasons and null fields — never a fabricated value, never a demo substitute;
+  production read tools never report `DEMO`). The `GET /version` payload is now
+  built by a single `buildVersionInfo()` source shared by every transport and
+  advertises `chainId` plus the deterministic toolset identity
+  (dynamic `toolCount`, `toolsetHash`, sorted `toolNames`) — and deliberately
+  carries **no** source-provenance fields (those belong to a hosting layer, not
+  this package). New test suites: the registry-derived tool test matrix,
+  output-schema conformance, and `/version` shape.
+- **Skill catalog generator + guards.** `pnpm skills:catalog` regenerates
+  [`skills/skill-catalog.json`](./skills/skill-catalog.json) deterministically
+  from the `SKILL.md` frontmatter (schema `hiss-skill-catalog-1.1.0`), and
+  `pnpm check:skill-catalog` (in `check:all`) fails when catalog and
+  frontmatter drift. `pnpm check:mcp-public-safe` (also in `check:all`) proves
+  `packages/mcp-server` and `packages/sdk` stay free of private-hosting
+  material.
+- **Stock-Premium market & venue truth reference.** New
+  [skills/hiss-stock-premium-lp-manager/references/market-and-venue-truth.md](./skills/hiss-stock-premium-lp-manager/references/market-and-venue-truth.md):
+  the venue is 24/7 but the reference is not (premium is `UNKNOWN` without a
+  verified reference); verified pools only (CREATE2 identity recomputation);
+  the quote asset decides the unit (a WETH-quoted price is never a `$` figure);
+  depth is not TVL and depth is not authorization; honest fail-closed states.
+
+### Changed
+
+- **Canonical capability encoding in skill frontmatter.** Optional capability
+  families now live in a dedicated `optional_capability_families` list; the
+  legacy trailing-`?` markers inside `required_capability_families` (which
+  broke strict/installer YAML parsers) are migrated across the seven affected
+  packs and rejected by `check:skill-catalog`. The
+  `hiss-stock-premium-lp-manager` description moved to a folded block scalar
+  (`>-`) for the same installer-parser reason. Catalog rows now also carry
+  `required_mcp_tools` and the corrected `hiss-price-mesh` version.
+
 - **Vault verified history & USDG accounting guide.** New
   [docs/vaults/verified-history-and-usdg-accounting.md](./docs/vaults/verified-history-and-usdg-accounting.md):
   how vault history is served as **real, block-pinned observations only** (gaps

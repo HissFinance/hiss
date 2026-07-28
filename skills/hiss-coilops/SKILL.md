@@ -6,7 +6,8 @@ version: 3
 visibility: public
 required_hiss_skills: [hiss-risk-fuses, hiss-receipts]
 required_mcp_servers: [hiss-mcp]
-required_capability_families: [market_data, equities, options?]
+required_capability_families: [market_data, equities]
+optional_capability_families: [options]
 local_only_data: false
 write_risk: prepare_only
 runtime_requirement: coil_runtime

@@ -34,6 +34,9 @@ export type {
   ReadState,
   ProtocolStatus,
   ContractRegistryEntry,
+  ContractRegistryReport,
+  ContractRegistryReportEntry,
+  ContractDeploymentStatus,
   VaultReads,
   StakingStatus,
   StakingPosition,
@@ -44,7 +47,7 @@ export { buildActionPlan, computePlanHash, planHashPayload } from "./plan";
 export type { BuildActionPlanInput } from "./plan";
 
 // Client (reads)
-export { HissClient } from "./client";
+export { HissClient, mapRegistryEntry } from "./client";
 export type { HissClientOptions, RewardModel } from "./client";
 
 // Ergonomic factory + address alias used across the SDK examples.

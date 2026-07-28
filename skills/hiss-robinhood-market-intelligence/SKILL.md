@@ -6,7 +6,8 @@ version: 1
 visibility: public
 required_hiss_skills: [hiss-robinhood-agentic]
 required_mcp_servers: [robinhood-trading-mcp]
-required_capability_families: [market_data?, scanner?]
+required_capability_families: []
+optional_capability_families: [market_data, scanner]
 local_only_data: false
 write_risk: prepare_only
 runtime_requirement: none

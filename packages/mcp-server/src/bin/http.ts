@@ -42,10 +42,9 @@ import { createHash } from "node:crypto";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createServer } from "../server.js";
 import { createHissClient } from "../lib/client.js";
-import { computeToolsetHash } from "../lib/toolset-hash.js";
 import { checkRpcReadiness, type ReadinessResult } from "../lib/readiness.js";
-import { getMcpSdkVersion, getNodeVersion, getDeploymentVersion } from "../lib/version-info.js";
-import { SERVER_NAME, SERVER_VERSION } from "../server.js";
+import { buildVersionInfo } from "../lib/version-info.js";
+import { SERVER_NAME } from "../server.js";
 import type { HissClient } from "../lib/types.js";
 
 const MCP_PATH = "/mcp";
@@ -234,6 +233,12 @@ export interface HttpServerOverrides {
   readiness?: () => Promise<ReadinessResult>;
   /** Monotonic clock for the rate limiter (tests). */
   now?: () => number;
+  /**
+   * Wall-clock source for per-request tool output (tests). Threaded into every
+   * per-request `createServer({ nowIso })` so time-stamped reads (e.g. the
+   * contract registry's `observedAt`) are deterministic. Defaults to real time.
+   */
+  nowIso?: () => string;
   /** Structured log sink (tests). */
   logger?: (entry: LogEntry) => void;
 }
@@ -251,7 +256,6 @@ export function createHttpServer(overrides: HttpServerOverrides = {}): HttpServe
   const config: HttpConfig = { ...resolveHttpConfig(), ...overrides.config };
   const now = overrides.now ?? (() => Date.now());
   const log = overrides.logger ?? defaultLogger;
-  const toolset = computeToolsetHash();
 
   // One shared read/prepare client — it holds no keys and no per-request state.
   const client = overrides.client ?? createHissClient({ rpcUrl: config.rpcUrl, chainId: config.chainId });
@@ -335,18 +339,10 @@ export function createHttpServer(overrides: HttpServerOverrides = {}): HttpServe
       return;
     }
 
-    // 4) Version — deployment + toolset identity, no tool invocation.
+    // 4) Version — server + chain + toolset identity, no tool invocation. The
+    // public-safe base shape shared by every transport (see buildVersionInfo).
     if (method === "GET" && path === "/version") {
-      sendJson(res, 200, {
-        server: { name: SERVER_NAME, version: SERVER_VERSION },
-        deploymentVersion: getDeploymentVersion(),
-        toolsetHash: toolset.hash,
-        toolCount: toolset.toolCount,
-        toolNames: toolset.toolNames,
-        mcpSdkVersion: getMcpSdkVersion(),
-        nodeVersion: getNodeVersion(),
-        transport: "streamable-http",
-      });
+      sendJson(res, 200, buildVersionInfo({ chainId: config.chainId, transport: "streamable-http" }));
       finish(200);
       return;
     }
@@ -364,7 +360,7 @@ export function createHttpServer(overrides: HttpServerOverrides = {}): HttpServe
 
     void (async () => {
       // Stateless: fresh Server + transport per request, torn down on close.
-      const server = createServer({ client });
+      const server = createServer({ client, nowIso: overrides.nowIso });
       const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
       res.on("close", () => {
         void transport.close();
