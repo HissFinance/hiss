@@ -52,7 +52,9 @@ afterEach(async () => {
 describe("stdio ≡ HTTP tool parity (hardening changed no tool behavior)", () => {
   for (const tool of HISS_TOOLS) {
     it(`${tool.name} produces identical results over stdio and HTTP`, async () => {
-      running = await startTestServer();
+      // Both transports share the SAME fixed clock so time-stamped reads
+      // (e.g. the contract registry's `observedAt`) compare deterministically.
+      running = await startTestServer({ nowIso: () => FIXED_NOW });
       const args = ARGS[tool.name] ?? {};
 
       // Reference: the in-process guarded caller (the stdio path).

@@ -68,6 +68,36 @@ export interface ContractRegistryEntry {
   description: string;
 }
 
+/** Deployment status of a registry entry derived from its runtime bytecode. */
+export type ContractDeploymentStatus = "deployed" | "no_bytecode" | "unknown";
+
+/**
+ * A registry entry enriched with a live runtime-bytecode observation. Fail-soft:
+ * a degraded `eth_getCode` read yields `status: "unknown"` and a null
+ * `runtimeCodeHash` — never a fabricated hash and never a false "no_bytecode".
+ */
+export interface ContractRegistryReportEntry {
+  /** Stable machine name (the registry key, e.g. "flagshipVault"). */
+  name: string;
+  /** Contract address, always shown. */
+  address: `0x${string}`;
+  /** keccak256 of the runtime bytecode when observed live; null when degraded or absent. */
+  runtimeCodeHash: `0x${string}` | null;
+  /** deployed | no_bytecode | unknown (degraded). */
+  status: ContractDeploymentStatus;
+}
+
+/**
+ * The contract registry as a JSON OBJECT (never a bare array): the observed
+ * chain id, an ISO-8601 observation timestamp, and the enriched entries. This
+ * is the object shape MCP `structuredContent` requires.
+ */
+export interface ContractRegistryReport {
+  chainId: number;
+  observedAt: string;
+  entries: ContractRegistryReportEntry[];
+}
+
 /** A vault's public read surface. */
 export interface VaultReads {
   address: `0x${string}`;

@@ -1,7 +1,20 @@
 ---
 name: hiss-stock-premium-lp-manager
-description: Orchestrate the full Stock-Token LP lifecycle on Robinhood Chain — scan premium/discount by canonical address, read amount-aware direction-specific premium evidence, preview one-sided Uniswap v3 USDG range-ladders, resolve per-user per-surface eligibility, compile typed UNSIGNED LP position packages (mint / increase / decrease / collect / close), then hand each package off for the USER to sign in their own browser wallet, Safe, authenticated Bankr session, or local runtime, verify the on-chain receipt, monitor, and reconcile the eight-line net P&L. HISS measures, verifies, prepares, and coordinates; it never holds keys, never signs, never submits, never custodies, never hedges, and never places orders — a compatible USER execution authority is required (returns EXECUTION_AUTHORITY_REQUIRED when none is connected). A one-sided USDG range below pool price is a bounded buy ladder, never guaranteed arbitrage: fees are not profit and inventory value can fall. Use when a user wants to analyze Stock-Token premium or prepare, execute-through-their-own-authority, and monitor a single-sided USDG LP position on Robinhood Chain. Do NOT use for generic LP dashboards, unrelated Uniswap questions, guaranteed/risk-free-profit claims, borrowing/shorting Stock Tokens, HISS-side execution, arbitrary contract calls, or bypassing jurisdiction gates.
-tags: [stock-premium, uniswap-v3, robinhood-chain, usdg, lp-position, user-signed, orchestration, receipts, price-mesh, bankr]
+description: >-
+  Orchestrate the full Stock-Token LP lifecycle on Robinhood Chain — scan premium/discount by canonical address, read amount-aware direction-specific premium evidence, preview one-sided Uniswap v3 USDG range-ladders, resolve per-user per-surface eligibility, compile typed UNSIGNED LP position packages (mint / increase / decrease / collect / close), then hand each package off for the USER to sign in their own browser wallet, Safe, authenticated Bankr session, or local runtime, verify the on-chain receipt, monitor, and reconcile the eight-line net P&L. HISS measures, verifies, prepares, and coordinates; it never holds keys, never signs, never submits, never custodies, never hedges, and never places orders — a compatible USER execution authority is required (returns EXECUTION_AUTHORITY_REQUIRED when none is connected). A one-sided USDG range below pool price is a bounded buy ladder, never guaranteed arbitrage: fees are not profit and inventory value can fall. Use when a user wants to analyze Stock-Token premium or prepare, execute-through-their-own-authority, and monitor a single-sided USDG LP position on Robinhood Chain. Do NOT use for generic LP dashboards, unrelated Uniswap questions, guaranteed/risk-free-profit claims, borrowing/shorting Stock Tokens, HISS-side execution, arbitrary contract calls, or bypassing jurisdiction gates.
+tags:
+  [
+    stock-premium,
+    uniswap-v3,
+    robinhood-chain,
+    usdg,
+    lp-position,
+    user-signed,
+    orchestration,
+    receipts,
+    price-mesh,
+    bankr,
+  ]
 version: 4
 visibility: public
 write_risk: user_signed
@@ -193,7 +206,9 @@ reconciled on-chain evidence, never asserted.
    `TOKEN_TO_USDG`) and an exact notional, read the amount-aware premium point:
    signed premium bps, executable price, expected impact bps, dynamic capacity, and
    a `confidence` of `EXECUTION_GRADE` / `DISPLAY_ONLY` / `OVER_CAPACITY` /
-   `UNKNOWN` / `HALTED`. See `references/premium-math.md`.
+   `UNKNOWN` / `HALTED`. See `references/premium-math.md` and
+   `references/market-and-venue-truth.md` (venue is 24/7, the reference is not;
+   quote asset decides the unit; depth is not TVL).
 3. **Preview the ladder (Build).** Construct a **single one-sided** v3 range
    (`PREMIUM_USDG_BUY_LADDER` or `DISCOUNT_TOKEN_SELL_LADDER`) at posture
    `OBSERVE_ONLY` / `SHADOW` / `PREPARE_ONLY`; capacity is bounded by usable depth.

@@ -114,7 +114,15 @@ const PREPARE_NOTE =
   "The target address is always shown. An action is complete only after your own on-chain receipt confirms.";
 
 function unsignedStructured(tx: UnsignedTx): JsonRecord {
-  return { ...(tx as unknown as JsonRecord), note: PREPARE_NOTE };
+  // Every hosted prepare response is UNSIGNED and NOT sent. Assert both
+  // invariants on the wire regardless of what the plan carried: `signed:false`
+  // and `liveTransactionSent:false`. HISS holds no keys and broadcasts nothing.
+  return {
+    ...(tx as unknown as JsonRecord),
+    signed: false,
+    liveTransactionSent: false,
+    note: PREPARE_NOTE,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -140,7 +148,10 @@ const READ_TOOLS: ToolDefinition[] = [
     description: "Read the deployed contract registry (name → address) for Robinhood Chain.",
     inputSchema: { type: "object", properties: {} },
     handler: async (_args, ctx) => {
-      const registry = await ctx.client.getContractRegistry();
+      // `structuredContent` MUST be a JSON object: `{ chainId, observedAt,
+      // entries: [{ name, address, runtimeCodeHash, status }] }` — never a bare
+      // array. `observedAt` is the server clock for deterministic output.
+      const registry = await ctx.client.getContractRegistry(ctx.nowIso);
       return { summary: "Contract registry read.", structured: registry };
     },
   },
@@ -330,7 +341,8 @@ const PREPARE_TOOLS: ToolDefinition[] = [
         schema: VAULT_MANIFEST_SCHEMA,
         chainId: typeof args.chainId === "number" ? args.chainId : 4663,
         name: requireString(args, "name"),
-        slug: typeof args.slug === "string" ? args.slug : undefined,
+        // Only include `slug` when supplied — never emit an `undefined` field.
+        ...(typeof args.slug === "string" ? { slug: args.slug } : {}),
         baseAsset: "USDG",
         allowedAssets: Array.isArray(args.allowedAssets) ? args.allowedAssets : [],
         fees: isRecord(args.fees) ? args.fees : { managementBps: 0, performanceBps: 0 },

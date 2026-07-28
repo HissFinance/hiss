@@ -128,9 +128,12 @@ export function createHissClient(opts: ClientOptions = {}): HissClient {
     // ---- reads ----
     getProtocolStatus: () => read.getProtocolStatus() as unknown as Promise<JsonRecord>,
 
-    // The SDK returns an ARRAY of registry entries; the MCP tool result schema
-    // requires an object, so wrap it under `entries`.
-    getContractRegistry: async () => ({ entries: read.getContractRegistry() }),
+    // The MCP tool result schema requires a JSON OBJECT (never a bare array).
+    // The SDK's detailed report is exactly that: `{ chainId, observedAt,
+    // entries: [{ name, address, runtimeCodeHash, status }] }`, where each
+    // entry carries a live, fail-soft runtime-bytecode observation.
+    getContractRegistry: async (observedAt) =>
+      (await read.getContractRegistryDetailed(observedAt)) as unknown as JsonRecord,
 
     listVaults: () => read.getVaults() as unknown as Promise<JsonRecord[]>,
 

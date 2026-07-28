@@ -21,7 +21,19 @@ export function mockClient(): HissClient {
   };
   return {
     getProtocolStatus: () => Promise.resolve(status),
-    getContractRegistry: () => Promise.resolve({ hissToken: status.token }),
+    getContractRegistry: (observedAt?: string) =>
+      Promise.resolve({
+        chainId: 4663,
+        observedAt: observedAt ?? "2026-07-16T00:00:00.000Z",
+        entries: [
+          {
+            name: "flagshipVault",
+            address: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+            runtimeCodeHash: null,
+            status: "unknown",
+          },
+        ],
+      }),
     listVaults: () =>
       Promise.resolve([{ slug: "flagship", address: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6" }]),
     getVault: (ref) =>

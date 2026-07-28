@@ -6,7 +6,8 @@ version: 1
 visibility: public
 required_hiss_skills: [hiss-robinhood-agentic, hiss-risk-fuses, hiss-receipts]
 required_mcp_servers: [robinhood-trading-mcp]
-required_capability_families: [options?, market_data, account_portfolio_other]
+required_capability_families: [market_data, account_portfolio_other]
+optional_capability_families: [options]
 local_only_data: false
 write_risk: user_signed
 runtime_requirement: session_harness

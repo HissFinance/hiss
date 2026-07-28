@@ -40,7 +40,11 @@ export type JsonRecord = Record<string, unknown>;
 export interface HissClient {
   // ---- reads ----
   getProtocolStatus(): Promise<JsonRecord>;
-  getContractRegistry(): Promise<JsonRecord>;
+  /**
+   * The contract registry as a JSON OBJECT: `{ chainId, observedAt, entries }`.
+   * Never a bare array. `observedAt` may be supplied for deterministic output.
+   */
+  getContractRegistry(observedAt?: string): Promise<JsonRecord>;
   listVaults(): Promise<JsonRecord[]>;
   getVault(ref: string): Promise<JsonRecord>;
   getVaultHoldings(vault: string): Promise<JsonRecord>;

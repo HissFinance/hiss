@@ -7,7 +7,8 @@ visibility: public
 required_hiss_skills:
   [hiss-robinhood-agentic, hiss-coilops, hiss-risk-fuses, hiss-receipts, hiss-agentic-ledger]
 required_mcp_servers: [robinhood-trading-mcp]
-required_capability_families: [account_portfolio_other, market_data, equities?, options?, scanner?]
+required_capability_families: [account_portfolio_other, market_data]
+optional_capability_families: [equities, options, scanner]
 local_only_data: false
 write_risk: user_signed
 runtime_requirement: session_harness
