@@ -87,8 +87,22 @@
       "runtime_requirement": "none"
     },
     {
+      "name": "hiss-lighter",
+      "version": 2,
+      "visibility": "public",
+      "description": "How HISS integrates with Lighter (the Robinhood-instance perp/spot exchange at api.rh.lighter.xyz). HISS reads PUBLIC market data (markets, orderbook, mid/spread/depth, trades) and PREPARES typed UNSIGNED order intents; it never signs, submits, or holds a Lighter API private key or auth token. Robinhood Stock-Token markets exist as USDG-quoted spot books (AAPL/USDG, TSLA/USDG, …). Signing happens only in the user's own local runtime via the official Python/Go SDK. Use when a user or agent asks whether HISS trades on Lighter, how to place a Lighter order, Lighter stock tokens, precision, nonces, or API keys.",
+      "required_hiss_skills": [],
+      "required_mcp_servers": [],
+      "required_mcp_tools": [],
+      "required_capability_families": [],
+      "optional_capability_families": [],
+      "local_only_data": null,
+      "write_risk": null,
+      "runtime_requirement": null
+    },
+    {
       "name": "hiss-mcp",
-      "version": 1,
+      "version": 2,
       "visibility": "public",
       "description": "Use the HISS local MCP server — a stdio Model Context Protocol server that exposes HISS CoilOps, vault, staking, rewards, and stock-token tooling as callable tools for your own agent. Covers connecting the server, the tool families and their read/prepare-only contract, and the guards every tool output passes (execution-claim guard, credential rejection, planned ≠ funded ≠ claimable). Use when a user wants their agent to call HISS tools over MCP rather than raw HTTP. Compiles and verifies; never executes trades or custodies funds.",
       "required_hiss_skills": [],

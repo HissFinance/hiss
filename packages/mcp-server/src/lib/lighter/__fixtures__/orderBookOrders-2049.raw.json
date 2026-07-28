@@ -1,0 +1,49 @@
+{
+  "code": 200,
+  "total_asks": 2,
+  "asks": [
+    {
+      "order_index": 577023702256879851,
+      "order_id": "577023702256879851",
+      "owner_account_index": 12,
+      "initial_base_amount": "24.4000",
+      "remaining_base_amount": "24.4000",
+      "price": "339.89",
+      "order_expiry": 1787678512166,
+      "transaction_time": 0
+    },
+    {
+      "order_index": 577023702256879870,
+      "order_id": "577023702256879870",
+      "owner_account_index": 12,
+      "initial_base_amount": "219.6000",
+      "remaining_base_amount": "219.6000",
+      "price": "341.08",
+      "order_expiry": 1787680176041,
+      "transaction_time": 0
+    }
+  ],
+  "total_bids": 2,
+  "bids": [
+    {
+      "order_index": 577305177233516379,
+      "order_id": "577305177233516379",
+      "owner_account_index": 12,
+      "initial_base_amount": "24.4000",
+      "remaining_base_amount": "24.4000",
+      "price": "339.27",
+      "order_expiry": 1787678512166,
+      "transaction_time": 0
+    },
+    {
+      "order_index": 577305177233516364,
+      "order_id": "577305177233516364",
+      "owner_account_index": 12,
+      "initial_base_amount": "219.6000",
+      "remaining_base_amount": "219.6000",
+      "price": "338.22",
+      "order_expiry": 1787680176041,
+      "transaction_time": 0
+    }
+  ]
+}

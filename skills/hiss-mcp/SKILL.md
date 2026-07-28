@@ -2,7 +2,7 @@
 name: hiss-mcp
 description: Use the HISS local MCP server — a stdio Model Context Protocol server that exposes HISS CoilOps, vault, staking, rewards, and stock-token tooling as callable tools for your own agent. Covers connecting the server, the tool families and their read/prepare-only contract, and the guards every tool output passes (execution-claim guard, credential rejection, planned ≠ funded ≠ claimable). Use when a user wants their agent to call HISS tools over MCP rather than raw HTTP. Compiles and verifies; never executes trades or custodies funds.
 tags: [mcp, model-context-protocol, hiss-tools, agents, coilops]
-version: 1
+version: 2
 visibility: public
 required_mcp_tools:
   - hiss_get_protocol_status
@@ -46,28 +46,34 @@ tool — credential-shaped inputs are rejected and never echoed.
 
 ## Tools
 
-The server registers **33 tools** — 18 read, 15 prepare. This list mirrors the
+The server registers **39 tools** — 21 read, 18 prepare. This list mirrors the
 MCP server source (`packages/mcp-server/src/tools.ts` +
-`packages/mcp-server/src/tools-stock-premium.ts`); the server's own `list_tools`
+`packages/mcp-server/src/tools-stock-premium.ts` +
+`packages/mcp-server/src/tools-lighter.ts`); the server's own `list_tools`
 response is always authoritative.
 
-**Read (18)** — `hiss_get_protocol_status`, `hiss_get_contract_registry`,
+**Read (21)** — `hiss_get_protocol_status`, `hiss_get_contract_registry`,
 `hiss_get_fee_schedule`, `hiss_get_supported_assets`, `hiss_get_vaults`,
 `hiss_get_vault`, `hiss_get_vault_holdings`, `hiss_get_vault_performance`,
 `hiss_get_staking_status`, `hiss_get_reward_status`, `hiss_get_receipt`,
 `hiss_verify_receipt`, `hiss_stock_token_registry`, `hiss_stock_premium_scan`,
 `hiss_stock_premium_explain`, `hiss_lp_ladder_preview`, `hiss_lp_position_read`,
-`hiss_lp_verify_receipt`.
+`hiss_lp_verify_receipt`, `hiss_lighter_markets`, `hiss_lighter_orderbook`,
+`hiss_lighter_depth`.
 
-**Prepare (15)** — `hiss_create_vault_candidate`, `hiss_validate_vault_candidate`,
+**Prepare (18)** — `hiss_create_vault_candidate`, `hiss_validate_vault_candidate`,
 `hiss_prepare_vault_creation`, `hiss_prepare_vault_deposit`,
 `hiss_prepare_vault_withdrawal`, `hiss_prepare_hiss_stake`,
 `hiss_prepare_xhiss_cooldown`, `hiss_prepare_xhiss_redeem`, `hiss_validate_coil`,
 `hiss_compile_coil`, `hiss_lp_prepare_mint`, `hiss_lp_prepare_increase`,
-`hiss_lp_prepare_withdraw`, `hiss_lp_prepare_collect`, `hiss_lp_prepare_close`.
+`hiss_lp_prepare_withdraw`, `hiss_lp_prepare_collect`, `hiss_lp_prepare_close`,
+`hiss_lighter_prepare_order`, `hiss_lighter_prepare_cancel`,
+`hiss_lighter_prepare_modify`.
 The five Stock-Premium prepares emit typed **unsigned** Uniswap v3 LP packages
 (`signed:false`, `liveTransactionSent:false`); a one-sided USDG range below pool
 price is a bounded buy ladder, never guaranteed arbitrage — fees are not profit.
+The three Lighter prepares emit typed **unsigned** order/cancel/modify intents
+(`signed:false`); HISS holds no Lighter key and signing is local-only.
 
 **Not MCP tools — HTTP API only.** CoilOps generation/scoring, receipts and share
 cards, the Bankrbot → Robinhood path, autonomy-fuse validation, and Bankr

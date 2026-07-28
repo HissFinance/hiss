@@ -2,7 +2,7 @@
 
 `@hiss-finance/mcp-server` is a local [Model Context Protocol](https://modelcontextprotocol.io)
 server that exposes HISS Finance to any MCP-compatible agent (Claude, and other MCP
-clients). It registers **33 tools** (18 read, 15 prepare) — all of which **read or
+clients). It registers **39 tools** (21 read, 18 prepare) — all of which **read or
 prepare only**, so **agents never execute trades, move funds, or take custody**.
 Preparation returns artifacts and unsigned transactions for a human or the user's
 wallet to sign. The server's own `list_tools` response is always the source of truth.
@@ -42,9 +42,9 @@ Example client config (stdio):
 - **Fail closed.** Missing artifacts, low-confidence classification, or missing
   authorization refuse.
 
-## The 33 tools
+## The 39 tools
 
-### Read tools (18)
+### Read tools (21)
 
 - `hiss_get_protocol_status` — protocol status snapshot (network, token, Safe, vault count).
 - `hiss_get_contract_registry` — deployed contract registry (name → address).
@@ -74,8 +74,13 @@ Example client config (stdio):
   read is null, never zero).
 - `hiss_lp_verify_receipt` — verify a Stock-Premium LP receipt's integrity hash locally
   (a preparation receipt is never evidence of on-chain settlement).
+- `hiss_lighter_markets` — list public Lighter (Robinhood-instance) markets; classifies the
+  USDG-quoted Stock-Token spot pairs. Fail-closed to `DEGRADED`; never a fabricated market.
+- `hiss_lighter_orderbook` — normalized Lighter orderbook for one market (bid/ask/mid/spread/
+  depth). An empty/one-sided book is `null` (UNKNOWN), never a fabricated mid.
+- `hiss_lighter_depth` — compact Lighter top-of-book + aggregate per-side depth (no full ladder).
 
-### Prepare tools (15)
+### Prepare tools (18)
 
 - `hiss_create_vault_candidate` — assemble a candidate VaultManifest (a draft — nothing is created).
 - `hiss_validate_vault_candidate` — validate a manifest fail-closed (chain, USDG, fee bounds, skin, fuses).
@@ -94,8 +99,13 @@ Example client config (stdio):
 - `hiss_lp_prepare_withdraw` — prepare a typed **unsigned** decreaseLiquidity (withdraw) package.
 - `hiss_lp_prepare_collect` — prepare a typed **unsigned** collect package (fees to the user's own recipient).
 - `hiss_lp_prepare_close` — prepare a typed **unsigned** burn (close) package for a fully-exited position.
+- `hiss_lighter_prepare_order` — prepare a typed **unsigned** Lighter order intent (precision-scaled
+  integers, expiry-bound, HISS risk envelope, deterministic `intentHash`). `signed:false`; nothing sent.
+- `hiss_lighter_prepare_cancel` — prepare a typed **unsigned** Lighter cancel intent for one resting order.
+- `hiss_lighter_prepare_modify` — prepare a typed **unsigned** Lighter modify intent (new size and/or price).
 
-> Bankr and Robinhood-MCP rails are **region- and provider-dependent**, have limited
+> Lighter signing happens only in the user's own local runtime (official Python/Go SDK) — HISS holds
+> no Lighter API key, auth token, or nonce and submits nothing. Bankr and Robinhood-MCP rails are **region- and provider-dependent**, have limited
 > rollout, and are **planning/preparation only** — they are documented separately and
 > are not part of this MCP tool set. An intent submitted is **not** settled; only an
 > on-chain confirmation counts. See [Bankrbot](./bankrbot.md) and

@@ -21,6 +21,7 @@ import { verifyReceipt } from "./lib/receipt.js";
 import { isCompleteVaultCandidate } from "./lib/client.js";
 import type { HissClient, JsonRecord, UnsignedTx } from "./lib/types.js";
 import type { StockPremiumEngine } from "./lib/stock-premium.js";
+import type { LighterReadClient } from "./lib/lighter/index.js";
 
 export interface ToolContext {
   client: HissClient;
@@ -31,6 +32,12 @@ export interface ToolContext {
    * deployment injects the real `@hiss/core` engine.
    */
   stockPremium?: StockPremiumEngine;
+  /**
+   * Injected Lighter READ client (public market data over the unauthenticated
+   * REST API). When absent, the Lighter tools build a default `fetch`-backed
+   * client; tests inject a fixture-fetch client. HISS holds no Lighter key.
+   */
+  lighter?: LighterReadClient;
 }
 
 export interface ToolOutcome {
@@ -593,15 +600,21 @@ const PREPARE_TOOLS: ToolDefinition[] = [
 // circular import (tools-stock-premium.ts imports types + ToolInputError from
 // here) resolves cleanly — the Stock-Premium defs use those only inside handlers.
 import { STOCK_PREMIUM_TOOLS } from "./tools-stock-premium.js";
+import { LIGHTER_TOOLS } from "./tools-lighter.js";
 
 /**
  * The full registry. The count is DYNAMIC (`HISS_TOOLS.length`) — the base 22
- * read/prepare tools plus the 11 Stock-Premium engine-bridge tools. Never
- * hard-code the total anywhere.
+ * read/prepare tools, the 11 Stock-Premium engine-bridge tools, and the 6
+ * Lighter READ/PREPARE market-rail tools. Never hard-code the total anywhere.
  */
-export const HISS_TOOLS: ToolDefinition[] = [...READ_TOOLS, ...PREPARE_TOOLS, ...STOCK_PREMIUM_TOOLS];
+export const HISS_TOOLS: ToolDefinition[] = [
+  ...READ_TOOLS,
+  ...PREPARE_TOOLS,
+  ...STOCK_PREMIUM_TOOLS,
+  ...LIGHTER_TOOLS,
+];
 
-export { STOCK_PREMIUM_TOOLS };
+export { STOCK_PREMIUM_TOOLS, LIGHTER_TOOLS };
 
 export function getTool(name: string): ToolDefinition | undefined {
   return HISS_TOOLS.find((t) => t.name === name);

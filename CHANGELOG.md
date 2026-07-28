@@ -13,6 +13,16 @@ Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADM
 
 ### Added
 
+- **Lighter (Robinhood-instance) READ/PREPARE MCP rail — 6 new tools (33 → 39).**
+  The MCP server registers `hiss_lighter_markets` / `hiss_lighter_orderbook` /
+  `hiss_lighter_depth` (READ public market data, fail-closed to `DEGRADED` /
+  `MARKET_NOT_AVAILABLE`, never a fabricated price) and `hiss_lighter_prepare_order`
+  / `hiss_lighter_prepare_cancel` / `hiss_lighter_prepare_modify` (typed **UNSIGNED**
+  intents, `signed:false`, precision-scaled integers, deterministic `intentHash`).
+  HISS holds no Lighter API key, auth token, or nonce and submits nothing — signing
+  happens only in the user's local runtime. New `hiss-lighter` skill pack + full
+  read/prepare test matrix (positive/negative/credential-reject/serialization/
+  stdio≡HTTP parity). Robinhood Stock-Tokens are USDG-quoted spot books.
 - **MCP contract-registry object shape, `DEGRADED` read mode, and `/version`
   chain identity.** `hiss_get_contract_registry` now returns a JSON **object**
   (`{ chainId, observedAt, entries }` — never a bare array), with each entry
@@ -275,7 +285,7 @@ documentation.
 - **CLI (`@hiss-finance/cli`)** — status reads, manifest validation, and
   transaction preparation from the terminal.
 - **MCP server (`@hiss-finance/mcp-server`)** — a local Model Context Protocol
-  server exposing 33 read/prepare tools; agents never execute or move funds.
+  server exposing read/prepare tools; agents never execute or move funds.
 - **Contract interfaces & ABIs** — `contracts/` interfaces and ABIs for the vault
   factory, flagship vault, xHISS staking vault, registries, reward distributors,
   and rebalance adapter.

@@ -1,11 +1,37 @@
 import { describe, it, expect } from "vitest";
 import { callHissTool } from "../src/server.js";
-import { HISS_TOOLS, STOCK_PREMIUM_TOOLS } from "../src/tools.js";
+import { HISS_TOOLS, STOCK_PREMIUM_TOOLS, LIGHTER_TOOLS } from "../src/tools.js";
 import { mockClient, VALID_VAULT_MANIFEST, VALID_COIL_MANIFEST } from "./helpers/mockClient.js";
 import { STOCK_PREMIUM_ARGS } from "./helpers/stockPremiumArgs.js";
+import { lighterFixtureClient } from "./helpers/lighterFixtureClient.js";
 import type { JsonRecord } from "../src/lib/types.js";
 
-const deps = { client: mockClient(), nowIso: () => "2026-07-16T00:00:00.000Z" };
+const deps = {
+  client: mockClient(),
+  nowIso: () => "2026-07-16T00:00:00.000Z",
+  // Deterministic, offline Lighter READ client (fixture-backed, no network, no key).
+  lighter: lighterFixtureClient(),
+};
+
+/** Valid Lighter tool args (AAPL/USDG market 2049 is present in the fixtures). */
+const LIGHTER_ARGS: Record<string, JsonRecord> = {
+  hiss_lighter_markets: {},
+  hiss_lighter_orderbook: { ticker: "AAPL" },
+  hiss_lighter_depth: { ticker: "AAPL" },
+  hiss_lighter_prepare_order: {
+    ticker: "AAPL",
+    side: "buy",
+    size: "1.0000",
+    price: "339.50",
+    orderType: "LIMIT",
+    timeInForce: "GOOD_TILL_TIME",
+    clientOrderIndex: 1,
+    // 1 day ahead of the real clock — inside the [5min, 30d] GTT window.
+    expiryMs: Date.now() + 24 * 60 * 60 * 1000,
+  },
+  hiss_lighter_prepare_cancel: { ticker: "AAPL", orderIndex: "12345" },
+  hiss_lighter_prepare_modify: { ticker: "AAPL", orderIndex: "12345", newPrice: "339.40" },
+};
 
 /** Valid arguments per tool so every tool can be exercised end-to-end. */
 const ARGS: Record<string, JsonRecord> = {
@@ -44,6 +70,7 @@ const ARGS: Record<string, JsonRecord> = {
   hiss_validate_coil: { manifest: VALID_COIL_MANIFEST },
   hiss_compile_coil: { manifest: VALID_COIL_MANIFEST },
   ...STOCK_PREMIUM_ARGS,
+  ...LIGHTER_ARGS,
 };
 
 const FORBIDDEN_NAME_FRAGMENTS = [
@@ -77,7 +104,7 @@ describe("tool registry is read/prepare only", () => {
     }
   });
 
-  it("classifies every tool and the count is dynamic (base 22 + Stock-Premium 11)", () => {
+  it("classifies every tool and the count is dynamic (base 22 + Stock-Premium 11 + Lighter 6)", () => {
     const read = HISS_TOOLS.filter((t) => t.kind === "read");
     const prepare = HISS_TOOLS.filter((t) => t.kind === "prepare");
     // Dynamic: no hard-coded total. read + prepare == the registry length.
@@ -86,9 +113,13 @@ describe("tool registry is read/prepare only", () => {
     expect(STOCK_PREMIUM_TOOLS).toHaveLength(11);
     expect(STOCK_PREMIUM_TOOLS.filter((t) => t.kind === "read")).toHaveLength(6);
     expect(STOCK_PREMIUM_TOOLS.filter((t) => t.kind === "prepare")).toHaveLength(5);
-    // Base 12 read + 10 prepare are still present alongside the 6 + 5 new ones.
-    expect(read).toHaveLength(18);
-    expect(prepare).toHaveLength(15);
+    // The Lighter rail contributes exactly 6 (3 read + 3 prepare).
+    expect(LIGHTER_TOOLS).toHaveLength(6);
+    expect(LIGHTER_TOOLS.filter((t) => t.kind === "read")).toHaveLength(3);
+    expect(LIGHTER_TOOLS.filter((t) => t.kind === "prepare")).toHaveLength(3);
+    // Base 12 read + 10 prepare + Stock-Premium (6+5) + Lighter (3+3).
+    expect(read).toHaveLength(21);
+    expect(prepare).toHaveLength(18);
   });
 });
 

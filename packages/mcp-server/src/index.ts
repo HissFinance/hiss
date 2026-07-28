@@ -15,6 +15,7 @@ export {
 export {
   HISS_TOOLS,
   STOCK_PREMIUM_TOOLS,
+  LIGHTER_TOOLS,
   getTool,
   ToolInputError,
   type ToolDefinition,
@@ -22,6 +23,15 @@ export {
   type ToolOutcome,
   type ToolKind,
 } from "./tools.js";
+export {
+  LighterReadClient,
+  type FetchLike as LighterFetchLike,
+  type LighterMarket,
+  type LighterOrderbook,
+  type LighterReadResult,
+  LIGHTER_CURRENT_RUNG,
+  lighterRailStatus,
+} from "./lib/lighter/index.js";
 export {
   stockPremiumFixtureEngine,
   verifyStockPremiumReceipt,

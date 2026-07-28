@@ -12,11 +12,13 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { REPO_ROOT } from "../lib/walk.ts";
 
-// The canonical MCP tool set is spread across the base registry and the
-// Stock-Premium engine-bridge module (both spread into `HISS_TOOLS`).
+// The canonical MCP tool set is spread across the base registry, the
+// Stock-Premium engine-bridge module, and the Lighter READ/PREPARE module (all
+// spread into `HISS_TOOLS`).
 const TOOLS_SOURCES = [
   join(REPO_ROOT, "packages/mcp-server/src/tools.ts"),
   join(REPO_ROOT, "packages/mcp-server/src/tools-stock-premium.ts"),
+  join(REPO_ROOT, "packages/mcp-server/src/tools-lighter.ts"),
 ];
 const TOOLS_SOURCE = TOOLS_SOURCES[0];
 

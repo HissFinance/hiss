@@ -1,0 +1,37 @@
+{
+  "code": 200,
+  "order_book_details": [],
+  "spot_order_book_details": [
+    {
+      "symbol": "AAPL/USDG",
+      "market_id": 2049,
+      "market_type": "spot",
+      "base_asset_id": 4,
+      "quote_asset_id": 3,
+      "status": "active",
+      "taker_fee": "0.0000",
+      "is_taker_fee_enabled": true,
+      "maker_fee": "0.0000",
+      "is_maker_fee_enabled": true,
+      "liquidation_fee": "0.0000",
+      "min_base_amount": "0.0200",
+      "min_quote_amount": "10.000000",
+      "order_quote_limit": "281474976.710655",
+      "supported_size_decimals": 4,
+      "supported_price_decimals": 2,
+      "supported_quote_decimals": 6,
+      "created_at": "1782499411756",
+      "multiplier": "1.000000000000000000",
+      "size_decimals": 4,
+      "price_decimals": 2,
+      "last_trade_price": 338.17,
+      "daily_trades_count": 9,
+      "daily_base_token_volume": 5.5165,
+      "daily_quote_token_volume": 1862.245769,
+      "daily_price_low": 336.99,
+      "daily_price_high": 338.54,
+      "daily_price_change": 0.3144374239862359,
+      "daily_chart": {}
+    }
+  ]
+}

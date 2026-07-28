@@ -10,7 +10,7 @@ describe("buildVersionInfo (public-safe base /version shape)", () => {
     expect(buildVersionInfo({ chainId: 46630, transport: "x" }).chainId).toBe(46630);
 
     expect(v.toolCount).toBe(HISS_TOOLS.length);
-    expect(v.toolCount).toBe(33);
+    expect(v.toolCount).toBe(39);
     expect(v.toolsetHash).toBe(computeToolsetHash().hash);
     expect(v.toolNames).toEqual(HISS_TOOLS.map((t) => t.name).sort());
     expect(v.server).toEqual({ name: "hiss-finance", version: "0.1.0" });

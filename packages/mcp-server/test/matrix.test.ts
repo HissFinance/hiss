@@ -29,18 +29,22 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { callHissTool } from "../src/server.js";
-import { HISS_TOOLS, STOCK_PREMIUM_TOOLS, getTool } from "../src/tools.js";
+import { HISS_TOOLS, STOCK_PREMIUM_TOOLS, LIGHTER_TOOLS, getTool } from "../src/tools.js";
 import { computeToolsetHash } from "../src/lib/toolset-hash.js";
 import { buildVersionInfo } from "../src/lib/version-info.js";
 import { mockClient, VALID_VAULT_MANIFEST, VALID_COIL_MANIFEST } from "./helpers/mockClient.js";
 import { STOCK_PREMIUM_ARGS, STOCK_PREMIUM_NEGATIVE } from "./helpers/stockPremiumArgs.js";
+import { lighterFixtureClient } from "./helpers/lighterFixtureClient.js";
 import { startTestServer, mcpCall, toolsCall, type RunningHttp } from "./helpers/httpHarness.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { JsonRecord } from "../src/lib/types.js";
 
 const FIXED_NOW = "2026-07-24T00:00:00.000Z";
-const deps = { client: mockClient(), nowIso: () => FIXED_NOW };
+const deps = { client: mockClient(), nowIso: () => FIXED_NOW, lighter: lighterFixtureClient() };
 const ADDR = "0x1111111111111111111111111111111111111111";
+// Fixed GTT expiry (inside [5min,30d] of FIXED_NOW) so the prepared order intent
+// is clock-stable for stdio≡HTTP parity.
+const LIGHTER_GTT_EXPIRY = new Date("2026-07-25T00:00:00.000Z").getTime();
 
 // The five Stock-Premium READ tools that must be LIVE|DEGRADED (never DEMO) in
 // production. Here (self-contained fixture engine) they report DEMO.
@@ -82,6 +86,22 @@ const POSITIVE: Record<string, JsonRecord> = {
   // compile_coil pins nowIso so its hash-stamped output is clock-stable for parity.
   hiss_compile_coil: { manifest: VALID_COIL_MANIFEST, nowIso: FIXED_NOW },
   ...STOCK_PREMIUM_ARGS,
+  // Lighter (AAPL/USDG market 2049 is in the fixtures; prepares use the fixed clock).
+  hiss_lighter_markets: {},
+  hiss_lighter_orderbook: { ticker: "AAPL" },
+  hiss_lighter_depth: { ticker: "AAPL" },
+  hiss_lighter_prepare_order: {
+    ticker: "AAPL",
+    side: "buy",
+    size: "1.0000",
+    price: "339.50",
+    orderType: "LIMIT",
+    timeInForce: "GOOD_TILL_TIME",
+    clientOrderIndex: 1,
+    expiryMs: LIGHTER_GTT_EXPIRY,
+  },
+  hiss_lighter_prepare_cancel: { ticker: "AAPL", orderIndex: "12345" },
+  hiss_lighter_prepare_modify: { ticker: "AAPL", orderIndex: "12345", newPrice: "339.40" },
 };
 
 /** One malformed vector per base tool (Stock-Premium negatives are imported). */
@@ -109,6 +129,21 @@ const NEGATIVE: Record<string, JsonRecord> = {
   hiss_validate_coil: { manifest: 42 },
   hiss_compile_coil: { manifest: { schema: "coil-manifest-1.0.0" } },
   ...Object.fromEntries(Object.entries(STOCK_PREMIUM_NEGATIVE).map(([k, v]) => [k, v[0]!])),
+  // Lighter negatives: missing selector / bad enum / malformed order index / no-op modify.
+  hiss_lighter_markets: { stockTokensOnly: "yes" },
+  hiss_lighter_orderbook: {},
+  hiss_lighter_depth: { marketId: "AAPL" },
+  hiss_lighter_prepare_order: {
+    ticker: "AAPL",
+    side: "hodl",
+    size: "1",
+    price: "1",
+    orderType: "LIMIT",
+    timeInForce: "POST_ONLY",
+    clientOrderIndex: 1,
+  },
+  hiss_lighter_prepare_cancel: { ticker: "AAPL", orderIndex: "not-numeric" },
+  hiss_lighter_prepare_modify: { ticker: "AAPL", orderIndex: "12345" },
 };
 
 // ---------------------------------------------------------------------------
@@ -309,8 +344,9 @@ describe("§23 toolset identity", () => {
     expect(toolset.toolCount).toBe(HISS_TOOLS.length);
     expect(version.toolCount).toBe(HISS_TOOLS.length);
     expect(version.toolsetHash).toBe(toolset.hash);
-    expect(HISS_TOOLS.length - STOCK_PREMIUM_TOOLS.length).toBe(22);
+    expect(HISS_TOOLS.length - STOCK_PREMIUM_TOOLS.length - LIGHTER_TOOLS.length).toBe(22);
     expect(STOCK_PREMIUM_TOOLS.length).toBe(11);
+    expect(LIGHTER_TOOLS.length).toBe(6);
   });
 
   it("tools/list over HTTP advertises exactly the registered tools", async () => {
@@ -343,8 +379,8 @@ describe("§23 matrix: every registered tool is green on every dimension", () =>
 
   it("every tx-producing prepare carries the unsigned / not-sent invariants", () => {
     const txPrepares = rows.filter((x) => x.kind === "prepare" && x.prepareInvariants !== "n/a");
-    // The 6 base tx prepares + the 5 Stock-Premium lp_prepare_* = 11 tx-producing.
-    expect(txPrepares.length).toBe(11);
+    // 6 base tx prepares + 5 Stock-Premium lp_prepare_* + 3 Lighter prepares = 14.
+    expect(txPrepares.length).toBe(14);
     for (const r of txPrepares) expect(r.prepareInvariants, r.tool).toBe(true);
   });
 

@@ -2,6 +2,7 @@ import type { AddressInfo } from "node:net";
 import { request as httpRequest } from "node:http";
 import { createHttpServer, type HttpServerOverrides } from "../../src/bin/http.js";
 import { mockClient } from "./mockClient.js";
+import { lighterFixtureClient } from "./lighterFixtureClient.js";
 import type { JsonRecord } from "../../src/lib/types.js";
 
 export interface RunningHttp {
@@ -14,6 +15,9 @@ export interface RunningHttp {
 export async function startTestServer(overrides: HttpServerOverrides = {}): Promise<RunningHttp> {
   const { httpServer } = createHttpServer({
     client: mockClient(),
+    // Deterministic, offline Lighter READ client so HTTP tool results are
+    // fixture-backed (no network) and byte-identical to the stdio path.
+    lighter: lighterFixtureClient(),
     logger: () => {},
     ...overrides,
   });

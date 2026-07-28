@@ -42,6 +42,7 @@ import { createHash } from "node:crypto";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createServer } from "../server.js";
 import { createHissClient } from "../lib/client.js";
+import type { LighterReadClient } from "../lib/lighter/index.js";
 import { checkRpcReadiness, type ReadinessResult } from "../lib/readiness.js";
 import { buildVersionInfo } from "../lib/version-info.js";
 import { SERVER_NAME } from "../server.js";
@@ -227,6 +228,12 @@ async function withDeadline<T>(promise: Promise<T>, ms: number): Promise<T | typ
 export interface HttpServerOverrides {
   /** Injected read/prepare client (tests). Defaults to one built from env. */
   client?: HissClient;
+  /**
+   * Injected Lighter READ client (tests). Defaults to undefined, in which case
+   * the Lighter tools build a `fetch`-backed client over the public Lighter REST
+   * API. HISS holds no Lighter key regardless.
+   */
+  lighter?: LighterReadClient;
   /** Config overrides merged over the env-resolved config (tests). */
   config?: Partial<HttpConfig>;
   /** Readiness probe override (tests). Defaults to a live RPC eth_chainId read. */
@@ -360,7 +367,7 @@ export function createHttpServer(overrides: HttpServerOverrides = {}): HttpServe
 
     void (async () => {
       // Stateless: fresh Server + transport per request, torn down on close.
-      const server = createServer({ client, nowIso: overrides.nowIso });
+      const server = createServer({ client, nowIso: overrides.nowIso, lighter: overrides.lighter });
       const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
       res.on("close", () => {
         void transport.close();
