@@ -11,6 +11,72 @@ commit in this repository. Pin to a tag for stability.
 
 Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADMAP.md).
 
+### `@hiss-finance/cli` 0.2.0 — world-class terminal
+
+A ground-up terminal-experience overhaul for the `hiss` CLI. **Two behavior
+changes are breaking for scripts** — read the migration notes.
+
+#### Added
+
+- **Global output-mode system.** One resolver turns `--output human|json|plain`
+  (with `--json` / `--plain` shorthands), `--color auto|always|never`,
+  `--unicode auto|always|never`, `--quiet`, and `--verbose` into a single
+  output context. `json` and `plain` are **always** ANSI-free; `human` uses
+  semantic color + Unicode only on a capable interactive TTY. `NO_COLOR` is
+  respected in `auto` (an explicit `--color always` is the one intentional
+  override). Diagnostics and the `--verbose` line go to **stderr**; stdout stays
+  clean and pipeable.
+- **New command families:** `mcp status|tools|doctor` (inspect the hosted HISS
+  MCP server), `lp …` (Stock-Premium LP manager records; inert/paused surfaces
+  report `UNKNOWN` rather than fabricate), and `agentic status|setup|coils|
+grants|receipts` (informational control-plane orientation, no credential
+  request). Richer `vault`, `stake`, `rewards`, `coil`, `receipt`, and `skill`
+  views with a shared component library (tables, panels, fuse/coverage,
+  key-value, evidence).
+- **Defense-in-depth output redaction.** Every rendered line — including the
+  `--verbose` stderr diagnostic — is passed through a label-based redactor, so a
+  secret that reaches an output string (e.g. `--rpc-url` userinfo
+  `scheme://user:pass@host`) is masked to `[redacted]` while public identifiers
+  (addresses, tx hashes, the `HISS` token symbol) are preserved verbatim.
+- **Quality/accessibility matrix** (264 tests): per-command golden snapshots in
+  human/json/plain, exit-code regression matrix, color/Unicode independence,
+  strict-ASCII PLAIN, redaction, width/wrapping, and streaming purity.
+
+#### Changed (behavior — breaking for scripts)
+
+- **Exit-code taxonomy `0–7`.** Previously the CLI emitted only `0` (any
+  rendered result, **including** business INVALID/FAILED/refusal) and `1` (any
+  thrown error). It now uses a stable set: `0` success · `1` general · `2` usage
+  (incl. malformed JSON / credential-shaped field) · `3` config (missing
+  file/rpc/chain) · `4` network · `5` policy/refusal · `6` verification-failed ·
+  `7` partial/unknown.
+  **Migration:** business fail-closed outcomes now exit **non-zero** —
+  `vault validate` INVALID → `6`, `coil validate` INVALID → `6`,
+  `receipt verify` FAILED → `6`, `coil compile` refusal → `5`,
+  `vault prepare-create` refusal → `5`, `skill print` not-found → `7`,
+  `lp scan`/`pools`/`positions` UNKNOWN → `7`. Scripts that treated exit `0` as
+  "the check passed" must now branch on the specific code. The rendered
+  human/JSON **text is unchanged**; only the process exit code moved.
+- **JSON envelope (`--json`).** Machine output is now a stable envelope: on
+  success `{ cliVersion, code, command, data, ok, summary }` with the command
+  payload under **`.data`** and `ok === (code === 0)`; on a thrown fault
+  `{ cliVersion, code, error: { code, kind, message }, ok:false }`.
+  **Migration:** the command payload moved to `.data` (was the bare payload) and
+  now carries `ok`/`code`. Update `jq` filters from `.field` to `.data.field`,
+  and branch on `.ok` / `.code`. Errors expose `.error` instead of
+  `.data`/`.summary`.
+- **`hiss --version` reports `0.2.0`** (package + `CLI_VERSION` aligned; the
+  JSON envelope's `cliVersion` follows).
+
+#### Fixed
+
+- **`--verbose` no longer leaks RPC credentials.** The verbose stderr diagnostic
+  wrote the raw `--rpc-url`; a URL carrying `user:pass@` userinfo leaked the
+  password. The diagnostic is now routed through the redactor (host preserved,
+  secret masked), with a process-level regression test.
+- Golden snapshots are hermetic (no absolute build path in `skill` output
+  snapshots); intentionally-malformed test fixture excluded from formatting.
+
 ### Added
 
 - **MCP contract-registry object shape, `DEGRADED` read mode, and `/version`

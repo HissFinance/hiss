@@ -9,3 +9,7 @@ pnpm-lock.yaml
 contracts/abi/
 contracts/out/
 *.min.js
+
+# Intentionally-malformed JSON fixture — exercises the CLI's bad-JSON exit path;
+# it is not valid JSON and must not be reformatted.
+packages/cli/test/fixtures/malformed.json

@@ -1,0 +1,2167 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > agentic.coils 1`] = `
+"Coils compile deterministically to plans. Use \`hiss coil validate\` then \`hiss coil compile\`.
+Coil execution modes
+Mode:    paper_only
+Meaning: research/backtest posture — nothing leaves the machine
+State:   paper
+
+Mode:    preview_only
+Meaning: compile + preview an intent — no order path
+State:   info
+
+Mode:    human_confirm
+Meaning: prepared intents require explicit human confirmation
+State:   ready
+
+Mode:    agentic_mcp_enabled
+Meaning: user-side MCP execution posture (user runtime only)
+State:   info
+┌───────────────────────────────────────────────────────────────────────────────
+│ A compiled coil is a plan (a hash), not an order. Fuses are binding and may   
+│ never be bypassed.                                                            
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > agentic.grants 1`] = `
+"Capability families are declared, not active — this CLI grants read + prepare only, never execution.
+Capability families
+Family             Meaning                                       State   
+─────────────────────────────────────────────────────────────────────────
+read.protocol      read chain + protocol state                   ready   
+read.vaults        read vault state, holdings, performance       ready   
+prepare.vault      build UNSIGNED vault create/deposit/withdraw  prepared
+prepare.stake      build UNSIGNED xHISS stake/cooldown/redeem    prepared
+coil.compile       compile coil plans locally (deterministic)    ready   
+execute.brokerage  place brokerage orders                        blocked 
+┌───────────────────────────────────────────────────────────────────────────────
+│ This CLI exposes read + prepare families only.                                
+│ execute.brokerage is never granted by HISS; it belongs to your own RH Trading 
+│ MCP runtime.                                                                  
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > agentic.receipts 1`] = `
+"Verify a receipt's integrity locally with \`hiss receipt verify\` — a missing stage is never implied as done.
+compilation — a coil/intent is compiled to a deterministic plan hash
+authorization — the plan is authorized by its policy/fuses (still a plan)
+submission — a stage that only YOUR wallet/runtime can perform
+settlement — recorded only from a verified on-chain receipt
+reconciliation — settlement reconciled against the plan
+┌───────────────────────────────────────────────────────────────────────────────
+│ Verify a receipt's integrity with \`hiss receipt verify\`.                      
+│ A stage without proof is shown as pending — never implied to have occurred.   
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > agentic.setup 1`] = `
+"Agentic setup: connect the HISS MCP for read/prepare; run the RH Trading MCP in your own runtime.
+1. Connect the HISS MCP (read + prepare): point your agent client at
+https://mcp.hiss.finance/mcp.
+2. Verify it with \`hiss mcp doctor\`.
+3. For brokerage actions, run the Robinhood Trading MCP in YOUR OWN runtime and
+follow its own auth flow.
+4. HISS never brokers that credential — it only prepares unsigned chain
+transactions for you to review.
+┌─ No credential is ever requested ─────────────────────────────────────────────
+│ HISS does not ask for, store, or forward any brokerage credential or private  
+│ key.                                                                          
+│ The Robinhood Trading MCP authenticates entirely inside your own agent        
+│ runtime.                                                                      
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > agentic.status 1`] = `
+"Agentic control-plane status: prepare-only authority, user-side execution, no custody.
+Agentic control plane
+Chain:               4663
+HISS MCP:            https://mcp.hiss.finance
+Execution authority: prepare-only (unsigned)
+RH Trading MCP:      user runtime (READY_TO_CONNECT)
+Default posture:     RESEARCH / PAPER
+Custody:             none (HISS never holds keys)
+Execution boundary
+Fuse:     HISS signs a transaction
+Result:   ✓ PASS
+Current:  never
+Limit:    UNKNOWN
+Reason:   UNKNOWN
+Evidence: UNKNOWN
+
+Fuse:     HISS requests a credential
+Result:   ✓ PASS
+Current:  never
+Limit:    UNKNOWN
+Reason:   UNKNOWN
+Evidence: UNKNOWN
+
+Fuse:     Order placement is user-side
+Result:   ✓ PASS
+Current:  user runtime
+Limit:    UNKNOWN
+Reason:   UNKNOWN
+Evidence: UNKNOWN
+
+Fuse:     Kill / pause available
+Result:   ✓ PASS
+Current:  user-controlled
+Limit:    UNKNOWN
+Reason:   UNKNOWN
+Evidence: UNKNOWN
+┌─ Boundary ────────────────────────────────────────────────────────────────────
+│ HISS reads state and prepares UNSIGNED transactions. It never signs, submits, 
+│ or holds keys.                                                                
+│ The Robinhood Trading MCP runs in YOUR agent runtime; HISS never sees or      
+│ requests a brokerage credential.                                              
+│ Brokerage order placement, confirmation, and custody are entirely user-side.  
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > coil.compile.ok 1`] = `
+"Compiled coil "Momentum Demo Coil" — hash 0xe13bbf82a8d66d211fd4cba638c951fa6ade25419d982b2947996ccad29b73a0. This is a plan, not an executed order.
+Compiled coil "Momentum Demo Coil"
+Identity:  Momentum Demo Coil
+Schema:    coil-compiled-1.0.0
+Universe:  3 instrument(s)
+Rules:     2
+Coil hash: 0xe13bbf82a8d66d211fd4cba638c951fa6ade25419d982b2947996ccad29b73a0
+Execution: plan only — no order
+Risk-fuse coverage
+Fuse                 Result  Current    Limit  Reason   Evidence
+────────────────────────────────────────────────────────────────
+maxPositionBps       ✓ PASS  UNKNOWN  UNKNOWN  UNKNOWN  UNKNOWN 
+maxGrossExposureBps  ✓ PASS  UNKNOWN  UNKNOWN  UNKNOWN  UNKNOWN 
+allowShorting        ✓ PASS  UNKNOWN  UNKNOWN  UNKNOWN  UNKNOWN 
+┌───────────────────────────────────────────────────────────────────────────────
+│ This is a plan (a deterministic hash), not an order. Risk fuses are binding   
+│ and may never be bypassed.                                                    
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > coil.compile.refused 1`] = `
+"Refusing to compile: coil manifest INVALID (4 issue(s)).
+■ REFUSED • manifest INVALID — nothing compiled
+Validation issues
+Code:    NAME_REQUIRED
+Path:    name
+Message: A non-empty coil name is required.
+
+Code:    UNIVERSE_INVALID
+Path:    universe
+Message: universe must be a non-empty array of instrument symbols.
+
+Code:    RULES_REQUIRED
+Path:    rules
+Message: rules must be a non-empty array.
+
+Code:    FUSES_REQUIRED
+Path:    fuses
+Message: A fuses object is required — risk fuses are mandatory.
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > coil.validate.invalid 1`] = `
+"Coil manifest INVALID: 4 issue(s).
+✗ INVALID — 4 issue(s) • coil-manifest-1.0.0
+Validation issues
+Code:    NAME_REQUIRED
+Path:    name
+Message: A non-empty coil name is required.
+
+Code:    UNIVERSE_INVALID
+Path:    universe
+Message: universe must be a non-empty array of instrument symbols.
+
+Code:    RULES_REQUIRED
+Path:    rules
+Message: rules must be a non-empty array.
+
+Code:    FUSES_REQUIRED
+Path:    fuses
+Message: A fuses object is required — risk fuses are mandatory.
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > coil.validate.valid 1`] = `
+"Coil manifest VALID (coil-manifest-1.0.0).
+✓ VALID • coil-manifest-1.0.0
+┌───────────────────────────────────────────────────────────────────────────────
+│ Universe, rules, and mandatory risk fuses (maxPositionBps,                    
+│ maxGrossExposureBps, allowShorting) are present.                              
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > contracts 1`] = `
+"Contract registry: 3 entries.
+Contract registry
+Contract      Address                                   
+────────────────────────────────────────────────────────
+hissToken     0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3
+vaultFactory  0x278d237c6890a5f7101296a9021ed9D26c821810
+treasurySafe  0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > lp.fees 1`] = `
+"LP management fee is 500 bps (immutable max 500 bps) on realized LP fees.
+LP management fee
+Fee policy:           HISS_LP_MANAGEMENT_FEE_V1
+Management fee (bps): 500
+Immutable max (bps):  500
+Applies to:           realized LP fees only
+Treasury:             0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+┌───────────────────────────────────────────────────────────────────────────────
+│ The fee is charged on realized LP fees only. Not a yield, not an APY, not a   
+│ forecast.                                                                     
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > lp.prepare-mint.unavailable 1`] = `
+"LP prepare-mint is not available in this build. Nothing was prepared and nothing was sent.
+┌─ LP prepare-mint unavailable ─────────────────────────────────────────────────
+│ The public SDK does not expose LP prepare-mint in this build.                 
+│ No unsigned transaction was produced (signed:false, nothing sent).            
+│ HissLpManagerV1 is LAUNCHED PAUSED (inert): no positions are enrollable and no
+│ fee is charged. Live pause/fee/owner/treasury are always a fresh chain read — 
+│ a failed read is UNKNOWN, never 'live' and never 'not deployed'.              
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > lp.scan.unknown 1`] = `
+"LP scan is UNKNOWN in this build — HissLpManagerV1 is DEPLOYED_PAUSED and no public read surface for scan ships here.
+? LP SCAN UNKNOWN • manager DEPLOYED_PAUSED — live read via hosted MCP
+┌─ Not available in this build ─────────────────────────────────────────────────
+│ HissLpManagerV1 is LAUNCHED PAUSED (inert): no positions are enrollable and no
+│ fee is charged. Live pause/fee/owner/treasury are always a fresh chain read — 
+│ a failed read is UNKNOWN, never 'live' and never 'not deployed'.              
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > lp.status 1`] = `
+"Stock-Premium LP manager HissLpManagerV1 is DEPLOYED_PAUSED on chain 4663.
+Stock-Premium LP — HissLpManagerV1
+Contract:                 HissLpManagerV1
+Address:                  0xBE5989a38953D8148B74d45eE6DEB127a32567E0
+Chain:                    4663
+Artifact status:          DEPLOYED_PAUSED
+Explorer verified:        true
+Owner (expected):         0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+Treasury (expected):      0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+Fee policy:               HISS_LP_MANAGEMENT_FEE_V1
+Fee (bps):                500
+Max fee (bps, immutable): 500
+Ⅱ DEPLOYED_PAUSED • inert — nothing enrollable
+┌───────────────────────────────────────────────────────────────────────────────
+│ HissLpManagerV1 is LAUNCHED PAUSED (inert): no positions are enrollable and no
+│ fee is charged. Live pause/fee/owner/treasury are always a fresh chain read — 
+│ a failed read is UNKNOWN, never 'live' and never 'not deployed'.              
+│ Explorer:                                                                     
+│ https://robinhoodchain.blockscout.com/address/0xBE5989a38953D8148B74d45eE6DEB1
+│ 27a32567E0                                                                    
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > mcp.doctor.down 1`] = `
+"HISS MCP doctor: https://mcp.example.test is unreachable — every check is UNKNOWN.
+HISS MCP doctor — https://mcp.example.test
+Fuse:     GET /version (introspection)
+Result:   ? UNKNOWN
+Current:  no response
+Limit:    UNKNOWN
+Reason:   UNKNOWN
+Evidence: UNKNOWN
+
+Fuse:     GET /healthz (liveness)
+Result:   ? UNKNOWN
+Current:  no response
+Limit:    UNKNOWN
+Reason:   UNKNOWN
+Evidence: UNKNOWN
+
+Fuse:     GET /readyz (RPC + chain match)
+Result:   ? UNKNOWN
+Current:  no response
+Limit:    UNKNOWN
+Reason:   UNKNOWN
+Evidence: UNKNOWN
+Chain:        UNKNOWN
+Tool count:   UNKNOWN
+Toolset hash: UNKNOWN
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > mcp.doctor.healthy 1`] = `
+"HISS MCP doctor: all 3 checks pass at https://mcp.example.test.
+HISS MCP doctor — https://mcp.example.test
+Fuse                             Result   Current    Limit  Reason   Evidence
+─────────────────────────────────────────────────────────────────────────────
+GET /version (introspection)     ✓ PASS  HTTP 200  UNKNOWN  UNKNOWN  UNKNOWN 
+GET /healthz (liveness)          ✓ PASS  HTTP 200  UNKNOWN  UNKNOWN  UNKNOWN 
+GET /readyz (RPC + chain match)  ✓ PASS  HTTP 200  UNKNOWN  UNKNOWN  UNKNOWN 
+Chain:        4663
+Tool count:   33
+Toolset hash: 0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > mcp.status.down 1`] = `
+"HISS MCP status is UNKNOWN — https://mcp.example.test did not respond.
+HISS MCP (hosted)
+Endpoint:     https://mcp.example.test
+MCP path:     https://mcp.example.test/mcp
+Transport:    UNKNOWN
+Chain:        UNKNOWN
+Server:       UNKNOWN
+Version:      UNKNOWN
+Tool count:   UNKNOWN
+Toolset hash: UNKNOWN
+Source SHA:   UNKNOWN
+Public SHA:   UNKNOWN
+? Health UNKNOWN • GET /healthz unreachable
+? Readiness UNKNOWN • GET /readyz unreachable (UNKNOWN)
+┌─ Endpoint unreachable ────────────────────────────────────────────────────────
+│ Could not reach the hosted MCP introspection endpoints — reporting UNKNOWN,   
+│ not a claim.                                                                  
+│ Detail: getaddrinfo ENOTFOUND mcp.hiss.finance                                
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > mcp.status.healthy 1`] = `
+"HISS MCP status read from https://mcp.example.test.
+HISS MCP (hosted)
+Endpoint:     https://mcp.example.test
+MCP path:     https://mcp.example.test/mcp
+Transport:    http
+Chain:        4663
+Server:       hiss-mcp
+Version:      1.2.3
+Tool count:   33
+Toolset hash: 0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd
+Source SHA:   deadbeef
+Public SHA:   cafebabe
+● Health LIVE • GET /healthz -> 200
+● Readiness LIVE • GET /readyz -> 200
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > mcp.tools.healthy 1`] = `
+"HISS MCP serves 33 tool(s) (toolset 0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd).
+HISS MCP toolset
+Endpoint:     https://mcp.example.test
+Tool count:   33
+Toolset hash: 0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd
+Chain:        4663
+┌───────────────────────────────────────────────────────────────────────────────
+│ The server did not enumerate tool names in /version.                          
+│ List them over the MCP protocol: POST https://mcp.example.test/mcp            
+│ (tools/list).                                                                 
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > receipt.verify.failed 1`] = `
+"Receipt verification FAILED: 1 issue(s).
+✗ FAILED — 1 issue(s)
+┌─ Verification issues ─────────────────────────────────────────────────────────
+│ Hash mismatch: recomputed canonical hash does not match the stated hash.      
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > receipt.verify.verified 1`] = `
+"Receipt integrity VERIFIED.
+Integrity
+○ PREPARATION • prepared only — not an executed action
+Canonical hash: 0xcaf148cbe2e70fb008e653ca7ca3ffc46365e3f1a515f13f9cf31de081427975
+┌───────────────────────────────────────────────────────────────────────────────
+│ No on-chain proof attached — this is an integrity record, not settlement. No  
+│ later stage is implied.                                                       
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > rewards.contributor 1`] = `
+"Vault-contributor reward status read for 0x1111111111111111111111111111111111111111.
+Account: 0x1111111111111111111111111111111111111111
+┌───────────────────────────────────────────────────────────────────────────────
+│ The vault-contributor distributor recipient may be null (undeployed) — nothing
+│ is claimable against null.                                                    
+│ Read-only report. planned ≠ funded ≠ claimable. Not a performance claim;      
+│ historical fee distributions are not forecasts.                               
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > rewards.provider 1`] = `
+"Provider reward status read for group group-1.
+Group: group-1
+┌───────────────────────────────────────────────────────────────────────────────
+│ Eligibility is facts-only — never PnL, APY, rank, or return-shaped inputs.    
+│ Read-only report. planned ≠ funded ≠ claimable. Not a performance claim;      
+│ historical fee distributions are not forecasts.                               
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > rewards.status 1`] = `
+"Reward status read.
+Planned split (HISS_REWARD_METHOD_V2)
+Leg                           Share
+───────────────────────────────────
+xHISS stakers                   50%
+Vault providers                 15%
+Vault contributors              15%
+Treasury                        10%
+Economic burn (dead address)    10%
+Funding (separate from the plan)
+Planned:   yes (split constants above)
+Funded:    false
+Claimable: UNKNOWN
+┌───────────────────────────────────────────────────────────────────────────────
+│ Read-only report. planned ≠ funded ≠ claimable. Not a performance claim;      
+│ historical fee distributions are not forecasts.                               
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > skill.list 1`] = `
+"2 skill packs found.
+Skill packs
+Pack       
+───────────
+demo-pack  
+second-pack
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > skill.print.found 1`] = `
+"Skill pack "demo-pack" (90 bytes).
+  # Demo Skill Pack
+
+This is a deterministic fixture skill pack used by the CLI test suite.
+
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > skill.print.notfound 1`] = `
+"Skill pack "does-not-exist" not found.
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > stake.cooldown 1`] = `
+"Prepared an UNSIGNED cooldown for 500 xHISS. Nothing was sent.
+Transaction review
+○ UNSIGNED • review it, then submit with your own wallet — nothing was sent
+Chain:    4663
+Target:   0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Function: startCooldown
+Value:    0 wei
+UNSIGNED — review and submit with your own wallet. Nothing was sent.
+xHISS:    500 xHISS
+Cooldown: 72h (259200s), then a 2-day redeem window
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > stake.prepare 1`] = `
+"Prepared an UNSIGNED stake of 1000 HISS. Nothing was sent.
+Transaction review
+○ UNSIGNED • review it, then submit with your own wallet — nothing was sent
+Chain:    4663
+Target:   0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Function: stake
+Value:    0 wei
+UNSIGNED — review and submit with your own wallet. Nothing was sent.
+Amount:            1000 HISS
+Required approval: ERC-20 approve(xHISS vault, amount) before staking
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > stake.redeem 1`] = `
+"Prepared an UNSIGNED xHISS redeem within your open redeem window. Nothing was sent.
+Transaction review
+○ UNSIGNED • review it, then submit with your own wallet — nothing was sent
+Chain:    4663
+Target:   0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Function: redeem
+Value:    0 wei
+UNSIGNED — review and submit with your own wallet. Nothing was sent.
+┌───────────────────────────────────────────────────────────────────────────────
+│ Redeem is only valid within an open redeem window. Exits are never pausable.  
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > stake.status 1`] = `
+"xHISS staking status read.
+● xHISS ACTIVE • live chain read · exits are never pausable
+xHISS staking
+xHISS vault:   0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be
+Staking asset: HISS
+Cooldown:      72h (259200s), then a 2-day redeem window
+┌───────────────────────────────────────────────────────────────────────────────
+│ Not a performance claim.                                                      
+│ Historical fee distributions are not forecasts.                               
+│ No known unresolved Critical or High findings after internal launch review.   
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > status.degraded 1`] = `
+"HISS Finance status read from robinhood-chain-mainnet.
+◐ RPC DEGRADED • chain 4663
+HISS Finance status
+Network: robinhood-chain-mainnet
+Chain:   4663
+RPC:     DEGRADED
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > status.success 1`] = `
+"HISS Finance status read from robinhood-chain-mainnet.
+● RPC LIVE • chain 4663
+HISS Finance status
+Network:        robinhood-chain-mainnet
+Chain:          4663
+RPC:            LIVE
+Block:          123456789
+RPC URL:        https://rpc.example.invalid
+Token:          HISS 0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3
+Vaults tracked: 2
+Treasury Safe:  0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.create 1`] = `
+"Vault creation is a two-step, key-free flow: \`vault validate\` then \`vault prepare-create\`.
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.holdings 1`] = `
+"Holdings read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6.
+Vault:  0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Source: onchain
+Holdings (live chain read)
+Asset        Symbol                         Balance
+───────────────────────────────────────────────────
+0x4716…eBa3  HISS     1,000,000,000,000,000,000,000
+0xb3b6…7D10  UNKNOWN                        UNKNOWN
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.inspect 1`] = `
+"Vault flagship inspected.
+● Deposits ACTIVE • live chain read
+Vault flagship
+Name:       HISS Vault
+Address:    0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Base asset: USDG
+Deposits:   ACTIVE
+┌───────────────────────────────────────────────────────────────────────────────
+│ Deposit state is a live chain read: planned != open != funded.                
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.list 1`] = `
+"2 vaults on Robinhood Chain.
+Vaults on Robinhood Chain
+Vault      Address                                     State 
+─────────────────────────────────────────────────────────────
+flagship   0x6d962604df1c6c5ef4b59d88863600fe71bb63e6  ACTIVE
+usdg-demo  0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10  PAUSED
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.performance 1`] = `
+"Historical performance read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Not a forecast; not a performance claim.
+Vault performance (point-in-time read)
+Vault:           0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Price per share: 1000000000000000000
+┌───────────────────────────────────────────────────────────────────────────────
+│ Price-per-share is a live chain read, not a return or forecast.               
+│ Not a forecast; not a performance claim.                                      
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.prepare-create.ok 1`] = `
+"Prepared an UNSIGNED vault-creation transaction. Nothing was sent.
+Transaction review
+○ UNSIGNED • review it, then submit with your own wallet — nothing was sent
+Chain:    4663
+Target:   0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Function: createVault
+Value:    0 wei
+UNSIGNED — review and submit with your own wallet. Nothing was sent.
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.prepare-create.refused 1`] = `
+"Refusing to prepare: manifest INVALID (8 issue(s)).
+■ REFUSED • manifest INVALID — nothing prepared
+Validation issues
+Code:    CHAIN_NOT_ROBINHOOD
+Path:    chainId
+Message: Vault chain must be Robinhood Chain (4663 or 46630). Base is never a vault chain.
+
+Code:    BASE_ASSET_INVALID
+Path:    baseAsset
+Message: Base asset must be USDG.
+
+Code:    ALLOWED_ASSETS_INVALID
+Path:    allowedAssets
+Message: allowedAssets must be a non-empty array of source-verified asset symbols.
+
+Code:    FEE_OUT_OF_BOUNDS
+Path:    fees.managementBps
+Message: fees.managementBps must be an integer bps in [0, 500].
+
+Code:    FEE_MISSING
+Path:    fees.performanceBps
+Message: fees.performanceBps is required.
+
+Code:    CREATOR_ADDRESS_INVALID
+Path:    creator.address
+Message: creator.address must be a 0x-prefixed 20-byte address.
+
+Code:    CREATOR_SKIN_REQUIRED
+Path:    creator.skinInGameUsdg
+Message: creator.skinInGameUsdg must be greater than 0 (creator skin-in-the-game is mandatory).
+
+Code:    REBALANCE_FUSES_REQUIRED
+Path:    rebalance.fuses
+Message: rebalance.fuses is required.
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.prepare-deposit 1`] = `
+"Prepared an UNSIGNED deposit of 1000 USDG to 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent.
+Transaction review
+○ UNSIGNED • review it, then submit with your own wallet — nothing was sent
+Chain:    4663
+Target:   0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Function: deposit
+Value:    0 wei
+UNSIGNED — review and submit with your own wallet. Nothing was sent.
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.prepare-withdraw 1`] = `
+"Prepared an UNSIGNED withdrawal of 50 shares from 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent.
+Transaction review
+○ UNSIGNED • review it, then submit with your own wallet — nothing was sent
+Chain:    4663
+Target:   0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Function: withdraw
+Value:    0 wei
+UNSIGNED — review and submit with your own wallet. Nothing was sent.
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.validate.invalid 1`] = `
+"Vault manifest INVALID: 8 issue(s).
+✗ INVALID — 8 issue(s) • vault-manifest-1.0.0
+Validation issues
+Code:    CHAIN_NOT_ROBINHOOD
+Path:    chainId
+Message: Vault chain must be Robinhood Chain (4663 or 46630). Base is never a vault chain.
+
+Code:    BASE_ASSET_INVALID
+Path:    baseAsset
+Message: Base asset must be USDG.
+
+Code:    ALLOWED_ASSETS_INVALID
+Path:    allowedAssets
+Message: allowedAssets must be a non-empty array of source-verified asset symbols.
+
+Code:    FEE_OUT_OF_BOUNDS
+Path:    fees.managementBps
+Message: fees.managementBps must be an integer bps in [0, 500].
+
+Code:    FEE_MISSING
+Path:    fees.performanceBps
+Message: fees.performanceBps is required.
+
+Code:    CREATOR_ADDRESS_INVALID
+Path:    creator.address
+Message: creator.address must be a 0x-prefixed 20-byte address.
+
+Code:    CREATOR_SKIN_REQUIRED
+Path:    creator.skinInGameUsdg
+Message: creator.skinInGameUsdg must be greater than 0 (creator skin-in-the-game is mandatory).
+
+Code:    REBALANCE_FUSES_REQUIRED
+Path:    rebalance.fuses
+Message: rebalance.fuses is required.
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.validate.valid 1`] = `
+"Vault manifest VALID (vault-manifest-1.0.0).
+✓ VALID • vault-manifest-1.0.0
+┌───────────────────────────────────────────────────────────────────────────────
+│ Robinhood Chain, USDG base, fees in bounds, creator skin present, rebalance   
+│ fuses set.                                                                    
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > agentic.coils 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "agentic.coils",
+  "data": {
+    "compile": "hiss coil compile <manifest.json>",
+    "executionModes": [
+      {
+        "meaning": "research/backtest posture — nothing leaves the machine",
+        "mode": "paper_only"
+      },
+      {
+        "meaning": "compile + preview an intent — no order path",
+        "mode": "preview_only"
+      },
+      {
+        "meaning": "prepared intents require explicit human confirmation",
+        "mode": "human_confirm"
+      },
+      {
+        "meaning": "user-side MCP execution posture (user runtime only)",
+        "mode": "agentic_mcp_enabled"
+      }
+    ],
+    "note": "A compiled coil is a plan, not an order. Risk fuses are binding and may never be bypassed."
+  },
+  "ok": true,
+  "summary": "Coils compile deterministically to plans. Use \`hiss coil validate\` then \`hiss coil compile\`."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > agentic.grants 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "agentic.grants",
+  "data": {
+    "families": [
+      {
+        "family": "read.protocol",
+        "meaning": "read chain + protocol state",
+        "state": "ready"
+      },
+      {
+        "family": "read.vaults",
+        "meaning": "read vault state, holdings, performance",
+        "state": "ready"
+      },
+      {
+        "family": "prepare.vault",
+        "meaning": "build UNSIGNED vault create/deposit/withdraw",
+        "state": "prepared"
+      },
+      {
+        "family": "prepare.stake",
+        "meaning": "build UNSIGNED xHISS stake/cooldown/redeem",
+        "state": "prepared"
+      },
+      {
+        "family": "coil.compile",
+        "meaning": "compile coil plans locally (deterministic)",
+        "state": "ready"
+      },
+      {
+        "family": "execute.brokerage",
+        "meaning": "place brokerage orders",
+        "state": "blocked"
+      }
+    ],
+    "note": "execute.brokerage is out of scope for HISS — it lives only in the user-runtime RH Trading MCP."
+  },
+  "ok": true,
+  "summary": "Capability families are declared, not active — this CLI grants read + prepare only, never execution."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > agentic.receipts 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "agentic.receipts",
+  "data": {
+    "lifecycle": [
+      "compilation",
+      "authorization",
+      "submission",
+      "settlement",
+      "reconciliation"
+    ],
+    "note": "Only a receipt carrying on-chain proof (onchainConfirmed + txHash) renders as settlement.",
+    "verify": "hiss receipt verify <receipt.json | inline-json>"
+  },
+  "ok": true,
+  "summary": "Verify a receipt's integrity locally with \`hiss receipt verify\` — a missing stage is never implied as done."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > agentic.setup 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "agentic.setup",
+  "data": {
+    "credentialRequested": false,
+    "hissMcp": "https://mcp.hiss.finance/mcp",
+    "rhTradingMcp": "user_runtime",
+    "steps": [
+      "1. Connect the HISS MCP (read + prepare): point your agent client at https://mcp.hiss.finance/mcp.",
+      "2. Verify it with \`hiss mcp doctor\`.",
+      "3. For brokerage actions, run the Robinhood Trading MCP in YOUR OWN runtime and follow its own auth flow.",
+      "4. HISS never brokers that credential — it only prepares unsigned chain transactions for you to review."
+    ]
+  },
+  "ok": true,
+  "summary": "Agentic setup: connect the HISS MCP for read/prepare; run the RH Trading MCP in your own runtime."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > agentic.status 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "agentic.status",
+  "data": {
+    "chainId": 4663,
+    "custody": "none",
+    "defaultPosture": "research_paper",
+    "executionAuthority": "prepare_only_unsigned",
+    "hissMcp": "https://mcp.hiss.finance",
+    "rhTradingMcp": "user_runtime_ready_to_connect"
+  },
+  "ok": true,
+  "summary": "Agentic control-plane status: prepare-only authority, user-side execution, no custody."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > coil.compile.ok 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "coil.compile.ok",
+  "data": {
+    "coilHash": "0xe13bbf82a8d66d211fd4cba638c951fa6ade25419d982b2947996ccad29b73a0",
+    "compiledAtIso": "2026-01-01T00:00:00.000Z",
+    "executed": false,
+    "fuses": {
+      "allowShorting": false,
+      "maxGrossExposureBps": 5000,
+      "maxPositionBps": 1000
+    },
+    "name": "Momentum Demo Coil",
+    "ruleCount": 2,
+    "schema": "coil-compiled-1.0.0",
+    "sourceSchema": "coil-manifest-1.0.0",
+    "universe": [
+      "AAPL",
+      "TSLA",
+      "NVDA"
+    ]
+  },
+  "ok": true,
+  "summary": "Compiled coil \\"Momentum Demo Coil\\" — hash 0xe13bbf82a8d66d211fd4cba638c951fa6ade25419d982b2947996ccad29b73a0. This is a plan, not an executed order."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > coil.compile.refused 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 5,
+  "command": "coil.compile.refused",
+  "data": {
+    "issues": [
+      {
+        "code": "NAME_REQUIRED",
+        "message": "A non-empty coil name is required.",
+        "path": "name"
+      },
+      {
+        "code": "UNIVERSE_INVALID",
+        "message": "universe must be a non-empty array of instrument symbols.",
+        "path": "universe"
+      },
+      {
+        "code": "RULES_REQUIRED",
+        "message": "rules must be a non-empty array.",
+        "path": "rules"
+      },
+      {
+        "code": "FUSES_REQUIRED",
+        "message": "A fuses object is required — risk fuses are mandatory.",
+        "path": "fuses"
+      }
+    ],
+    "ok": false
+  },
+  "ok": false,
+  "summary": "Refusing to compile: coil manifest INVALID (4 issue(s))."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > coil.validate.invalid 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 6,
+  "command": "coil.validate.invalid",
+  "data": {
+    "issues": [
+      {
+        "code": "NAME_REQUIRED",
+        "message": "A non-empty coil name is required.",
+        "path": "name"
+      },
+      {
+        "code": "UNIVERSE_INVALID",
+        "message": "universe must be a non-empty array of instrument symbols.",
+        "path": "universe"
+      },
+      {
+        "code": "RULES_REQUIRED",
+        "message": "rules must be a non-empty array.",
+        "path": "rules"
+      },
+      {
+        "code": "FUSES_REQUIRED",
+        "message": "A fuses object is required — risk fuses are mandatory.",
+        "path": "fuses"
+      }
+    ],
+    "ok": false,
+    "schema": "coil-manifest-1.0.0"
+  },
+  "ok": false,
+  "summary": "Coil manifest INVALID: 4 issue(s)."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > coil.validate.valid 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "coil.validate.valid",
+  "data": {
+    "issues": [],
+    "ok": true,
+    "schema": "coil-manifest-1.0.0"
+  },
+  "ok": true,
+  "summary": "Coil manifest VALID (coil-manifest-1.0.0)."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > contracts 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "contracts",
+  "data": {
+    "hissToken": "0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3",
+    "treasurySafe": "0xF100Fc28dd1721C698046Dbd60408c523b69e36c",
+    "vaultFactory": "0x278d237c6890a5f7101296a9021ed9D26c821810"
+  },
+  "ok": true,
+  "summary": "Contract registry: 3 entries."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > lp.fees 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "lp.fees",
+  "data": {
+    "appliesTo": "realized_lp_fees_only",
+    "feeBps": 500,
+    "feePolicyVersion": "HISS_LP_MANAGEMENT_FEE_V1",
+    "maxFeeBps": 500,
+    "treasury": "0xF100Fc28dd1721C698046Dbd60408c523b69e36c"
+  },
+  "ok": true,
+  "summary": "LP management fee is 500 bps (immutable max 500 bps) on realized LP fees."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > lp.prepare-mint.unavailable 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 7,
+  "command": "lp.prepare-mint.unavailable",
+  "data": {
+    "action": "prepare-mint",
+    "available": false,
+    "guidance": "LP prepare flows are not exposed by the public SDK yet; the manager is launched paused.",
+    "liveTransactionSent": false,
+    "manager": "0xBE5989a38953D8148B74d45eE6DEB127a32567E0",
+    "managerStatus": "DEPLOYED_PAUSED",
+    "signed": false
+  },
+  "ok": false,
+  "summary": "LP prepare-mint is not available in this build. Nothing was prepared and nothing was sent."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > lp.scan.unknown 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 7,
+  "command": "lp.scan.unknown",
+  "data": {
+    "available": false,
+    "chainId": 4663,
+    "guidance": "Query the hosted HISS MCP (\`hiss mcp status\`) or the HISS vault API for live LP state.",
+    "manager": "0xBE5989a38953D8148B74d45eE6DEB127a32567E0",
+    "managerStatus": "DEPLOYED_PAUSED",
+    "subject": "scan"
+  },
+  "ok": false,
+  "summary": "LP scan is UNKNOWN in this build — HissLpManagerV1 is DEPLOYED_PAUSED and no public read surface for scan ships here."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > lp.status 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "lp.status",
+  "data": {
+    "address": "0xBE5989a38953D8148B74d45eE6DEB127a32567E0",
+    "chainId": 4663,
+    "contract": "HissLpManagerV1",
+    "expectedFeeBps": 500,
+    "expectedOwner": "0xF100Fc28dd1721C698046Dbd60408c523b69e36c",
+    "expectedTreasury": "0xF100Fc28dd1721C698046Dbd60408c523b69e36c",
+    "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xBE5989a38953D8148B74d45eE6DEB127a32567E0",
+    "explorerVerified": true,
+    "feePolicyVersion": "HISS_LP_MANAGEMENT_FEE_V1",
+    "immutableMaxFeeBps": 500,
+    "launchedPaused": true,
+    "status": "DEPLOYED_PAUSED"
+  },
+  "ok": true,
+  "summary": "Stock-Premium LP manager HissLpManagerV1 is DEPLOYED_PAUSED on chain 4663."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > mcp.doctor.down 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 4,
+  "command": "mcp.doctor.down",
+  "data": {
+    "base": "https://mcp.example.test",
+    "checks": [
+      {
+        "name": "GET /version (introspection)",
+        "ok": false,
+        "status": null
+      },
+      {
+        "name": "GET /healthz (liveness)",
+        "ok": false,
+        "status": null
+      },
+      {
+        "name": "GET /readyz (RPC + chain match)",
+        "ok": false,
+        "status": null
+      }
+    ],
+    "version": null
+  },
+  "ok": false,
+  "summary": "HISS MCP doctor: https://mcp.example.test is unreachable — every check is UNKNOWN."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > mcp.doctor.healthy 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "mcp.doctor.healthy",
+  "data": {
+    "base": "https://mcp.example.test",
+    "checks": [
+      {
+        "name": "GET /version (introspection)",
+        "ok": true,
+        "status": 200
+      },
+      {
+        "name": "GET /healthz (liveness)",
+        "ok": true,
+        "status": 200
+      },
+      {
+        "name": "GET /readyz (RPC + chain match)",
+        "ok": true,
+        "status": 200
+      }
+    ],
+    "version": {
+      "chainId": 4663,
+      "publicSha": "cafebabe",
+      "server": {
+        "name": "hiss-mcp",
+        "version": "1.2.3"
+      },
+      "sourceSha": "deadbeef",
+      "toolCount": 33,
+      "toolsetHash": "0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd",
+      "transport": "http"
+    }
+  },
+  "ok": true,
+  "summary": "HISS MCP doctor: all 3 checks pass at https://mcp.example.test."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > mcp.status.down 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 4,
+  "command": "mcp.status.down",
+  "data": {
+    "base": "https://mcp.example.test",
+    "health": {
+      "ok": false,
+      "status": null
+    },
+    "reachable": false,
+    "readiness": {
+      "ok": false,
+      "status": null
+    },
+    "version": null
+  },
+  "ok": false,
+  "summary": "HISS MCP status is UNKNOWN — https://mcp.example.test did not respond."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > mcp.status.healthy 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "mcp.status.healthy",
+  "data": {
+    "base": "https://mcp.example.test",
+    "health": {
+      "ok": true,
+      "status": 200
+    },
+    "reachable": true,
+    "readiness": {
+      "ok": true,
+      "status": 200
+    },
+    "version": {
+      "chainId": 4663,
+      "publicSha": "cafebabe",
+      "server": {
+        "name": "hiss-mcp",
+        "version": "1.2.3"
+      },
+      "sourceSha": "deadbeef",
+      "toolCount": 33,
+      "toolsetHash": "0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd",
+      "transport": "http"
+    }
+  },
+  "ok": true,
+  "summary": "HISS MCP status read from https://mcp.example.test."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > mcp.tools.healthy 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "mcp.tools.healthy",
+  "data": {
+    "base": "https://mcp.example.test",
+    "source": "https://mcp.example.test/mcp",
+    "toolCount": 33,
+    "toolNames": [],
+    "toolsetHash": "0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd"
+  },
+  "ok": true,
+  "summary": "HISS MCP serves 33 tool(s) (toolset 0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd)."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > receipt.verify.failed 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 6,
+  "command": "receipt.verify.failed",
+  "data": {
+    "computedHash": "0x05806a96af3df57a3ef606b77c6d11d9e582d8125d158a9805b17d1c7c977a33",
+    "issues": [
+      "Hash mismatch: recomputed canonical hash does not match the stated hash."
+    ],
+    "kind": "state-read",
+    "ok": false,
+    "onchainConfirmed": false,
+    "statedHash": "0xdeadbeef"
+  },
+  "ok": false,
+  "summary": "Receipt verification FAILED: 1 issue(s)."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > receipt.verify.verified 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "receipt.verify.verified",
+  "data": {
+    "computedHash": "0xcaf148cbe2e70fb008e653ca7ca3ffc46365e3f1a515f13f9cf31de081427975",
+    "issues": [],
+    "kind": "state-read",
+    "ok": true,
+    "onchainConfirmed": false,
+    "statedHash": "0xcaf148cbe2e70fb008e653ca7ca3ffc46365e3f1a515f13f9cf31de081427975"
+  },
+  "ok": true,
+  "summary": "Receipt integrity VERIFIED."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > rewards.contributor 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "rewards.contributor",
+  "data": {
+    "account": "0x1111111111111111111111111111111111111111",
+    "funded": false
+  },
+  "ok": true,
+  "summary": "Vault-contributor reward status read for 0x1111111111111111111111111111111111111111."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > rewards.provider 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "rewards.provider",
+  "data": {
+    "funded": false,
+    "group": "group-1"
+  },
+  "ok": true,
+  "summary": "Provider reward status read for group group-1."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > rewards.status 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "rewards.status",
+  "data": {
+    "funded": false,
+    "model": {
+      "legs": {
+        "burnBps": 1000,
+        "treasuryBps": 1000,
+        "vaultContributorsBps": 1500,
+        "vaultProvidersBps": 1500,
+        "xhissStakersBps": 5000
+      },
+      "version": "HISS_REWARD_METHOD_V2"
+    }
+  },
+  "ok": true,
+  "summary": "Reward status read."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > skill.list 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "skill.list",
+  "data": {
+    "skills": [
+      "demo-pack",
+      "second-pack"
+    ],
+    "skillsDir": "<skills-dir>"
+  },
+  "ok": true,
+  "summary": "2 skill packs found."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > skill.print.found 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "skill.print.found",
+  "data": {
+    "content": "# Demo Skill Pack\\n\\nThis is a deterministic fixture skill pack used by the CLI test suite.\\n",
+    "found": true,
+    "skill": "demo-pack"
+  },
+  "ok": true,
+  "summary": "Skill pack \\"demo-pack\\" (90 bytes)."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > skill.print.notfound 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 7,
+  "command": "skill.print.notfound",
+  "data": {
+    "found": false,
+    "skill": "does-not-exist",
+    "skillsDir": "<skills-dir>"
+  },
+  "ok": false,
+  "summary": "Skill pack \\"does-not-exist\\" not found."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > stake.cooldown 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "stake.cooldown",
+  "data": {
+    "chainId": 4663,
+    "data": "0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00",
+    "description": "deposit into the vault",
+    "signed": false,
+    "to": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    "value": "0"
+  },
+  "ok": true,
+  "summary": "Prepared an UNSIGNED cooldown for 500 xHISS. Nothing was sent."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > stake.prepare 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "stake.prepare",
+  "data": {
+    "chainId": 4663,
+    "data": "0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00",
+    "description": "deposit into the vault",
+    "signed": false,
+    "to": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    "value": "0"
+  },
+  "ok": true,
+  "summary": "Prepared an UNSIGNED stake of 1000 HISS. Nothing was sent."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > stake.redeem 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "stake.redeem",
+  "data": {
+    "chainId": 4663,
+    "data": "0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00",
+    "description": "deposit into the vault",
+    "signed": false,
+    "to": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    "value": "0"
+  },
+  "ok": true,
+  "summary": "Prepared an UNSIGNED xHISS redeem within your open redeem window. Nothing was sent."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > stake.status 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "stake.status",
+  "data": {
+    "cooldownSeconds": 259200,
+    "paused": {
+      "value": false
+    },
+    "stakingAsset": "HISS",
+    "vaultAddress": "0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be"
+  },
+  "ok": true,
+  "summary": "xHISS staking status read."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > status.degraded 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "status.degraded",
+  "data": {
+    "chain": "4663",
+    "chainId": 4663,
+    "network": "robinhood-chain-mainnet",
+    "reachable": false
+  },
+  "ok": true,
+  "summary": "HISS Finance status read from robinhood-chain-mainnet."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > status.success 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "status.success",
+  "data": {
+    "blockNumber": "123456789",
+    "chain": "4663",
+    "chainId": 4663,
+    "network": "robinhood-chain-mainnet",
+    "reachable": true,
+    "rpcUrl": "https://rpc.example.invalid",
+    "token": {
+      "address": "0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3",
+      "symbol": "HISS"
+    },
+    "treasurySafe": "0xF100Fc28dd1721C698046Dbd60408c523b69e36c",
+    "vaultCount": 2
+  },
+  "ok": true,
+  "summary": "HISS Finance status read from robinhood-chain-mainnet."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.create 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.create",
+  "data": {
+    "note": "HISS never signs or submits. It never holds keys or takes custody.",
+    "steps": [
+      "hiss vault validate <manifest.json>",
+      "hiss vault prepare-create <manifest.json>  # emits an unsigned transaction",
+      "Submit the unsigned transaction with your own wallet."
+    ]
+  },
+  "ok": true,
+  "summary": "Vault creation is a two-step, key-free flow: \`vault validate\` then \`vault prepare-create\`."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.holdings 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.holdings",
+  "data": {
+    "holdings": [
+      {
+        "asset": "0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3",
+        "balance": {
+          "state": "live",
+          "value": "1000000000000000000000"
+        },
+        "symbol": {
+          "state": "live",
+          "value": "HISS"
+        }
+      },
+      {
+        "asset": "0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10",
+        "balance": {
+          "state": "unknown"
+        },
+        "symbol": {
+          "state": "unknown"
+        }
+      }
+    ],
+    "source": "onchain",
+    "vault": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6"
+  },
+  "ok": true,
+  "summary": "Holdings read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.inspect 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.inspect",
+  "data": {
+    "acceptingPublicDeposits": true,
+    "address": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    "baseAsset": "USDG",
+    "name": "HISS Vault",
+    "ref": "flagship",
+    "slug": "flagship"
+  },
+  "ok": true,
+  "summary": "Vault flagship inspected."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.list 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.list",
+  "data": [
+    {
+      "acceptingPublicDeposits": true,
+      "address": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+      "name": "HISS Vault",
+      "slug": "flagship"
+    },
+    {
+      "acceptingPublicDeposits": false,
+      "address": "0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10",
+      "name": "USDG Demo",
+      "slug": "usdg-demo"
+    }
+  ],
+  "ok": true,
+  "summary": "2 vaults on Robinhood Chain."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.performance 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.performance",
+  "data": {
+    "pricePerShare": {
+      "state": "live",
+      "value": "1000000000000000000"
+    },
+    "vault": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6"
+  },
+  "ok": true,
+  "summary": "Historical performance read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Not a forecast; not a performance claim."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.prepare-create.ok 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.prepare-create.ok",
+  "data": {
+    "chainId": 4663,
+    "data": "0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00",
+    "description": "deposit into the vault",
+    "signed": false,
+    "to": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    "value": "0"
+  },
+  "ok": true,
+  "summary": "Prepared an UNSIGNED vault-creation transaction. Nothing was sent."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.prepare-create.refused 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 5,
+  "command": "vault.prepare-create.refused",
+  "data": {
+    "issues": [
+      {
+        "code": "CHAIN_NOT_ROBINHOOD",
+        "message": "Vault chain must be Robinhood Chain (4663 or 46630). Base is never a vault chain.",
+        "path": "chainId"
+      },
+      {
+        "code": "BASE_ASSET_INVALID",
+        "message": "Base asset must be USDG.",
+        "path": "baseAsset"
+      },
+      {
+        "code": "ALLOWED_ASSETS_INVALID",
+        "message": "allowedAssets must be a non-empty array of source-verified asset symbols.",
+        "path": "allowedAssets"
+      },
+      {
+        "code": "FEE_OUT_OF_BOUNDS",
+        "message": "fees.managementBps must be an integer bps in [0, 500].",
+        "path": "fees.managementBps"
+      },
+      {
+        "code": "FEE_MISSING",
+        "message": "fees.performanceBps is required.",
+        "path": "fees.performanceBps"
+      },
+      {
+        "code": "CREATOR_ADDRESS_INVALID",
+        "message": "creator.address must be a 0x-prefixed 20-byte address.",
+        "path": "creator.address"
+      },
+      {
+        "code": "CREATOR_SKIN_REQUIRED",
+        "message": "creator.skinInGameUsdg must be greater than 0 (creator skin-in-the-game is mandatory).",
+        "path": "creator.skinInGameUsdg"
+      },
+      {
+        "code": "REBALANCE_FUSES_REQUIRED",
+        "message": "rebalance.fuses is required.",
+        "path": "rebalance.fuses"
+      }
+    ],
+    "ok": false,
+    "schema": "vault-manifest-1.0.0"
+  },
+  "ok": false,
+  "summary": "Refusing to prepare: manifest INVALID (8 issue(s))."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.prepare-deposit 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.prepare-deposit",
+  "data": {
+    "chainId": 4663,
+    "data": "0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00",
+    "description": "deposit into the vault",
+    "signed": false,
+    "to": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    "value": "0"
+  },
+  "ok": true,
+  "summary": "Prepared an UNSIGNED deposit of 1000 USDG to 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.prepare-withdraw 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.prepare-withdraw",
+  "data": {
+    "chainId": 4663,
+    "data": "0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00",
+    "description": "deposit into the vault",
+    "signed": false,
+    "to": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    "value": "0"
+  },
+  "ok": true,
+  "summary": "Prepared an UNSIGNED withdrawal of 50 shares from 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.validate.invalid 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 6,
+  "command": "vault.validate.invalid",
+  "data": {
+    "issues": [
+      {
+        "code": "CHAIN_NOT_ROBINHOOD",
+        "message": "Vault chain must be Robinhood Chain (4663 or 46630). Base is never a vault chain.",
+        "path": "chainId"
+      },
+      {
+        "code": "BASE_ASSET_INVALID",
+        "message": "Base asset must be USDG.",
+        "path": "baseAsset"
+      },
+      {
+        "code": "ALLOWED_ASSETS_INVALID",
+        "message": "allowedAssets must be a non-empty array of source-verified asset symbols.",
+        "path": "allowedAssets"
+      },
+      {
+        "code": "FEE_OUT_OF_BOUNDS",
+        "message": "fees.managementBps must be an integer bps in [0, 500].",
+        "path": "fees.managementBps"
+      },
+      {
+        "code": "FEE_MISSING",
+        "message": "fees.performanceBps is required.",
+        "path": "fees.performanceBps"
+      },
+      {
+        "code": "CREATOR_ADDRESS_INVALID",
+        "message": "creator.address must be a 0x-prefixed 20-byte address.",
+        "path": "creator.address"
+      },
+      {
+        "code": "CREATOR_SKIN_REQUIRED",
+        "message": "creator.skinInGameUsdg must be greater than 0 (creator skin-in-the-game is mandatory).",
+        "path": "creator.skinInGameUsdg"
+      },
+      {
+        "code": "REBALANCE_FUSES_REQUIRED",
+        "message": "rebalance.fuses is required.",
+        "path": "rebalance.fuses"
+      }
+    ],
+    "ok": false,
+    "schema": "vault-manifest-1.0.0"
+  },
+  "ok": false,
+  "summary": "Vault manifest INVALID: 8 issue(s)."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.validate.valid 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.validate.valid",
+  "data": {
+    "issues": [],
+    "ok": true,
+    "schema": "vault-manifest-1.0.0"
+  },
+  "ok": true,
+  "summary": "Vault manifest VALID (vault-manifest-1.0.0)."
+}
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > agentic.coils 1`] = `
+"Coils compile deterministically to plans. Use \`hiss coil validate\` then \`hiss coil compile\`.
+  Execution modes: paper_only, preview_only, human_confirm, agentic_mcp_enabled.
+  Validate: hiss coil validate <manifest.json>
+  Compile: hiss coil compile <manifest.json>  (a deterministic plan hash; nothing is executed)
+  Risk fuses are binding and may never be bypassed.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > agentic.grants 1`] = `
+"Capability families are declared, not active - this CLI grants read + prepare only, never execution.
+  read.protocol: read chain + protocol state
+  read.vaults: read vault state, holdings, performance
+  prepare.vault: build UNSIGNED vault create/deposit/withdraw
+  prepare.stake: build UNSIGNED xHISS stake/cooldown/redeem
+  coil.compile: compile coil plans locally (deterministic)
+  execute.brokerage: place brokerage orders
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > agentic.receipts 1`] = `
+"Verify a receipt's integrity locally with \`hiss receipt verify\` - a missing stage is never implied as done.
+  compilation - a coil/intent is compiled to a deterministic plan hash
+  authorization - the plan is authorized by its policy/fuses (still a plan)
+  submission - a stage that only YOUR wallet/runtime can perform
+  settlement - recorded only from a verified on-chain receipt
+  reconciliation - settlement reconciled against the plan
+  Verify: hiss receipt verify <receipt.json>
+  Only on-chain-proven receipts render as settlement; a missing stage is never implied to have happened.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > agentic.setup 1`] = `
+"Agentic setup: connect the HISS MCP for read/prepare; run the RH Trading MCP in your own runtime.
+  1. Connect the HISS MCP (read + prepare): point your agent client at https://mcp.hiss.finance/mcp.
+  2. Verify it with \`hiss mcp doctor\`.
+  3. For brokerage actions, run the Robinhood Trading MCP in YOUR OWN runtime and follow its own auth flow.
+  4. HISS never brokers that credential - it only prepares unsigned chain transactions for you to review.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > agentic.status 1`] = `
+"Agentic control-plane status: prepare-only authority, user-side execution, no custody.
+  HISS reads state and prepares UNSIGNED transactions. It never signs, submits, or holds keys.
+  The Robinhood Trading MCP runs in YOUR agent runtime; HISS never sees or requests a brokerage credential.
+  Brokerage order placement, confirmation, and custody are entirely user-side.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > coil.compile.ok 1`] = `
+"Compiled coil "Momentum Demo Coil" - hash 0xe13bbf82a8d66d211fd4cba638c951fa6ade25419d982b2947996ccad29b73a0. This is a plan, not an executed order.
+  Universe: 3 instrument(s)
+  Rules: 2
+  Risk fuses are binding and may never be bypassed. Nothing was executed.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > coil.compile.refused 1`] = `
+"Refusing to compile: coil manifest INVALID (4 issue(s)).
+  NAME_REQUIRED @ name: A non-empty coil name is required.
+  UNIVERSE_INVALID @ universe: universe must be a non-empty array of instrument symbols.
+  RULES_REQUIRED @ rules: rules must be a non-empty array.
+  FUSES_REQUIRED @ fuses: A fuses object is required - risk fuses are mandatory.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > coil.validate.invalid 1`] = `
+"Coil manifest INVALID: 4 issue(s).
+  NAME_REQUIRED @ name: A non-empty coil name is required.
+  UNIVERSE_INVALID @ universe: universe must be a non-empty array of instrument symbols.
+  RULES_REQUIRED @ rules: rules must be a non-empty array.
+  FUSES_REQUIRED @ fuses: A fuses object is required - risk fuses are mandatory.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > coil.validate.valid 1`] = `
+"Coil manifest VALID (coil-manifest-1.0.0).
+  Coil manifest is valid: universe, rules, and mandatory risk fuses are present.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > contracts 1`] = `
+"Contract registry: 3 entries.
+  hissToken: 0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3
+  vaultFactory: 0x278d237c6890a5f7101296a9021ed9D26c821810
+  treasurySafe: 0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > lp.fees 1`] = `
+"LP management fee is 500 bps (immutable max 500 bps) on realized LP fees.
+  Management fee: 500 bps
+  Immutable max: 500 bps
+  The fee applies to realized LP fees only. No guaranteed yield or APY.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > lp.prepare-mint.unavailable 1`] = `
+"LP prepare-mint is not available in this build. Nothing was prepared and nothing was sent.
+  The public SDK does not expose LP prepare-mint calldata in this build.
+  HissLpManagerV1 is LAUNCHED PAUSED (inert): no positions are enrollable and no fee is charged. Live pause/fee/owner/treasury are always a fresh chain read - a failed read is UNKNOWN, never 'live' and never 'not deployed'.
+  No unsigned transaction was produced. HISS never signs or submits.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > lp.scan.unknown 1`] = `
+"LP scan is UNKNOWN in this build - HissLpManagerV1 is DEPLOYED_PAUSED and no public read surface for scan ships here.
+  HissLpManagerV1 is LAUNCHED PAUSED (inert): no positions are enrollable and no fee is charged. Live pause/fee/owner/treasury are always a fresh chain read - a failed read is UNKNOWN, never 'live' and never 'not deployed'.
+  scan is not available from the public read surface in this build - reporting UNKNOWN.
+  Use \`hiss mcp status\` for the hosted MCP, or the HISS vault API, for live LP state.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > lp.status 1`] = `
+"Stock-Premium LP manager HissLpManagerV1 is DEPLOYED_PAUSED on chain 4663.
+  Contract: HissLpManagerV1 (0xBE5989a38953D8148B74d45eE6DEB127a32567E0)
+  Chain: 4663 - status DEPLOYED_PAUSED
+  Fee: 500 bps (immutable max 500 bps)
+  HissLpManagerV1 is LAUNCHED PAUSED (inert): no positions are enrollable and no fee is charged. Live pause/fee/owner/treasury are always a fresh chain read - a failed read is UNKNOWN, never 'live' and never 'not deployed'.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > mcp.doctor.down 1`] = `
+"HISS MCP doctor: https://mcp.example.test is unreachable - every check is UNKNOWN.
+  UNKNOWN - GET /version (introspection)
+  UNKNOWN - GET /healthz (liveness)
+  UNKNOWN - GET /readyz (RPC + chain match)
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > mcp.doctor.healthy 1`] = `
+"HISS MCP doctor: all 3 checks pass at https://mcp.example.test.
+  PASS - GET /version (introspection)
+  PASS - GET /healthz (liveness)
+  PASS - GET /readyz (RPC + chain match)
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > mcp.status.down 1`] = `
+"HISS MCP status is UNKNOWN - https://mcp.example.test did not respond.
+  Endpoint did not respond - status is UNKNOWN (not down, not live).
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > mcp.status.healthy 1`] = `
+"HISS MCP status read from https://mcp.example.test.
+  Endpoint: https://mcp.example.test
+  Transport: http
+  Chain: 4663
+  Tool count: 33
+  Toolset hash: 0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > mcp.tools.healthy 1`] = `
+"HISS MCP serves 33 tool(s) (toolset 0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd).
+  Tool count: 33
+  Toolset hash: 0xa9b97e7f0000000000000000000000000000000000000000000000000000abcd
+  List via: POST https://mcp.example.test/mcp
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > receipt.verify.failed 1`] = `
+"Receipt verification FAILED: 1 issue(s).
+  Hash mismatch: recomputed canonical hash does not match the stated hash.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > receipt.verify.verified 1`] = `
+"Receipt integrity VERIFIED.
+  Integrity OK - canonical hash 0xcaf148cbe2e70fb008e653ca7ca3ffc46365e3f1a515f13f9cf31de081427975.
+  No on-chain proof attached - this receipt is an integrity record, not settlement.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > rewards.contributor 1`] = `
+"Vault-contributor reward status read for 0x1111111111111111111111111111111111111111.
+  Vault contributors is the current name for the former depositor cohort. The vault-contributor vesting distributor recipient may be null (not deployed) - nothing is claimable against null.
+  Read-only report. planned != funded != claimable. Not a performance claim; historical fee distributions are not forecasts.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > rewards.provider 1`] = `
+"Provider reward status read for group group-1.
+  Eligibility is facts-only - never PnL, APY, rank, or return-shaped inputs.
+  Read-only report. planned != funded != claimable. Not a performance claim; historical fee distributions are not forecasts.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > rewards.status 1`] = `
+"Reward status read.
+  Read-only report. planned != funded != claimable. Not a performance claim; historical fee distributions are not forecasts.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > skill.list 1`] = `
+"2 skill packs found.
+  demo-pack
+  second-pack
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > skill.print.found 1`] = `
+"Skill pack "demo-pack" (90 bytes).
+  # Demo Skill Pack
+
+This is a deterministic fixture skill pack used by the CLI test suite.
+
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > skill.print.notfound 1`] = `
+"Skill pack "does-not-exist" not found.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > stake.cooldown 1`] = `
+"Prepared an UNSIGNED cooldown for 500 xHISS. Nothing was sent.
+  Chain: 4663
+  To: 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+  Value: 0 wei
+  Calldata: 0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00
+  This transaction is UNSIGNED. Review it and submit it with your own wallet.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > stake.prepare 1`] = `
+"Prepared an UNSIGNED stake of 1000 HISS. Nothing was sent.
+  Chain: 4663
+  To: 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+  Value: 0 wei
+  Calldata: 0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00
+  This transaction is UNSIGNED. Review it and submit it with your own wallet.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > stake.redeem 1`] = `
+"Prepared an UNSIGNED xHISS redeem within your open redeem window. Nothing was sent.
+  Chain: 4663
+  To: 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+  Value: 0 wei
+  Calldata: 0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00
+  This transaction is UNSIGNED. Review it and submit it with your own wallet.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > stake.status 1`] = `
+"xHISS staking status read.
+  xHISS vault: 0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be
+  Staking asset: HISS
+  Cooldown: 259200s
+  Not a performance claim.
+  Historical fee distributions are not forecasts.
+  No known unresolved Critical or High findings after internal launch review.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > status.degraded 1`] = `
+"HISS Finance status read from robinhood-chain-mainnet.
+  Network: robinhood-chain-mainnet
+  Chain: 4663
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > status.success 1`] = `
+"HISS Finance status read from robinhood-chain-mainnet.
+  Network: robinhood-chain-mainnet
+  Chain: 4663
+  Token: HISS at 0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3
+  Vaults tracked: 2
+  Treasury Safe: 0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.create 1`] = `
+"Vault creation is a two-step, key-free flow: \`vault validate\` then \`vault prepare-create\`.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.holdings 1`] = `
+"Holdings read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6.
+  Source: live chain read (onchain).
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.inspect 1`] = `
+"Vault flagship inspected.
+  Name: HISS Vault
+  Address: 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+  Base asset: USDG
+  Deposits: read live on chain (planned != open != funded).
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.list 1`] = `
+"2 vaults on Robinhood Chain.
+  flagship - 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+  usdg-demo - 0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.performance 1`] = `
+"Historical performance read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Not a forecast; not a performance claim.
+  Historical figures are not forecasts and are not guaranteed.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.prepare-create.ok 1`] = `
+"Prepared an UNSIGNED vault-creation transaction. Nothing was sent.
+  Chain: 4663
+  To: 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+  Value: 0 wei
+  Calldata: 0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00
+  This transaction is UNSIGNED. Review it and submit it with your own wallet.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.prepare-create.refused 1`] = `
+"Refusing to prepare: manifest INVALID (8 issue(s)).
+  CHAIN_NOT_ROBINHOOD @ chainId: Vault chain must be Robinhood Chain (4663 or 46630). Base is never a vault chain.
+  BASE_ASSET_INVALID @ baseAsset: Base asset must be USDG.
+  ALLOWED_ASSETS_INVALID @ allowedAssets: allowedAssets must be a non-empty array of source-verified asset symbols.
+  FEE_OUT_OF_BOUNDS @ fees.managementBps: fees.managementBps must be an integer bps in [0, 500].
+  FEE_MISSING @ fees.performanceBps: fees.performanceBps is required.
+  CREATOR_ADDRESS_INVALID @ creator.address: creator.address must be a 0x-prefixed 20-byte address.
+  CREATOR_SKIN_REQUIRED @ creator.skinInGameUsdg: creator.skinInGameUsdg must be greater than 0 (creator skin-in-the-game is mandatory).
+  REBALANCE_FUSES_REQUIRED @ rebalance.fuses: rebalance.fuses is required.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.prepare-deposit 1`] = `
+"Prepared an UNSIGNED deposit of 1000 USDG to 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent.
+  Chain: 4663
+  To: 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+  Value: 0 wei
+  Calldata: 0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00
+  This transaction is UNSIGNED. Review it and submit it with your own wallet.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.prepare-withdraw 1`] = `
+"Prepared an UNSIGNED withdrawal of 50 shares from 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent.
+  Chain: 4663
+  To: 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+  Value: 0 wei
+  Calldata: 0xb6b55f25000000000000000000000000000000000000000000000000000000003b9aca00
+  This transaction is UNSIGNED. Review it and submit it with your own wallet.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.validate.invalid 1`] = `
+"Vault manifest INVALID: 8 issue(s).
+  CHAIN_NOT_ROBINHOOD @ chainId: Vault chain must be Robinhood Chain (4663 or 46630). Base is never a vault chain.
+  BASE_ASSET_INVALID @ baseAsset: Base asset must be USDG.
+  ALLOWED_ASSETS_INVALID @ allowedAssets: allowedAssets must be a non-empty array of source-verified asset symbols.
+  FEE_OUT_OF_BOUNDS @ fees.managementBps: fees.managementBps must be an integer bps in [0, 500].
+  FEE_MISSING @ fees.performanceBps: fees.performanceBps is required.
+  CREATOR_ADDRESS_INVALID @ creator.address: creator.address must be a 0x-prefixed 20-byte address.
+  CREATOR_SKIN_REQUIRED @ creator.skinInGameUsdg: creator.skinInGameUsdg must be greater than 0 (creator skin-in-the-game is mandatory).
+  REBALANCE_FUSES_REQUIRED @ rebalance.fuses: rebalance.fuses is required.
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.validate.valid 1`] = `
+"Vault manifest VALID (vault-manifest-1.0.0).
+  Manifest is valid: Robinhood Chain, USDG base, fees in bounds, creator skin present, rebalance fuses set.
+"
+`;

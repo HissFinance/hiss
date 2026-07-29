@@ -103,7 +103,15 @@ Once installed, import the workspace packages into your own app, or run the CLI:
 # Read live protocol status from Robinhood Chain (supply a public RPC)
 pnpm --filter @hiss-finance/cli start status \
   --rpc-url https://rpc.mainnet.chain.robinhood.com
+
+# Machine-readable envelope (ANSI-free stdout) or ASCII for logs/screen readers
+pnpm --filter @hiss-finance/cli start status --json --rpc-url … | jq .data
+pnpm --filter @hiss-finance/cli start vault list --plain
 ```
+
+The `hiss` CLI has a global output system — `human` (default), `--json`, and
+`--plain` — respects `NO_COLOR`, and exits with a stable 0–7 code taxonomy so
+scripts can branch on outcome. See the [CLI guide](./docs/cli.md).
 
 When the packages are published, this section will switch to a single
 `pnpm add @hiss-finance/sdk`. Until then, consume them via the workspace or a
