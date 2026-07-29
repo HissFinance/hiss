@@ -14,14 +14,16 @@ export type HissBasketManifest = VaultManifest;
 
 /** A URL/id-safe slug derived from a human-readable name. */
 export function slugify(input: string): string {
-  return input
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    // Runs of non-alphanumerics are already collapsed to a single "-" above,
-    // so a single-dash trim is sufficient AND linear (no `-+` backtracking /
-    // polynomial-ReDoS on uncontrolled input).
-    .replace(/^-|-$/g, "");
+  return (
+    input
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      // Runs of non-alphanumerics are already collapsed to a single "-" above,
+      // so a single-dash trim is sufficient AND linear (no `-+` backtracking /
+      // polynomial-ReDoS on uncontrolled input).
+      .replace(/^-|-$/g, "")
+  );
 }
 
 /** A deterministic short id from parts — keccak-derived, never random. */
