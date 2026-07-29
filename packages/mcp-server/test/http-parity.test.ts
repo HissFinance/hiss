@@ -4,6 +4,7 @@ import { callHissTool } from "../src/server.js";
 import { HISS_TOOLS } from "../src/tools.js";
 import { mockClient, VALID_VAULT_MANIFEST, VALID_COIL_MANIFEST } from "./helpers/mockClient.js";
 import { STOCK_PREMIUM_ARGS } from "./helpers/stockPremiumArgs.js";
+import { lighterFixtureClient } from "./helpers/lighterFixtureClient.js";
 import type { JsonRecord } from "../src/lib/types.js";
 
 const TOOL_COUNT = HISS_TOOLS.length;
@@ -41,6 +42,22 @@ const ARGS: Record<string, JsonRecord> = {
   hiss_validate_coil: { manifest: VALID_COIL_MANIFEST },
   hiss_compile_coil: { manifest: VALID_COIL_MANIFEST, nowIso: FIXED_NOW },
   ...STOCK_PREMIUM_ARGS,
+  hiss_lighter_markets: {},
+  hiss_lighter_orderbook: { ticker: "AAPL" },
+  hiss_lighter_depth: { ticker: "AAPL" },
+  hiss_lighter_prepare_order: {
+    ticker: "AAPL",
+    side: "buy",
+    size: "1.0000",
+    price: "339.50",
+    orderType: "LIMIT",
+    timeInForce: "GOOD_TILL_TIME",
+    clientOrderIndex: 1,
+    // 1 day past FIXED_NOW — inside the [5min, 30d] GTT window, clock-stable.
+    expiryMs: new Date("2026-07-25T00:00:00.000Z").getTime(),
+  },
+  hiss_lighter_prepare_cancel: { ticker: "AAPL", orderIndex: "12345" },
+  hiss_lighter_prepare_modify: { ticker: "AAPL", orderIndex: "12345", newPrice: "339.40" },
 };
 
 let running: RunningHttp | undefined;
@@ -61,6 +78,8 @@ describe("stdio ≡ HTTP tool parity (hardening changed no tool behavior)", () =
       const reference = await callHissTool(tool.name, args, {
         client: mockClient(),
         nowIso: () => FIXED_NOW,
+        // Same fixture-backed Lighter client the HTTP harness uses → parity.
+        lighter: lighterFixtureClient(),
       });
 
       // HTTP: the same tool over Streamable HTTP.

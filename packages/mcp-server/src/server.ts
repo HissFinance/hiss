@@ -15,6 +15,7 @@ import { assertNoExecutionClaim, ExecutionClaimError } from "./lib/guard.js";
 import { CredentialRejectedError } from "./lib/credentials.js";
 import type { HissClient, JsonRecord } from "./lib/types.js";
 import type { StockPremiumEngine } from "./lib/stock-premium.js";
+import type { LighterReadClient } from "./lib/lighter/index.js";
 
 export const SERVER_NAME = "hiss-finance";
 export const SERVER_VERSION = "0.1.0";
@@ -41,6 +42,12 @@ export interface ServerDeps {
    * so `mcp.hiss.finance` serves live-data Stock-Premium tools.
    */
   stockPremium?: StockPremiumEngine;
+  /**
+   * Optional injected Lighter READ client (public market data). When omitted,
+   * the Lighter tools build a default `fetch`-backed client against the public
+   * Lighter REST API. HISS holds no Lighter key, token, or account authority.
+   */
+  lighter?: LighterReadClient;
 }
 
 function makeContext(deps: ServerDeps): ToolContext {
@@ -51,6 +58,7 @@ function makeContext(deps: ServerDeps): ToolContext {
     client: deps.client,
     nowIso: (deps.nowIso ?? (() => new Date().toISOString()))(),
     stockPremium: deps.stockPremium,
+    lighter: deps.lighter,
   };
 }
 

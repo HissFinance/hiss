@@ -16,10 +16,15 @@ import { assertRealizableUnsignedTx } from "../src/lib/txguard.js";
 import { assertNoCredentials, CredentialRejectedError } from "../src/lib/credentials.js";
 import { mockClient } from "./helpers/mockClient.js";
 import { STOCK_PREMIUM_ARGS, STOCK_PREMIUM_NEGATIVE } from "./helpers/stockPremiumArgs.js";
+import { lighterFixtureClient } from "./helpers/lighterFixtureClient.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { JsonRecord } from "../src/lib/types.js";
 
-const deps = { client: mockClient(), nowIso: () => "2026-07-24T00:00:00.000Z" };
+const deps = {
+  client: mockClient(),
+  nowIso: () => "2026-07-24T00:00:00.000Z",
+  lighter: lighterFixtureClient(),
+};
 
 /** A result is a well-formed TYPED error: isError + structured error.code string. */
 function isTypedError(result: CallToolResult, code?: string): boolean {
@@ -86,6 +91,43 @@ const NEGATIVE: Record<string, JsonRecord[]> = {
     { manifest: {}, nowIso: "not-a-date" },
   ],
   ...STOCK_PREMIUM_NEGATIVE,
+  // Lighter READ: missing selector / wrong-typed selector / bad option type.
+  hiss_lighter_markets: [{ stockTokensOnly: "yes" }],
+  hiss_lighter_orderbook: [{}, { marketId: "AAPL" }, { ticker: "AAPL", maxLevels: "5" }],
+  hiss_lighter_depth: [{}, { ticker: 7 }],
+  // Lighter PREPARE: fail-closed on bad enum / sub-minimum / bad index / no-op.
+  hiss_lighter_prepare_order: [
+    {},
+    {
+      ticker: "AAPL",
+      side: "hodl",
+      size: "1",
+      price: "1",
+      orderType: "LIMIT",
+      timeInForce: "POST_ONLY",
+      clientOrderIndex: 1,
+    },
+    {
+      ticker: "AAPL",
+      side: "buy",
+      size: "0.0001",
+      price: "339.5",
+      orderType: "LIMIT",
+      timeInForce: "POST_ONLY",
+      clientOrderIndex: 1,
+    },
+    {
+      ticker: "NOTREAL",
+      side: "buy",
+      size: "1",
+      price: "1",
+      orderType: "LIMIT",
+      timeInForce: "POST_ONLY",
+      clientOrderIndex: 1,
+    },
+  ],
+  hiss_lighter_prepare_cancel: [{}, { ticker: "AAPL", orderIndex: "not-numeric" }, { ticker: "AAPL" }],
+  hiss_lighter_prepare_modify: [{}, { ticker: "AAPL", orderIndex: "12345" }],
 };
 
 describe("negative-vector coverage: every registered tool rejects bad input with typed errors", () => {
