@@ -136,32 +136,28 @@ presentation stays in the renderer.
 
 ## 5. Boundary confirmation (§29 — public repo)
 
-Scanned `packages/cli/src` + `package.json` for the private-boundary
-tokens (OpenClaw, Bankr API key / Keychain, operator EOA
-`0x403bad…`/`0x80c61255…`, Safe-signature coordination, private crons,
-local host/mirror paths, internal deployment automation):
+Scanned `packages/cli/src` + `package.json` for any private-boundary
+violation — references to private operational infrastructure, credentials
+at rest, or internal identity.
 
 **Result: the current CLI is boundary-clean.** No hits. The CLI is
 read-and-prepare only, imports only the public `@hiss-finance/sdk` and
-`@hiss-finance/core`, and never references signing, submission,
-credentials-at-rest, or operator identity. The existing guards
-(`assertNoExecutionClaim`, `assertNoCredentials`) actively enforce two
-facets of the boundary.
+`@hiss-finance/core`, and never references signing, submission, or
+credentials at rest. The existing guards (`assertNoExecutionClaim`,
+`assertNoCredentials`) actively enforce two facets of the boundary.
 
-**Boundary rule for Agents 3 & 5 (carry forward):**
+**Boundary rule (carry forward):**
 
-- No new command, help string, error message, example, or JSON field may
-  name OpenClaw, private cron/scheduler internals, the operator/Bankr EOA
-  or its Keychain storage, Safe multisig signature coordination, private
-  alert channels, internal deployment automation, or any local host/mirror
-  path (`/Users/…`).
+- No command, help string, error message, example, or JSON field may expose
+  private operational infrastructure, credential storage, internal
+  automation, or any local filesystem path.
 - The CLI must never gain a `--private-key`, `--mnemonic`, `--sign`, or
   `--submit` flag, an env var that reads a secret, or any code path that
   broadcasts. `assertNoCredentials` must remain wired on every file/JSON
   input command (`vault validate/prepare-create`, `coil validate/compile`).
 - Color/renderer work introduces **no** network, telemetry, or analytics
   calls. The renderer must not phone home.
-- Agent 5 (release) must run a boundary + secret scan on the diff before
+- The release lane must run a boundary + secret scan on the diff before
   tagging, and confirm `files` ships only `dist` + `LICENSE`.
 
 ## 6. Recommended file-ownership map (Agents 2–5)
