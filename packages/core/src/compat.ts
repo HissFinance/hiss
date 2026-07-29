@@ -18,7 +18,10 @@ export function slugify(input: string): string {
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    // Runs of non-alphanumerics are already collapsed to a single "-" above,
+    // so a single-dash trim is sufficient AND linear (no `-+` backtracking /
+    // polynomial-ReDoS on uncontrolled input).
+    .replace(/^-|-$/g, "");
 }
 
 /** A deterministic short id from parts — keccak-derived, never random. */

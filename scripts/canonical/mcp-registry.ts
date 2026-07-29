@@ -20,7 +20,6 @@ const TOOLS_SOURCES = [
   join(REPO_ROOT, "packages/mcp-server/src/tools-stock-premium.ts"),
   join(REPO_ROOT, "packages/mcp-server/src/tools-lighter.ts"),
 ];
-const TOOLS_SOURCE = TOOLS_SOURCES[0];
 
 /** A tool name in the HISS MCP namespace (snake_case, `hiss_` prefix). */
 const TOOL_NAME_RE = /name:\s*"(hiss_[a-z0-9_]+)"/g;
