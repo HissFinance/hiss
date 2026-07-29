@@ -85,7 +85,11 @@ function stateToken(p: Probe<unknown>): "live" | "degraded" | "unknown" {
 }
 
 function baseFrom(baseUrl?: string): string {
-  return (baseUrl ?? process.env.HISS_MCP_URL ?? DEFAULT_MCP_BASE_URL).replace(/\/+$/, "");
+  let url = baseUrl ?? process.env.HISS_MCP_URL ?? DEFAULT_MCP_BASE_URL;
+  // Strip trailing slashes linearly — avoids the /\/+$/ polynomial-ReDoS on
+  // an uncontrolled URL (many trailing '/').
+  while (url.endsWith("/")) url = url.slice(0, -1);
+  return url;
 }
 
 /** `hiss mcp status` — endpoint, transport, chain, health/readiness, tool facts. */

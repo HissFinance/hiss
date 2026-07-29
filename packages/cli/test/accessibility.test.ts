@@ -10,15 +10,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import {
-  renderCapture,
-  capture,
-  mockClient,
-  healthyMcpFetch,
-  fixture,
-  SKILLS_DIR,
-  nonAscii,
-} from "./_helpers.js";
+import { renderCapture, capture, mockClient, healthyMcpFetch, fixture, nonAscii } from "./_helpers.js";
 import { renderResult, renderErrorResult, type CommandResult } from "../src/lib/output.js";
 
 import { statusCommand, contractsCommand } from "../src/commands/status.js";
