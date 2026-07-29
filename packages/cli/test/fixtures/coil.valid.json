@@ -1,0 +1,14 @@
+{
+  "schema": "coil-manifest-1.0.0",
+  "name": "Momentum Demo Coil",
+  "universe": ["AAPL", "TSLA", "NVDA"],
+  "rules": [
+    { "when": "rsi < 30", "do": "flag-oversold" },
+    { "when": "rsi > 70", "do": "flag-overbought" }
+  ],
+  "fuses": {
+    "maxPositionBps": 1000,
+    "maxGrossExposureBps": 5000,
+    "allowShorting": false
+  }
+}
