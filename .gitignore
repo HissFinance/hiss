@@ -13,3 +13,4 @@ coverage/
 .pnpm-store/
 !*.env.example
 !.env.example
+packages/cli/*.tgz
