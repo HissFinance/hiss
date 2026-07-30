@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { statusCommand, contractsCommand } from "../src/commands/status.js";
 import { assertNoExecutionClaim } from "../src/lib/guard.js";
+import { EXIT } from "../src/lib/exit.js";
 import type { HissClient } from "../src/lib/types.js";
 
 /** Minimal mock RPC-backed client — only the reads under test are wired. */
@@ -47,6 +48,29 @@ describe("status command (mock RPC)", () => {
     }
     const data = result.data as { network: string };
     expect(data.network).toBe("robinhood-chain-mainnet");
+  });
+
+  it("a reachable read exits 0 (success)", async () => {
+    const result = await statusCommand(
+      mockClient({
+        getProtocolStatus: () =>
+          Promise.resolve({ network: "robinhood-chain-mainnet", chain: "4663", reachable: true, blockNumber: "23468679" }),
+      }),
+    );
+    expect(result.exitCode).toBe(EXIT.SUCCESS);
+  });
+
+  it("a DEGRADED read (reachable:false — blocked RPC) exits 4 (network), body unchanged", async () => {
+    const result = await statusCommand(
+      mockClient({
+        getProtocolStatus: () =>
+          Promise.resolve({ network: "unknown", chainId: 4663, reachable: false, blockNumber: null, rpcUrl: "http://127.0.0.1:9/blocked" }),
+      }),
+    );
+    // The exit code reflects the failed dependency — not a silent success.
+    expect(result.exitCode).toBe(EXIT.NETWORK);
+    // The rendered snapshot is still produced (data preserved), never a throw.
+    expect((result.data as { reachable: boolean }).reachable).toBe(false);
   });
 
   it("lists the contract registry", async () => {

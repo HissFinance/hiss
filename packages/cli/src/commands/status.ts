@@ -18,6 +18,22 @@ function rpcToken(status: JsonRecord): { state: StateToken; label: string } {
   return { state: "unknown", label: "UNKNOWN" };
 }
 
+/**
+ * Map read reachability → process exit code (exit.ts taxonomy). Conservative:
+ * only an AFFIRMATIVE `reachable === false` demotes the exit code. A read that
+ * simply omits the field is treated as success (the demotion requires evidence
+ * of failure, never its absence).
+ *   reachable === false → 4 network (a DEGRADED read is an upstream/RPC
+ *                         dependency failure — the SDK caught the RPC error and
+ *                         returned a degraded object instead of throwing; the
+ *                         exit code must still reflect the failed dependency)
+ *   otherwise           → 0 success
+ * The rendered human/JSON body is unchanged; only the exit code moves.
+ */
+function statusExitCode(status: JsonRecord): number {
+  return status.reachable === false ? EXIT.NETWORK : EXIT.SUCCESS;
+}
+
 export async function statusCommand(client: HissClient): Promise<CommandResult> {
   const status = await client.getProtocolStatus();
   const chain = str(status.chain, status.chainId != null ? String(status.chainId) : "unknown");
@@ -61,7 +77,7 @@ export async function statusCommand(client: HissClient): Promise<CommandResult> 
     data: status,
     detail,
     view,
-    exitCode: EXIT.SUCCESS,
+    exitCode: statusExitCode(status),
   };
 }
 
