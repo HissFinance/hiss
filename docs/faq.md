@@ -22,7 +22,9 @@ on-chain contracts. Protocol actions require the 2-of-3 Treasury Safe. See
 
 ### Can I install it from npm?
 
-Not yet — packages are **not published to npm**. Build from source:
+The **CLI is on npm**: `npm install -g @hiss-finance/cli` (published with build
+provenance; `npm audit signatures` verifies the attestation). The other packages
+(SDK, core, …) are **not yet published** — build those from source:
 `git clone` → `pnpm install` → `pnpm build`. See [Getting started](./getting-started.md).
 
 ### Does it cost anything to use?
