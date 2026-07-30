@@ -165,8 +165,17 @@ jobs:
       - name: Verify provenance attestation exists
         run: |
           VER="$(node -p "require('./packages/cli/package.json').version")"
-          npm view "@hiss-finance/cli@$VER" --json > "$RUNNER_TEMP/view.json"
-          node -e 'const o=require(process.env.RUNNER_TEMP+"/view.json"); const has=!!(o.dist&&(o.dist.attestations||o.dist["npm-signature"])); console.log("provenance/attestation present?", has); if(!has) throw new Error("no provenance attestation on published version")'
+          # dist.attestations can lag the publish by a few seconds (registry
+          # propagation); retry before failing so a real publish isn't reported
+          # as missing provenance.
+          for i in $(seq 1 12); do
+            npm view "@hiss-finance/cli@$VER" --json > "$RUNNER_TEMP/view.json" 2>/dev/null || true
+            if node -e 'const o=require(process.env.RUNNER_TEMP+"/view.json"); process.exit((o.dist&&o.dist.attestations)?0:1)' 2>/dev/null; then
+              echo "provenance attestation present ✓"; exit 0
+            fi
+            echo "waiting for attestation to propagate ($i)…"; sleep 6
+          done
+          echo "::error::no provenance attestation on published version after retries"; exit 1
 
       - name: Registry reinstall smoke (clean env)
         run: |
