@@ -96,10 +96,13 @@ jobs:
         working-directory: packages/cli
         run: |
           set -euo pipefail
+          # npm pack --pack-destination does NOT create the target dir; create it
+          # first or the tarball lands elsewhere and the install below ENOENTs.
+          mkdir -p "$RUNNER_TEMP/pack" "$RUNNER_TEMP/prefix"
           npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP/pack"
-          TGZ="$(ls "$RUNNER_TEMP/pack"/*.tgz)"
+          TGZ="$(ls "$RUNNER_TEMP/pack"/*.tgz | head -1)"
+          test -n "$TGZ" && test -f "$TGZ" || { echo "::error::npm pack produced no tarball in $RUNNER_TEMP/pack"; exit 1; }
           export NPM_CONFIG_PREFIX="$RUNNER_TEMP/prefix"
-          mkdir -p "$NPM_CONFIG_PREFIX"
           npm install -g "$TGZ"
           BIN="$NPM_CONFIG_PREFIX/bin/hiss"
           PKG_VER="$(node -p "require('$GITHUB_WORKSPACE/packages/cli/package.json').version")"
