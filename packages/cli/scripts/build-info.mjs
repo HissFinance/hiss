@@ -44,6 +44,4 @@ const info = {
 };
 
 writeFileSync(outPath, JSON.stringify(info, null, 2) + "\n");
-process.stdout.write(
-  `build-info.json → version ${info.version} · sha ${shortSha ?? "(no git)"}\n`,
-);
+process.stdout.write(`build-info.json → version ${info.version} · sha ${shortSha ?? "(no git)"}\n`);

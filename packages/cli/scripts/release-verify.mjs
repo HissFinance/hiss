@@ -122,7 +122,10 @@ check("published deps resolvable", () => {
   const bad = Object.entries(deps).filter(
     ([n, v]) => n.startsWith("@hiss-finance/") || String(v).startsWith("workspace:"),
   );
-  assert(bad.length === 0, `dependencies contain unpublished/workspace refs: ${bad.map(([n]) => n).join(", ")}`);
+  assert(
+    bad.length === 0,
+    `dependencies contain unpublished/workspace refs: ${bad.map(([n]) => n).join(", ")}`,
+  );
   return Object.keys(deps).join(", ") || "(none)";
 });
 
@@ -212,14 +215,8 @@ check("size budget", () => {
     const n = Number(cols[4]);
     if (Number.isFinite(n)) unpacked += n;
   }
-  assert(
-    packed <= MAX_PACKED_BYTES,
-    `packed ${packed}B exceeds budget ${MAX_PACKED_BYTES}B`,
-  );
-  assert(
-    unpacked <= MAX_UNPACKED_BYTES,
-    `unpacked ${unpacked}B exceeds budget ${MAX_UNPACKED_BYTES}B`,
-  );
+  assert(packed <= MAX_PACKED_BYTES, `packed ${packed}B exceeds budget ${MAX_PACKED_BYTES}B`);
+  assert(unpacked <= MAX_UNPACKED_BYTES, `unpacked ${unpacked}B exceeds budget ${MAX_UNPACKED_BYTES}B`);
   return `packed ${(packed / 1024).toFixed(1)}KB / unpacked ${(unpacked / 1024).toFixed(1)}KB`;
 });
 

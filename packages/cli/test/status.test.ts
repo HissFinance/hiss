@@ -54,7 +54,12 @@ describe("status command (mock RPC)", () => {
     const result = await statusCommand(
       mockClient({
         getProtocolStatus: () =>
-          Promise.resolve({ network: "robinhood-chain-mainnet", chain: "4663", reachable: true, blockNumber: "23468679" }),
+          Promise.resolve({
+            network: "robinhood-chain-mainnet",
+            chain: "4663",
+            reachable: true,
+            blockNumber: "23468679",
+          }),
       }),
     );
     expect(result.exitCode).toBe(EXIT.SUCCESS);
@@ -64,7 +69,13 @@ describe("status command (mock RPC)", () => {
     const result = await statusCommand(
       mockClient({
         getProtocolStatus: () =>
-          Promise.resolve({ network: "unknown", chainId: 4663, reachable: false, blockNumber: null, rpcUrl: "http://127.0.0.1:9/blocked" }),
+          Promise.resolve({
+            network: "unknown",
+            chainId: 4663,
+            reachable: false,
+            blockNumber: null,
+            rpcUrl: "http://127.0.0.1:9/blocked",
+          }),
       }),
     );
     // The exit code reflects the failed dependency — not a silent success.
