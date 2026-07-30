@@ -31,7 +31,15 @@ guide gets you from clone to first read/prepare.
 
 ## Install
 
-Packages are **not yet published to npm**. Build from source:
+The **CLI** is published to npm (with build provenance):
+
+```bash
+npm install -g @hiss-finance/cli
+hiss status
+```
+
+The other packages (SDK, core, …) are **not yet published** — build them from
+source:
 
 ```bash
 git clone https://github.com/HissFinance/hiss.git
@@ -79,10 +87,11 @@ console.log(status.vaults.flagship.address); // 0x6d96...63e6
 console.log(status.staking.xhiss.address); // 0x6998...67Be
 ```
 
-Or from the terminal:
+Or from the terminal with the published CLI:
 
 ```bash
-pnpm --filter @hiss-finance/cli start status --rpc-url https://rpc.mainnet.chain.robinhood.com
+npm install -g @hiss-finance/cli
+hiss status
 ```
 
 ## Your first prepare

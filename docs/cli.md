@@ -6,19 +6,21 @@ protocol state, validate manifests, inspect the hosted MCP server, and
 broadcasts, holds keys, or requests a brokerage credential. Every prepared
 transaction is `signed: false`; nothing is sent.
 
-> Packages are **not yet published to npm**. Run from the workspace after
-> `pnpm install` (source-distributed TypeScript, executed via `tsx`).
-
 ## Install & run
 
 ```bash
-pnpm install            # from the repo root
-# Run any command through the package `start` script:
-pnpm --filter @hiss-finance/cli start <command> [options]
+npm install -g @hiss-finance/cli
+hiss <command> [options]
 ```
 
-The examples below use the `hiss <command>` short form for readability; in the
-workspace that is `pnpm --filter @hiss-finance/cli start <command>`.
+Requires Node.js >= 18. Published to npm with build provenance (`npm audit
+signatures` verifies the attestation); or run without installing via
+`npx @hiss-finance/cli <command>`.
+
+> Contributors can run the in-repo build instead of the published package:
+> `pnpm install` from the repo root, then
+> `pnpm --filter @hiss-finance/cli start <command>` — the workspace equivalent of
+> the `hiss <command>` short form used in the examples below.
 
 Reads that hit the chain need `--rpc-url` (mainnet:
 `https://rpc.mainnet.chain.robinhood.com`, testnet chain id `46630`). Local
