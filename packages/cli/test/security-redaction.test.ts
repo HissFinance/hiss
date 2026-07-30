@@ -138,6 +138,41 @@ describe("§24.6 defense-in-depth — redaction runs on rendered output", () => 
     expect(cap.err()).not.toContain("supersecretvalue123");
     expect(cap.out()).toBe(""); // errors never touch stdout
   });
+
+  it("JSON `data` is deep-redacted — an RPC-URL credential never leaks in --json", () => {
+    // Regression for the credential leak found post-publish of 0.2.0: `status
+    // --json` echoed data.rpcUrl verbatim, so `--rpc-url scheme://user:pass@host`
+    // leaked the userinfo into machine output (the mode most likely to be logged).
+    const cap = capture({ mode: "json", color: false });
+    renderResult(
+      {
+        summary: "HISS Finance status read.",
+        data: {
+          reachable: false,
+          chainId: 4663,
+          rpcUrl: "https://alice:supersecretvalue123@rpc.example.com",
+          note: "apiKey=supersecretvalue123",
+        },
+        exitCode: 4,
+      },
+      cap.ctx,
+    );
+    const out = cap.out();
+    expect(out).not.toContain("supersecretvalue123");
+    expect(out).toContain("[redacted]");
+    // The envelope is still valid JSON and the non-secret host is preserved.
+    const parsed = JSON.parse(out);
+    expect(parsed.data.chainId).toBe(4663);
+    expect(parsed.data.rpcUrl).toContain("rpc.example.com");
+  });
+
+  it("JSON `data` deep-redaction preserves public identifiers (addresses/hashes)", () => {
+    const cap = capture({ mode: "json", color: false });
+    renderResult({ summary: "ok", data: { safe: SAFE, tx: TX_HASH, chainId: 4663 }, exitCode: 0 }, cap.ctx);
+    const parsed = JSON.parse(cap.out());
+    expect(parsed.data.safe).toBe(SAFE);
+    expect(parsed.data.tx).toBe(TX_HASH);
+  });
 });
 
 /**

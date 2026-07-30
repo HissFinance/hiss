@@ -23,6 +23,7 @@ import {
   SAMPLE_TX,
 } from "./_helpers.js";
 import type { CommandResult } from "../src/lib/output.js";
+import { redact } from "../src/lib/redact.js";
 import type { HissClient } from "../src/lib/types.js";
 
 import { statusCommand, contractsCommand } from "../src/commands/status.js";
@@ -68,7 +69,11 @@ import { skillListCommand, skillPrintCommand } from "../src/commands/skill.js";
  * output legitimately shows the caller's own dir — only the TEST snapshot is
  * normalized.
  */
-const scrubPaths = (s: string): string => s.split(SKILLS_DIR).join("<skills-dir>");
+// JSON `data` is now deep-redacted, so an absolute skills dir appears with its
+// /Users/<user> (or /home/<user>) segment masked to [redacted]. Normalize BOTH
+// the raw and the redacted forms to the stable token so goldens stay hermetic.
+const scrubPaths = (s: string): string =>
+  s.split(SKILLS_DIR).join("<skills-dir>").split(redact(SKILLS_DIR)).join("<skills-dir>");
 
 const FIXED_NOW = "2026-01-01T00:00:00.000Z";
 const VALID_RECEIPT = JSON.stringify({

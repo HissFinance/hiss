@@ -25,6 +25,7 @@ import type { ViewBlock } from "./view.js";
 import { renderBlocks } from "./render.js";
 import { serializeJson, asciiFold } from "./format.js";
 import { stripAnsi } from "./width.js";
+import { redactDeep } from "./redact.js";
 
 /** Legacy 3-value mode (mode ⊕ verbosity are separated in the new context). */
 export type OutputMode = "human" | "json" | "quiet";
@@ -73,7 +74,7 @@ export const consolePrinter: Printer = {
   err: (line) => process.stderr.write(line + "\n"),
 };
 
-const DEFAULT_CLI_VERSION = "0.2.0";
+const DEFAULT_CLI_VERSION = "0.2.1";
 
 /** The stable JSON envelope (§2). Keys are canonicalized by the serializer. */
 export interface JsonEnvelope {
@@ -120,10 +121,16 @@ export function renderResult(result: CommandResult, ctx: OutputContext, meta?: R
 
   if (ctx.mode === "json") {
     // Guard the human-facing summary/warnings even in JSON (a trip is an
-    // internal fault → the throw keeps stdout empty). Data is machine-only.
+    // internal fault → the throw keeps stdout empty). The `data` payload is
+    // machine-readable and the MOST likely to be piped to a log, so deep-redact
+    // its string values with the same redactor used for human output — a
+    // credential embedded in e.g. an RPC-URL (`--rpc-url scheme://user:pass@…`)
+    // must never leak just because the caller asked for JSON.
     guardPlain(result.summary, receiptVerified);
     for (const w of warnings) guardPlain(w, receiptVerified);
-    ctx.stdout(serializeJson(buildEnvelope(result, meta)) + "\n");
+    const env = buildEnvelope(result, meta);
+    env.data = redactDeep(env.data, ctx.redact);
+    ctx.stdout(serializeJson(env) + "\n");
     return;
   }
 
