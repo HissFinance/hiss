@@ -68,7 +68,7 @@ import {
   agenticReceiptsCommand,
 } from "./commands/agentic.js";
 
-export const CLI_VERSION = "0.2.0";
+export const CLI_VERSION = "0.2.1";
 
 interface GlobalOpts {
   output?: RenderMode;

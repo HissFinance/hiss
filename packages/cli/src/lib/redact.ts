@@ -104,3 +104,24 @@ export function redact(input: string): string {
 
 /** The identity redactor — for tests that need a pass-through. */
 export const noRedact = (s: string): string => s;
+
+/**
+ * Deep-redact every STRING value in an arbitrary JSON-ish value, applying
+ * {@link redact} (or a supplied redactor) to each. Used to sanitize the `--json`
+ * `data` payload: a machine-readable envelope is the MOST likely to be piped to
+ * a log, so a credential embedded there (e.g. RPC-URL userinfo the user passed
+ * via --rpc-url) must be masked exactly as it is in human output. Object keys
+ * are preserved verbatim (only values are scanned); public identifiers
+ * (addresses, hashes) pass through untouched because `redact` never keys on
+ * bare hex.
+ */
+export function redactDeep<T>(value: T, redactor: (s: string) => string = redact): T {
+  if (typeof value === "string") return redactor(value) as unknown as T;
+  if (Array.isArray(value)) return value.map((v) => redactDeep(v, redactor)) as unknown as T;
+  if (value !== null && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) out[k] = redactDeep(v, redactor);
+    return out as unknown as T;
+  }
+  return value;
+}
