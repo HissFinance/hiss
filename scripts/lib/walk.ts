@@ -72,8 +72,12 @@ export function listFiles(root: string = REPO_ROOT, opts: WalkOptions = {}): str
     }
     for (const entry of entries) {
       const full = join(dir, entry.name);
+      // Ignore by name for BOTH dirs and files: in a linked git worktree `.git`
+      // is a pointer FILE (not a directory), so a dir-only skip would scan it
+      // and leak the operator's local worktree path. Names in IGNORE_DIRS are
+      // never legitimate tracked text files, so skipping matching files is safe.
+      if (ignore.has(entry.name)) continue;
       if (entry.isDirectory()) {
-        if (ignore.has(entry.name)) continue;
         stack.push(full);
       } else if (entry.isFile()) {
         if (opts.textOnly && isBinary(full)) continue;
