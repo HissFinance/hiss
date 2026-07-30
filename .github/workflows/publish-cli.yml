@@ -51,16 +51,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           # 22.x resolves to >= 22.14.0, the trusted-publishing floor.
+          # NOTE: intentionally NO `registry-url` — it writes an .npmrc line
+          # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` that, with no
+          # token set, expands to an EMPTY authToken and shadows npm's OIDC
+          # trusted-publishing exchange (→ 404). The registry comes from the
+          # package's publishConfig.registry instead.
           node-version: "22"
-          registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
 
-      - name: Ensure npm >= 11.5.1 (trusted publishing floor)
+      - name: Ensure npm 11.x (>= 11.5.1 for OIDC; avoid npm 12 bin-field mangling)
         run: |
-          npm install -g npm@latest
+          # Pin to the 11.x line: npm@latest currently resolves to 12.x, which
+          # "auto-corrects" and DROPS the package `bin` on publish (shipping a
+          # binless CLI). 11.x publishes the bin correctly and supports OIDC.
+          npm install -g 'npm@^11.15.0'
           echo "npm $(npm --version) · node $(node --version)"
-          node -e 'const [a,b,c]=process.versions.node.split(".").map(Number); if(a<22||(a===22&&b<14)) throw new Error("Node < 22.14.0")'
-          node -e 'const v=require("child_process").execSync("npm --version").toString().trim(); const [a,b,c]=v.split(".").map(Number); if(a<11||(a===11&&(b<5||(b===5&&c<1)))) throw new Error("npm < 11.5.1: "+v)'
+          node -e 'const [a,b]=process.versions.node.split(".").map(Number); if(a<22||(a===22&&b<14)) throw new Error("Node < 22.14.0")'
+          node -e 'const v=require("child_process").execSync("npm --version").toString().trim(); const [a,b,c]=v.split(".").map(Number); if(a!==11||b<5||(b===5&&c<1)) throw new Error("npm not in the supported 11.x (>=11.5.1) range: "+v)'
 
       - name: Verify tag version == package version
         run: |
