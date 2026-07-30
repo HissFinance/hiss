@@ -1,0 +1,145 @@
+# Publish @hiss-finance/cli to npm via OIDC trusted publishing.
+#
+# Token-less: there is NO long-lived npm publish token anywhere. Authentication
+# is GitHub Actions OIDC ("trusted publishing"); npm mints a short-lived,
+# cryptographically-signed token per publish and generates provenance
+# automatically. Requirements (verified against the official npm docs at
+# implementation time): npm CLI >= 11.5.1, Node >= 22.14.0, permissions
+# id-token:write + contents:read, and the trusted-publisher config on npmjs.com
+# must name THIS workflow file (publish-cli.yml, case-sensitive) and the
+# `npm-production` environment.
+#
+# Triggered only by a `cli-v*` tag push on HissFinance/hiss. It never publishes
+# from a fork, a pull request, or an arbitrary branch: the tagged commit must be
+# contained in origin/main, and the tag version must equal the package version.
+name: Publish CLI
+
+on:
+  push:
+    tags:
+      - "cli-v*"
+
+# Least privilege. id-token:write is the ONLY elevated scope, and it is what
+# OIDC trusted publishing needs; there is no packages:write, no contents:write.
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-cli-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish @hiss-finance/cli
+    # Never publish from a fork of this repository.
+    if: github.repository == 'HissFinance/hiss'
+    runs-on: ubuntu-latest # GitHub-hosted only; never a self-hosted runner.
+    # Protected environment — the owner gates publishes with required reviewers.
+    environment: npm-production
+    timeout-minutes: 25
+    steps:
+      - name: Checkout (full history for ancestry check)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          # 22.x resolves to >= 22.14.0, the trusted-publishing floor.
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      - name: Ensure npm >= 11.5.1 (trusted publishing floor)
+        run: |
+          npm install -g npm@latest
+          echo "npm $(npm --version) · node $(node --version)"
+          node -e 'const [a,b,c]=process.versions.node.split(".").map(Number); if(a<22||(a===22&&b<14)) throw new Error("Node < 22.14.0")'
+          node -e 'const v=require("child_process").execSync("npm --version").toString().trim(); const [a,b,c]=v.split(".").map(Number); if(a<11||(a===11&&(b<5||(b===5&&c<1)))) throw new Error("npm < 11.5.1: "+v)'
+
+      - name: Verify tag version == package version
+        run: |
+          TAG="${GITHUB_REF_NAME#cli-v}"
+          PKG="$(node -p "require('./packages/cli/package.json').version")"
+          echo "tag=$TAG package=$PKG"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::tag version ($TAG) != package.json version ($PKG)"; exit 1
+          fi
+
+      - name: Verify tagged commit is contained in origin/main
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::tagged commit $GITHUB_SHA is not contained in origin/main — refusing to publish from an off-main commit"; exit 1
+          fi
+          echo "tagged commit is on main ✓"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build CLI (self-contained bundle)
+        run: pnpm --filter @hiss-finance/cli build
+
+      - name: release:verify (13 pre-publish gates)
+        run: pnpm --filter @hiss-finance/cli release:verify
+
+      - name: Pack + inspect (dry run)
+        working-directory: packages/cli
+        run: npm pack --dry-run
+
+      - name: Isolated tarball install + binary smoke
+        working-directory: packages/cli
+        run: |
+          set -euo pipefail
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP/pack"
+          TGZ="$(ls "$RUNNER_TEMP/pack"/*.tgz)"
+          export NPM_CONFIG_PREFIX="$RUNNER_TEMP/prefix"
+          mkdir -p "$NPM_CONFIG_PREFIX"
+          npm install -g "$TGZ"
+          BIN="$NPM_CONFIG_PREFIX/bin/hiss"
+          PKG_VER="$(node -p "require('$GITHUB_WORKSPACE/packages/cli/package.json').version")"
+          # --version parity
+          test "$("$BIN" --version)" = "$PKG_VER"
+          # --json parses and is ANSI-free (capture-then-parse; a degraded live
+          # read must not fail the smoke — we assert the envelope, not the code).
+          OUT="$("$BIN" status --json || true)"
+          node -e 'const s=process.argv[1]; if(/\x1b\[/.test(s)) throw new Error("ANSI in JSON"); const o=JSON.parse(s); if(typeof o!=="object"||o===null) throw new Error("bad envelope"); console.log("pre-publish smoke ok · code",o.code)' "$OUT"
+
+      - name: Publish (OIDC — token-less, provenance automatic)
+        working-directory: packages/cli
+        # No NODE_AUTH_TOKEN. --ignore-scripts because dist/ is already built
+        # above; provenance is still generated by npm during publish.
+        run: npm publish --ignore-scripts
+
+      - name: Verify package on the registry
+        run: |
+          VER="$(node -p "require('./packages/cli/package.json').version")"
+          for i in $(seq 1 12); do
+            if npm view "@hiss-finance/cli@$VER" version >/dev/null 2>&1; then break; fi
+            echo "waiting for registry propagation ($i)…"; sleep 6
+          done
+          npm view "@hiss-finance/cli@$VER" version dist.integrity dist-tags
+
+      - name: Verify provenance attestation exists
+        run: |
+          VER="$(node -p "require('./packages/cli/package.json').version")"
+          npm view "@hiss-finance/cli@$VER" --json > "$RUNNER_TEMP/view.json"
+          node -e 'const o=require(process.env.RUNNER_TEMP+"/view.json"); const has=!!(o.dist&&(o.dist.attestations||o.dist["npm-signature"])); console.log("provenance/attestation present?", has); if(!has) throw new Error("no provenance attestation on published version")'
+
+      - name: Registry reinstall smoke (clean env)
+        run: |
+          set -euo pipefail
+          VER="$(node -p "require('$GITHUB_WORKSPACE/packages/cli/package.json').version")"
+          export NPM_CONFIG_PREFIX="$RUNNER_TEMP/reinstall"
+          mkdir -p "$NPM_CONFIG_PREFIX"
+          cd "$RUNNER_TEMP"
+          npm install -g "@hiss-finance/cli@$VER"
+          BIN="$NPM_CONFIG_PREFIX/bin/hiss"
+          test "$("$BIN" --version)" = "$VER"
+          OUT="$("$BIN" status --json || true)"
+          node -e 'const o=JSON.parse(process.argv[1]); if(typeof o!=="object") throw new Error("bad envelope"); console.log("registry reinstall smoke ok · code",o.code)' "$OUT"

@@ -30,16 +30,27 @@ function asUnsigned(tx: JsonRecord): UnsignedTx {
   };
 }
 
+/** Public Robinhood Chain RPC endpoints — read-only, no embedded credentials. */
+const DEFAULT_RPC_URL: Record<number, string> = {
+  4663: "https://rpc.mainnet.chain.robinhood.com",
+  46630: "https://rpc.testnet.chain.robinhood.com",
+};
+
 /**
  * Build a HissClient backed by the public SDK. The SDK client is expected to
  * expose the same read + prepare surface; results are passed through
  * unchanged for reads and normalized to unsigned transactions for prepares.
+ *
+ * When no `rpcUrl` is configured (a fresh global install with no flags/env),
+ * default to the public read-only RPC for the selected chain so basic reads
+ * (`hiss status`, `hiss vaults`, …) work out of the box without a monorepo.
  */
 export function createHissClient(opts: ClientOptions = {}): HissClient {
   type SdkFn = (...args: unknown[]) => Promise<unknown>;
+  const chainId = opts.chainId ?? 4663;
   const sdk = createSdkClient({
-    rpcUrl: opts.rpcUrl,
-    chainId: opts.chainId ?? 4663,
+    rpcUrl: opts.rpcUrl ?? DEFAULT_RPC_URL[chainId] ?? DEFAULT_RPC_URL[4663],
+    chainId,
   }) as unknown as Record<string, SdkFn | undefined>;
 
   const invoke = async (method: string, ...args: unknown[]): Promise<unknown> => {
@@ -47,7 +58,10 @@ export function createHissClient(opts: ClientOptions = {}): HissClient {
     if (typeof fn !== "function") {
       throw new Error(`@hiss-finance/sdk client does not implement "${method}".`);
     }
-    return fn(...args);
+    // The SDK client is a class instance — call the method bound to it so `this`
+    // (chainId/rpcUrl/viem client) is preserved. Calling `fn(...)` detached would
+    // lose `this` and throw "Cannot read properties of undefined (reading 'chainId')".
+    return fn.call(sdk, ...args);
   };
   const call = async (method: string, ...args: unknown[]): Promise<JsonRecord> =>
     (await invoke(method, ...args)) as JsonRecord;

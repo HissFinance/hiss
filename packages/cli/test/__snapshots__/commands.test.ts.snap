@@ -1453,7 +1453,7 @@ exports[`§24.4 golden — JSON envelope (stable, canonical) > stake.status 1`] 
 exports[`§24.4 golden — JSON envelope (stable, canonical) > status.degraded 1`] = `
 "{
   "cliVersion": "0.2.0",
-  "code": 0,
+  "code": 4,
   "command": "status.degraded",
   "data": {
     "chain": "4663",
@@ -1461,7 +1461,7 @@ exports[`§24.4 golden — JSON envelope (stable, canonical) > status.degraded 1
     "network": "robinhood-chain-mainnet",
     "reachable": false
   },
-  "ok": true,
+  "ok": false,
   "summary": "HISS Finance status read from robinhood-chain-mainnet."
 }
 "

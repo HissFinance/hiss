@@ -1,45 +1,77 @@
 {
   "name": "@hiss-finance/cli",
   "version": "0.2.0",
-  "description": "Read-and-prepare command-line interface for HISS Finance — inspect protocol state and build unsigned transactions. Never signs, submits, or holds keys.",
+  "description": "Command-line interface for the HISS agentic trading control plane on Robinhood Chain — public reads, strategy compilation, risk fuses, unsigned transaction preparation and receipt verification.",
   "license": "Apache-2.0",
   "type": "module",
+  "sideEffects": false,
   "bin": {
-    "hiss": "dist/bin/hiss.js"
+    "hiss": "./dist/bin/hiss.js"
   },
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
-    }
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
-    "dist",
-    "LICENSE",
-    "README.md"
+    "dist/**",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=18"
   },
+  "keywords": [
+    "hiss",
+    "hiss-finance",
+    "cli",
+    "robinhood-chain",
+    "defi",
+    "vault",
+    "usdg",
+    "staking",
+    "coilops",
+    "agentic",
+    "unsigned-transactions",
+    "read-only"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HissFinance/hiss.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/HissFinance/hiss/tree/main/packages/cli#readme",
+  "bugs": {
+    "url": "https://github.com/HissFinance/hiss/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -w -p tsconfig.json",
+    "build": "tsup && node scripts/build-info.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "start": "tsx src/bin/hiss.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "pack:dry-run": "npm pack --dry-run",
+    "release:verify": "node scripts/release-verify.mjs",
+    "prepack": "pnpm run build"
   },
   "dependencies": {
-    "@hiss-finance/core": "workspace:*",
-    "@hiss-finance/sdk": "workspace:*",
     "commander": "^12.1.0",
-    "picocolors": "1.1.1"
+    "picocolors": "1.1.1",
+    "viem": "^2.21.0"
   },
   "devDependencies": {
+    "@hiss-finance/core": "workspace:*",
+    "@hiss-finance/sdk": "workspace:*",
     "@types/node": "^20.14.0",
+    "tsup": "^8.5.0",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
   }
