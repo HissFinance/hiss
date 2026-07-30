@@ -38,6 +38,11 @@ jobs:
     # Protected environment — the owner gates publishes with required reviewers.
     environment: npm-production
     timeout-minutes: 25
+    # Declare the OIDC permission at the JOB level too (not only workflow level)
+    # so the id-token env is unambiguously provisioned for the publish job.
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout (full history for ancestry check)
         uses: actions/checkout@v4
@@ -119,6 +124,15 @@ jobs:
           # read must not fail the smoke — we assert the envelope, not the code).
           OUT="$("$BIN" status --json || true)"
           node -e 'const s=process.argv[1]; if(/\x1b\[/.test(s)) throw new Error("ANSI in JSON"); const o=JSON.parse(s); if(typeof o!=="object"||o===null) throw new Error("bad envelope"); console.log("pre-publish smoke ok · code",o.code)' "$OUT"
+
+      - name: Diagnose OIDC availability (no secrets printed)
+        run: |
+          echo "id-token request URL present: ${ACTIONS_ID_TOKEN_REQUEST_URL:+yes}"
+          echo "id-token request token present: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+yes}"
+          echo "npm version: $(npm --version)"
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
+            echo "::error::OIDC id-token env is absent — the job lacks effective id-token:write; npm cannot do trusted publishing"; exit 1
+          fi
 
       - name: Publish (OIDC — token-less, provenance automatic)
         working-directory: packages/cli
