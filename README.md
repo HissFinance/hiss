@@ -76,11 +76,14 @@ Protocol-level actions are governed by a 2-of-3 [Treasury Safe](./docs/trust-bou
 
 ## 5-minute quickstart
 
-> The packages are **not yet published to npm** — build them from source with
-> `pnpm`. **Node.js 20+** and **pnpm 10+** are required (the repo pins
-> `pnpm@10.28.1`). The TypeScript packages run directly from source via
-> [`tsx`](https://tsx.is); the Solidity contracts use [Foundry](https://book.getfoundry.sh/).
-> No private credentials are required — reads use a public RPC you supply.
+> The **`@hiss-finance/cli`** package is **published to npm** with build
+> provenance — `npm install -g @hiss-finance/cli`, then `hiss <command>`. The
+> other packages (SDK, core, …) are **not yet published** — build them from
+> source with `pnpm`. **Node.js 20+** and **pnpm 10+** are required for a source
+> build (the repo pins `pnpm@10.28.1`). The TypeScript packages run directly from
+> source via [`tsx`](https://tsx.is); the Solidity contracts use
+> [Foundry](https://book.getfoundry.sh/). No private credentials are required —
+> reads use a public RPC you supply.
 
 ```bash
 # 1. Clone
@@ -97,25 +100,27 @@ pnpm build
 pnpm test
 ```
 
-Once installed, import the workspace packages into your own app, or run the CLI:
+The CLI is on npm — no clone required:
 
 ```bash
-# Read live protocol status from Robinhood Chain (supply a public RPC)
-pnpm --filter @hiss-finance/cli start status \
-  --rpc-url https://rpc.mainnet.chain.robinhood.com
+npm install -g @hiss-finance/cli
+
+# Read live protocol status from Robinhood Chain (public RPC by default)
+hiss status
 
 # Machine-readable envelope (ANSI-free stdout) or ASCII for logs/screen readers
-pnpm --filter @hiss-finance/cli start status --json --rpc-url … | jq .data
-pnpm --filter @hiss-finance/cli start vault list --plain
+hiss status --json | jq .data
+hiss vault list --plain
 ```
 
 The `hiss` CLI has a global output system — `human` (default), `--json`, and
 `--plain` — respects `NO_COLOR`, and exits with a stable 0–7 code taxonomy so
 scripts can branch on outcome. See the [CLI guide](./docs/cli.md).
 
-When the packages are published, this section will switch to a single
-`pnpm add @hiss-finance/sdk`. Until then, consume them via the workspace or a
-local `file:` / `link:` reference.
+Contributors building from source can run the same commands as
+`pnpm --filter @hiss-finance/cli start <command>`. The remaining packages (e.g.
+`@hiss-finance/sdk`) are not yet published — consume them via the workspace or a
+local `file:` / `link:` reference until they are.
 
 ## 🧠 Install HISS Agent Skills
 

@@ -4,8 +4,10 @@ All notable changes to this repository are documented here. The format is based 
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Because the packages are **not yet published to npm**, a "release" is a tagged
-commit in this repository. Pin to a tag for stability.
+The **`@hiss-finance/cli`** package is published to npm — released via `cli-v*`
+tags through GitHub OIDC trusted publishing (with build provenance). The other
+packages are **not yet published**; for those a "release" is a tagged commit in
+this repository. Pin to an npm version or a tag for stability.
 
 ## [Unreleased]
 

@@ -38,6 +38,11 @@ jobs:
     # Protected environment — the owner gates publishes with required reviewers.
     environment: npm-production
     timeout-minutes: 25
+    # Declare the OIDC permission at the JOB level too (not only workflow level)
+    # so the id-token env is unambiguously provisioned for the publish job.
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout (full history for ancestry check)
         uses: actions/checkout@v4
@@ -51,15 +56,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           # 22.x resolves to >= 22.14.0, the trusted-publishing floor.
+          # registry-url is REQUIRED (per npm docs) so npm targets the npm
+          # registry for the OIDC exchange. With job-level id-token:write present,
+          # npm performs OIDC and the empty NODE_AUTH_TOKEN placeholder is unused.
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
 
-      - name: Ensure npm >= 11.5.1 (trusted publishing floor)
+      - name: Ensure npm >= 11.5.1 (trusted-publishing floor; latest OIDC behavior)
         run: |
+          # Use the latest npm for the most current OIDC trusted-publishing logic.
+          # (The earlier "bin removed" warning is cosmetic — the published 0.2.0
+          # bin is intact on the registry — so npm 12 is safe here.)
           npm install -g npm@latest
           echo "npm $(npm --version) · node $(node --version)"
-          node -e 'const [a,b,c]=process.versions.node.split(".").map(Number); if(a<22||(a===22&&b<14)) throw new Error("Node < 22.14.0")'
+          node -e 'const [a,b]=process.versions.node.split(".").map(Number); if(a<22||(a===22&&b<14)) throw new Error("Node < 22.14.0")'
           node -e 'const v=require("child_process").execSync("npm --version").toString().trim(); const [a,b,c]=v.split(".").map(Number); if(a<11||(a===11&&(b<5||(b===5&&c<1)))) throw new Error("npm < 11.5.1: "+v)'
 
       - name: Verify tag version == package version
@@ -96,10 +107,13 @@ jobs:
         working-directory: packages/cli
         run: |
           set -euo pipefail
+          # npm pack --pack-destination does NOT create the target dir; create it
+          # first or the tarball lands elsewhere and the install below ENOENTs.
+          mkdir -p "$RUNNER_TEMP/pack" "$RUNNER_TEMP/prefix"
           npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP/pack"
-          TGZ="$(ls "$RUNNER_TEMP/pack"/*.tgz)"
+          TGZ="$(ls "$RUNNER_TEMP/pack"/*.tgz | head -1)"
+          test -n "$TGZ" && test -f "$TGZ" || { echo "::error::npm pack produced no tarball in $RUNNER_TEMP/pack"; exit 1; }
           export NPM_CONFIG_PREFIX="$RUNNER_TEMP/prefix"
-          mkdir -p "$NPM_CONFIG_PREFIX"
           npm install -g "$TGZ"
           BIN="$NPM_CONFIG_PREFIX/bin/hiss"
           PKG_VER="$(node -p "require('$GITHUB_WORKSPACE/packages/cli/package.json').version")"
@@ -109,6 +123,29 @@ jobs:
           # read must not fail the smoke — we assert the envelope, not the code).
           OUT="$("$BIN" status --json || true)"
           node -e 'const s=process.argv[1]; if(/\x1b\[/.test(s)) throw new Error("ANSI in JSON"); const o=JSON.parse(s); if(typeof o!=="object"||o===null) throw new Error("bad envelope"); console.log("pre-publish smoke ok · code",o.code)' "$OUT"
+
+      - name: Diagnose OIDC availability (no secrets printed)
+        run: |
+          echo "id-token request URL present: ${ACTIONS_ID_TOKEN_REQUEST_URL:+yes}"
+          echo "id-token request token present: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+yes}"
+          echo "npm version: $(npm --version)"
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
+            echo "::error::OIDC id-token env is absent — the job lacks effective id-token:write; npm cannot do trusted publishing"; exit 1
+          fi
+
+      - name: Strip the empty setup-node authToken so npm chooses OIDC
+        run: |
+          # setup-node (registry-url) writes `//registry.npmjs.org/:_authToken=
+          # ${NODE_AUTH_TOKEN}`. With no token that resolves to an EMPTY authToken
+          # which npm treats as "auth is configured" and uses instead of the OIDC
+          # exchange (→ 404). Remove that line so npm, seeing no configured auth +
+          # id-token env present, performs the OIDC trusted-publishing exchange.
+          CFG="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+          echo "npmrc: $CFG"
+          if [ -f "$CFG" ]; then
+            grep -v ':_authToken=' "$CFG" > "$CFG.tmp" && mv "$CFG.tmp" "$CFG"
+            echo "authToken lines remaining: $(grep -c '_authToken' "$CFG" || true)"
+          fi
 
       - name: Publish (OIDC — token-less, provenance automatic)
         working-directory: packages/cli
@@ -128,8 +165,17 @@ jobs:
       - name: Verify provenance attestation exists
         run: |
           VER="$(node -p "require('./packages/cli/package.json').version")"
-          npm view "@hiss-finance/cli@$VER" --json > "$RUNNER_TEMP/view.json"
-          node -e 'const o=require(process.env.RUNNER_TEMP+"/view.json"); const has=!!(o.dist&&(o.dist.attestations||o.dist["npm-signature"])); console.log("provenance/attestation present?", has); if(!has) throw new Error("no provenance attestation on published version")'
+          # dist.attestations can lag the publish by a few seconds (registry
+          # propagation); retry before failing so a real publish isn't reported
+          # as missing provenance.
+          for i in $(seq 1 12); do
+            npm view "@hiss-finance/cli@$VER" --json > "$RUNNER_TEMP/view.json" 2>/dev/null || true
+            if node -e 'const o=require(process.env.RUNNER_TEMP+"/view.json"); process.exit((o.dist&&o.dist.attestations)?0:1)' 2>/dev/null; then
+              echo "provenance attestation present ✓"; exit 0
+            fi
+            echo "waiting for attestation to propagate ($i)…"; sleep 6
+          done
+          echo "::error::no provenance attestation on published version after retries"; exit 1
 
       - name: Registry reinstall smoke (clean env)
         run: |

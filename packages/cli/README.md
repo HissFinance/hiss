@@ -4,12 +4,17 @@
 Robinhood Chain. It reads protocol state and builds **unsigned** transactions.
 It never signs, submits, holds keys, or requests a brokerage credential.
 
-> Packages are **not yet published to npm**. Run from the workspace:
->
-> ```bash
-> pnpm install
-> pnpm --filter @hiss-finance/cli start <command> [options]
-> ```
+## Install
+
+```bash
+npm install -g @hiss-finance/cli
+hiss <command> [options]
+```
+
+Requires Node.js >= 18. Published with build provenance (`npm audit signatures`
+verifies the attestation). Or run without installing: `npx @hiss-finance/cli
+<command>`. Contributors can run the in-repo build instead:
+`pnpm install && pnpm --filter @hiss-finance/cli start <command>`.
 
 ## Highlights
 

@@ -43,8 +43,11 @@ released minor line and the `main` branch.
 | `0.1.x`             | Yes       |
 | `< 0.1.0`           | No        |
 
-Because the packages are **not yet published to npm**, "released" means a tagged
-commit in this repository. Pin to a tag and watch releases for security updates.
+The **`@hiss-finance/cli`** package is published to npm with build provenance;
+for it, "released" means a published npm version (`cli-v*` tag → OIDC). The other
+packages are **not yet published**; for those "released" means a tagged commit in
+this repository. Pin to an npm version or a tag and watch releases for security
+updates.
 
 ## Scope
 

@@ -9,8 +9,10 @@ It never signs, never broadcasts on your behalf, never holds keys, and never tak
 custody. Preparation returns unsigned transactions; you send them with your own
 wallet.
 
-> Packages are **not yet published to npm**. Consume them from the workspace after
-> `pnpm build`, or via a local `file:`/`link:` reference.
+> The **SDK is not yet published to npm** — consume it from the workspace after
+> `pnpm build`, or via a local `file:`/`link:` reference. (The
+> [`@hiss-finance/cli`](./cli.md), which bundles the SDK, **is** published:
+> `npm install -g @hiss-finance/cli`.)
 
 ## Client
 

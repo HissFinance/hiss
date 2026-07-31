@@ -5,8 +5,9 @@
 your own wallet connector and styling. The hooks **read** and **prepare**; signing
 happens in your wallet.
 
-> Packages are **not yet published to npm**. Consume from the workspace after
-> `pnpm build`.
+> The **React package is not yet published to npm** — consume it from the
+> workspace after `pnpm build`. (Only the [`@hiss-finance/cli`](./cli.md) is
+> published so far.)
 
 ## Provider
 
