@@ -50,6 +50,15 @@ export function mockClient(overrides: Partial<HissClient> = {}): HissClient {
         vaultCount: 2,
         treasurySafe: "0xF100Fc28dd1721C698046Dbd60408c523b69e36c",
         rpcUrl: "https://rpc.example.invalid",
+        vaults: {
+          canonicalDepositVault: "0x432e90b1b35995ebe46ed93b4db369abfc230e69",
+          canonicalLabel:
+            "HISS Vault V2 — canonical new-deposit vault (queue-routed epoch settlement, 24/7 lanes)",
+          legacyV1Vault: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+          legacyLabel:
+            "HISS Vault (flagship V1) — LEGACY: closed to new deposits; existing balances withdraw/redeem here",
+          note: "Static lifecycle facts — queue/keeper/capacity/pause state is a live read (getVaultV2Status).",
+        },
       }),
     getContractRegistry: () =>
       Promise.resolve({
@@ -60,26 +69,73 @@ export function mockClient(overrides: Partial<HissClient> = {}): HissClient {
     listVaults: () =>
       Promise.resolve([
         {
-          slug: "flagship",
-          name: "HISS Vault",
-          address: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
-          acceptingPublicDeposits: true,
+          name: { state: "live", value: "HISS Vault V2" },
+          address: "0x432e90b1b35995ebe46ed93b4db369abfc230e69",
+          lifecycle: "canonical_v2",
+          depositRoute: "request_queue",
         },
         {
-          slug: "usdg-demo",
-          name: "USDG Demo",
-          address: "0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10",
-          acceptingPublicDeposits: false,
+          name: { state: "live", value: "HISS Vault" },
+          address: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+          lifecycle: "legacy_v1",
+          depositRoute: "erc4626_deposit",
+          acceptingPublicDeposits: { state: "live", value: false },
         },
       ]),
     getVault: (ref: string) =>
       Promise.resolve({
-        slug: "flagship",
-        name: "HISS Vault",
-        address: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+        name: { state: "live", value: "HISS Vault V2" },
+        address: "0x432e90b1b35995ebe46ed93b4db369abfc230e69",
+        lifecycle: "canonical_v2",
+        depositRoute: "request_queue",
         baseAsset: "USDG",
-        acceptingPublicDeposits: true,
-        ref,
+        totalSupply: { state: "live", value: "520655374841481296331" },
+        totalAssets: { state: "live", value: "481000000" },
+        requestedRef: ref,
+      }),
+    getVaultV2Status: () =>
+      Promise.resolve({
+        vault: "0x432e90b1b35995ebe46ed93b4db369abfc230e69",
+        chainId: 4663,
+        source: {
+          rpcUrl: "https://rpc.example.invalid",
+          blockNumber: "123456789",
+          blockTimestampUnix: 1767225600,
+        },
+        vaultReads: {
+          paused: { state: "live", value: false },
+          totalSupply: { state: "live", value: "520655374841481296331" },
+          totalAssets: { state: "live", value: "481000000" },
+          usdgCash: { state: "live", value: "120000000" },
+          queueActive: { state: "live", value: true },
+          pendingRedeemCount: { state: "live", value: "0" },
+        },
+        queue: {
+          address: "0x317d1eec013a91a316858e80bf782496f231729a",
+          paused: { state: "live", value: false },
+          pendingCount: { state: "live", value: "0" },
+          pendingDepositUsdg: { state: "live", value: "0" },
+          pendingRedemptionShares: { state: "live", value: "0" },
+        },
+        keeper: {
+          state: "HEALTHY",
+          keeperActive: { state: "live", value: true },
+          settlementActive: { state: "live", value: true },
+          reason: "Settler keeper authority active and liveness evidence fresh.",
+        },
+        rebalancing: {
+          active: false,
+          byPolicy: true,
+          reason:
+            "AAPL is currently the only execution-grade Stock Token asset. Initial public operation uses settlement-driven allocation and preserves the current USDG cash reserve.",
+        },
+        liveness: { state: "OK", executionAllowed: true, ageSeconds: "42" },
+        capacity: {
+          immediateDepositCapacityUsdg: "2500000000",
+          immediateUsdgRedemptionCapacityUsdg: "120000000",
+          perAsset: [],
+        },
+        note: "Live chain reads on the canonical V2 vault. A failed leg is UNKNOWN (null/degraded) — never fabricated. Rebalancing inactive is owner-declared policy, not a fault state. Not a performance claim.",
       }),
     getVaultHoldings: (vault: string) =>
       Promise.resolve({

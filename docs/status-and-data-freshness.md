@@ -47,23 +47,24 @@ Vault surfaces separate what may be **shown** from what may be **executed**:
   close — display-only, **never** an execution basis), or `MODEL_ACCRUAL`
   (accrual-like feeds, e.g. SGOV's once-daily round). A stale or carried value is
   always presented as such, never as live.
-- **Execution stays strict.** Priced entry and exit require live, in-bound oracle
-  rounds on-chain; stale feeds make them revert (fail closed). Deposits are
-  additionally only **advertised** open while the trading session is open and
-  every required basket asset's feed is within its per-basis deposit-freshness
-  bound (live-feed assets 3,600 s; accrual-like assets 26 h) — see
-  [the effective deposit gate](./vaults/risk-fuses.md#the-effective-deposit-gate-advertised-availability).
+- **Execution stays strict.** Priced settlement requires execution-grade,
+  corroborated pricing; when the evidence is not there, priced execution fails
+  closed while the in-kind exit stays open. Availability is decided by on-chain
+  market health — never by the calendar. See
+  [24/7 architecture](./vaults/24-7-architecture.md).
 - **Unknown is not closed.** A failed read yields `UNKNOWN`: it is never collapsed
   into "closed" (or "open"); surfaces keep the last verified state, labeled,
   instead of overriding to a hard claim.
 
-A continuous, around-the-clock **valuation + settlement** design — where
+The continuous, around-the-clock **valuation + settlement** architecture — where
 calendar/session state is context only and on-chain market health (not the clock)
-decides availability — is documented in
-[24/7 vault architecture](./vaults/24-7-architecture.md). That architecture is
-**designed and tested but undeployed**; production 24/7 settlement is **not active**
-and is separately gated behind independent audits and owner authorization. Today's
-deployed vault keeps the strict, fail-closed off-hours execution posture above.
+decides availability — is **LIVE on the canonical V2 vault**
+(`0x432e90b1B35995EBE46eD93B4Db369abfc230E69`); its dynamic capacity is always a
+**live Price Mesh read, never a fixed promise**. The legacy V1 flagship is
+closed to new deposits and empty. See
+[24/7 vault architecture](./vaults/24-7-architecture.md); the legacy
+V1-style direct-deposit gate is documented in
+[the effective deposit gate](./vaults/risk-fuses.md#the-effective-deposit-gate-advertised-availability).
 
 ## Freshness in practice
 
@@ -77,7 +78,7 @@ deployed vault keeps the strict, fail-closed off-hours execution posture above.
 ## Reading status safely
 
 ```ts
-const status = await hiss.status.read();
+const status = await hiss.getProtocolStatus();
 // Treat every field as a point-in-time read. For a transaction, re-read immediately
 // before preparing, and confirm completion via the on-chain receipt.
 ```

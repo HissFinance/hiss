@@ -14,13 +14,25 @@
 
 import { createPublicClient, http, keccak256, type Hex } from "viem";
 import { verifyReceipt as vaultKitVerifyReceipt, type VaultKitReceipt } from "@hiss-finance/vault-kit";
-import { ERC20_ABI, VAULT_ABI, VAULT_ASSET_REGISTRY_ABI, XHISS_ABI } from "./abi";
+import {
+  ERC20_ABI,
+  VAULT_ABI,
+  VAULT_ASSET_REGISTRY_ABI,
+  VAULT_V2_ABI,
+  VAULT_V2_LIVENESS_ABI,
+  VAULT_V2_PRICE_MESH_ABI,
+  VAULT_V2_QUEUE_ABI,
+  VAULT_V2_SETTLER_ABI,
+  XHISS_ABI,
+} from "./abi";
 import { chainForId } from "./chains";
 import {
   ADDRESSES,
   DECIMALS,
   ROBINHOOD_CHAIN_MAINNET,
   ROBINHOOD_MAINNET_RPC_URL,
+  VAULT_LIFECYCLE,
+  VAULT_V2_REBALANCE_POLICY,
   XHISS_TIMING,
 } from "./constants";
 import type {
@@ -32,6 +44,8 @@ import type {
   StakingPosition,
   StakingStatus,
   VaultReads,
+  VaultV2AssetCapacity,
+  VaultV2Status,
 } from "./types";
 
 export interface HissClientOptions {
@@ -97,6 +111,13 @@ export class HissClient {
       rpcUrl: this.rpcUrl,
       reachable: block.state === "live",
       blockNumber: block.value != null ? block.value.toString() : null,
+      vaults: {
+        canonicalDepositVault: ADDRESSES.vaultV2,
+        canonicalLabel: VAULT_LIFECYCLE.canonicalLabel,
+        legacyV1Vault: ADDRESSES.flagshipVault,
+        legacyLabel: VAULT_LIFECYCLE.legacyLabel,
+        note: "Static lifecycle facts — queue/keeper/capacity/pause state is a live read (getVaultV2Status).",
+      },
       ...(block.error ? { note: `RPC unreachable: ${block.error}` } : {}),
     };
   }
@@ -106,7 +127,26 @@ export class HissClient {
     return [
       { key: "usdg", address: ADDRESSES.usdg, description: "USDG settlement asset (6 decimals)" },
       { key: "hiss", address: ADDRESSES.hiss, description: "$HISS protocol token (18 decimals)" },
-      { key: "flagshipVault", address: ADDRESSES.flagshipVault, description: "Flagship HISS Vault (proxy)" },
+      {
+        key: "vaultV2",
+        address: ADDRESSES.vaultV2,
+        description: "HISS Vault V2 — canonical new-deposit vault (queue-routed epoch settlement)",
+      },
+      {
+        key: "vaultV2RequestQueue",
+        address: ADDRESSES.vaultV2RequestQueue,
+        description: "HissRequestQueue — V2 deposit/USDG-redemption escrow + epoch queue",
+      },
+      {
+        key: "vaultV2BatchSettler",
+        address: ADDRESSES.vaultV2BatchSettler,
+        description: "HissBatchSettler — V2 settlement/keeper/rebalance authority flags",
+      },
+      {
+        key: "flagshipVault",
+        address: ADDRESSES.flagshipVault,
+        description: "HISS Vault (flagship V1, proxy) — LEGACY; closed to new deposits",
+      },
       {
         key: "vaultFactory",
         address: ADDRESSES.vaultFactory,
@@ -281,8 +321,19 @@ export class HissClient {
   // Vaults
   // -------------------------------------------------------------------------
 
-  /** Read a single vault's public state (fail-soft per field). */
-  async getVault(vault: `0x${string}` = ADDRESSES.flagshipVault): Promise<VaultReads> {
+  /** True when `address` is the canonical V2 vault. */
+  private isVaultV2(address: string): boolean {
+    return address.toLowerCase() === ADDRESSES.vaultV2.toLowerCase();
+  }
+
+  /**
+   * Read a single vault's public state (fail-soft per field). Defaults to the
+   * CANONICAL V2 vault. The legacy V1 flagship is still directly addressable —
+   * it is labeled `legacy_v1` and never the deposit default.
+   */
+  async getVault(vault: `0x${string}` = ADDRESSES.vaultV2): Promise<VaultReads> {
+    if (this.isVaultV2(vault)) return this.getVaultV2();
+
     const [name, symbol, asset, totalAssets, totalSupply, pricePerShare, accepting] = await Promise.all([
       soft(() => this.client.readContract({ address: vault, abi: VAULT_ABI, functionName: "name" })),
       soft(() => this.client.readContract({ address: vault, abi: VAULT_ABI, functionName: "symbol" })),
@@ -295,6 +346,7 @@ export class HissClient {
       ),
     ]);
 
+    const isLegacyV1 = vault.toLowerCase() === ADDRESSES.flagshipVault.toLowerCase();
     return {
       address: vault,
       chainId: this.chainId,
@@ -305,12 +357,350 @@ export class HissClient {
       totalSupply: mapBig(totalSupply),
       pricePerShare: mapBig(pricePerShare),
       acceptingPublicDeposits: accepting,
+      depositRoute: "erc4626_deposit",
+      ...(isLegacyV1
+        ? {
+            lifecycle: "legacy_v1" as const,
+            note:
+              `${VAULT_LIFECYCLE.legacyLabel}. New deposits route to the canonical V2 vault ` +
+              `(${ADDRESSES.vaultV2}). Live state above is a chain read, never assumed.`,
+          }
+        : { lifecycle: "unknown" as const }),
     };
   }
 
-  /** Discover known vaults. Today this is the flagship; extend with a snapshot. */
+  /** Read the canonical V2 vault's public state (fail-soft per field). */
+  async getVaultV2(): Promise<VaultReads> {
+    const vault = ADDRESSES.vaultV2;
+    const [name, symbol, asset, totalAssets, totalSupply, pps, paused, queueActive] = await Promise.all([
+      soft(() => this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "name" })),
+      soft(() => this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "symbol" })),
+      soft(() => this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "asset" })),
+      soft(() =>
+        this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "totalAssets" }),
+      ),
+      soft(() =>
+        this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "totalSupply" }),
+      ),
+      soft(
+        () =>
+          this.client.readContract({
+            address: vault,
+            abi: VAULT_V2_ABI,
+            functionName: "pricePerShare",
+          }) as Promise<readonly [bigint, number]>,
+      ),
+      soft(() => this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "paused" })),
+      soft(() =>
+        this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "queueActive" }),
+      ),
+    ]);
+
+    // V2 pricePerShare returns (pps, availability) — surface pps, degraded on failure.
+    const pricePerShare: ReadResult<string> =
+      pps.state === "live" && pps.value != null
+        ? { state: "live", value: pps.value[0].toString() }
+        : { state: "degraded", value: null, ...(pps.error ? { error: pps.error } : {}) };
+
+    return {
+      address: vault,
+      chainId: this.chainId,
+      name,
+      symbol,
+      asset,
+      totalAssets: mapBig(totalAssets),
+      totalSupply: mapBig(totalSupply),
+      pricePerShare,
+      // No V1-style direct-deposit gate exists on V2 — deposits are queue-routed.
+      acceptingPublicDeposits: {
+        state: "degraded",
+        value: null,
+        error:
+          "Not a V2 read: V2 has no direct-deposit gate. Deposits settle through the request queue — see queueActive/paused and getVaultV2Status().",
+      },
+      lifecycle: "canonical_v2",
+      depositRoute: "request_queue",
+      queueActive,
+      paused,
+      note: `${VAULT_LIFECYCLE.canonicalLabel}. Queue, keeper, and capacity state are live reads — see getVaultV2Status().`,
+    };
+  }
+
+  /**
+   * Discover known vaults: the CANONICAL V2 vault first, then the legacy V1
+   * flagship as a separately labeled entry (never the deposit default).
+   */
   async getVaults(): Promise<VaultReads[]> {
-    return [await this.getVault(ADDRESSES.flagshipVault)];
+    const [v2, v1] = await Promise.all([this.getVaultV2(), this.getVault(ADDRESSES.flagshipVault)]);
+    return [v2, v1];
+  }
+
+  /**
+   * Live lane/status snapshot for the canonical V2 vault: pause + queue +
+   * keeper/settlement/rebalance authority flags, liveness evidence, and
+   * side-aware safe-notional capacity. Every leg is fail-soft (UNKNOWN on a
+   * failed read — never fabricated, never "live", never "not deployed").
+   * Rebalancing inactive is BY POLICY (owner-declared), not a fault state;
+   * a live `rebalanceActive == true` read wins over the declaration.
+   */
+  async getVaultV2Status(): Promise<VaultV2Status> {
+    const vault = ADDRESSES.vaultV2;
+    const queue = ADDRESSES.vaultV2RequestQueue;
+    const settler = ADDRESSES.vaultV2BatchSettler;
+
+    const [
+      block,
+      vPaused,
+      vSupply,
+      vAssets,
+      vCash,
+      vQueueActive,
+      vPendingRedeems,
+      qPaused,
+      qPending,
+      qPendingDeposit,
+      qPendingRedemption,
+      sSettlement,
+      sKeeper,
+      sRebalance,
+      livenessReport,
+      heldCount,
+    ] = await Promise.all([
+      soft(() => this.client.getBlock()),
+      soft(() => this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "paused" })),
+      soft(() =>
+        this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "totalSupply" }),
+      ),
+      soft(() =>
+        this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "totalAssets" }),
+      ),
+      soft(() => this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "usdgCash" })),
+      soft(() =>
+        this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "queueActive" }),
+      ),
+      soft(() =>
+        this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "pendingRedeemCount" }),
+      ),
+      soft(() =>
+        this.client.readContract({ address: queue, abi: VAULT_V2_QUEUE_ABI, functionName: "paused" }),
+      ),
+      soft(() =>
+        this.client.readContract({ address: queue, abi: VAULT_V2_QUEUE_ABI, functionName: "pendingCount" }),
+      ),
+      soft(() =>
+        this.client.readContract({
+          address: queue,
+          abi: VAULT_V2_QUEUE_ABI,
+          functionName: "pendingDepositUsdg",
+        }),
+      ),
+      soft(() =>
+        this.client.readContract({
+          address: queue,
+          abi: VAULT_V2_QUEUE_ABI,
+          functionName: "pendingRedemptionShares",
+        }),
+      ),
+      soft(() =>
+        this.client.readContract({
+          address: settler,
+          abi: VAULT_V2_SETTLER_ABI,
+          functionName: "settlementActive",
+        }),
+      ),
+      soft(() =>
+        this.client.readContract({
+          address: settler,
+          abi: VAULT_V2_SETTLER_ABI,
+          functionName: "keeperActive",
+        }),
+      ),
+      soft(() =>
+        this.client.readContract({
+          address: settler,
+          abi: VAULT_V2_SETTLER_ABI,
+          functionName: "rebalanceActive",
+        }),
+      ),
+      soft(
+        () =>
+          this.client.readContract({
+            address: ADDRESSES.vaultV2Liveness,
+            abi: VAULT_V2_LIVENESS_ABI,
+            functionName: "liveness",
+          }) as Promise<{
+            state: number;
+            executionAllowed: boolean;
+            displayAllowed: boolean;
+            observedChainId: bigint;
+            ageSeconds: bigint;
+            producedBlocks: bigint;
+            reason: string;
+          }>,
+      ),
+      soft(() =>
+        this.client.readContract({ address: vault, abi: VAULT_V2_ABI, functionName: "heldAssetCount" }),
+      ),
+    ]);
+
+    // --- per-held-asset side-aware capacity (fail-soft, unknown != zero) ----
+    const perAsset: VaultV2AssetCapacity[] = [];
+    if (heldCount.state === "live" && heldCount.value != null) {
+      const n = Number(heldCount.value);
+      for (let i = 0; i < n; i += 1) {
+        const token = await soft<`0x${string}`>(
+          () =>
+            this.client.readContract({
+              address: vault,
+              abi: VAULT_V2_ABI,
+              functionName: "heldAssets",
+              args: [BigInt(i)],
+            }) as Promise<`0x${string}`>,
+        );
+        if (token.state !== "live" || token.value == null) continue;
+        const [symbol, buy, sell] = await Promise.all([
+          soft<string>(
+            () =>
+              this.client.readContract({
+                address: token.value as `0x${string}`,
+                abi: ERC20_ABI,
+                functionName: "symbol",
+              }) as Promise<string>,
+          ),
+          soft(
+            () =>
+              this.client.readContract({
+                address: ADDRESSES.vaultV2PriceMesh,
+                abi: VAULT_V2_PRICE_MESH_ABI,
+                functionName: "maxSafeBuyNotionalUsdg",
+                args: [token.value as `0x${string}`],
+              }) as Promise<readonly [boolean, bigint, number]>,
+          ),
+          soft(
+            () =>
+              this.client.readContract({
+                address: ADDRESSES.vaultV2PriceMesh,
+                abi: VAULT_V2_PRICE_MESH_ABI,
+                functionName: "maxSafeSellNotionalUsdg",
+                args: [token.value as `0x${string}`],
+              }) as Promise<readonly [boolean, bigint, number]>,
+          ),
+        ]);
+        perAsset.push({
+          token: token.value,
+          symbol: mapStr(symbol),
+          buyKnown: buy.state === "live" && buy.value != null ? buy.value[0] : null,
+          buyNotionalUsdg: buy.state === "live" && buy.value != null ? buy.value[1].toString() : null,
+          buyZeroReason: buy.state === "live" && buy.value != null ? buy.value[2] : null,
+          sellKnown: sell.state === "live" && sell.value != null ? sell.value[0] : null,
+          sellNotionalUsdg: sell.state === "live" && sell.value != null ? sell.value[1].toString() : null,
+          sellZeroReason: sell.state === "live" && sell.value != null ? sell.value[2] : null,
+        });
+      }
+    }
+
+    // Min over KNOWN sides only; any unknown side ⇒ unknown overall (fail closed).
+    const minSide = (side: "buy" | "sell"): string | null => {
+      if (perAsset.length === 0) return null;
+      let min: bigint | null = null;
+      for (const a of perAsset) {
+        const known = side === "buy" ? a.buyKnown : a.sellKnown;
+        const notional = side === "buy" ? a.buyNotionalUsdg : a.sellNotionalUsdg;
+        if (known !== true || notional === null) return null;
+        const v = BigInt(notional);
+        if (min === null || v < min) min = v;
+      }
+      return min === null ? null : min.toString();
+    };
+    const depositCapacity = minSide("buy");
+    const sellCapacity = minSide("sell");
+    let redemptionCapacity: string | null = null;
+    if (sellCapacity !== null && vCash.state === "live" && vCash.value != null) {
+      const cash = vCash.value as bigint;
+      const cap = BigInt(sellCapacity);
+      redemptionCapacity = (cap < cash ? cap : cash).toString();
+    }
+
+    // --- liveness + keeper lane ---------------------------------------------
+    const LIVENESS_STATES = ["UNKNOWN", "UNAVAILABLE", "STALE", "DEGRADED", "OK"] as const;
+    const liveness =
+      livenessReport.state === "live" && livenessReport.value != null
+        ? {
+            state: LIVENESS_STATES[livenessReport.value.state] ?? ("UNKNOWN" as const),
+            executionAllowed: livenessReport.value.executionAllowed,
+            ageSeconds: livenessReport.value.ageSeconds.toString(),
+          }
+        : { state: null, executionAllowed: null, ageSeconds: null };
+
+    const keeperState: VaultV2Status["keeper"]["state"] =
+      sKeeper.state !== "live" || sKeeper.value == null
+        ? "UNKNOWN"
+        : sKeeper.value === false
+          ? "INACTIVE"
+          : liveness.executionAllowed === true
+            ? "HEALTHY"
+            : "DEGRADED";
+    const keeperReason =
+      keeperState === "HEALTHY"
+        ? "Settler keeper authority active and liveness evidence fresh."
+        : keeperState === "DEGRADED"
+          ? "Keeper authority active but liveness evidence is stale/unknown — priced execution sizes down/zero until a heartbeat lands."
+          : keeperState === "INACTIVE"
+            ? "Settler keeper authority is owner-disabled."
+            : "Keeper state unread (UNKNOWN, never assumed).";
+
+    // --- rebalance lane: live flag wins; inactive is BY POLICY, not a fault --
+    const rebActive = sRebalance.state === "live" && sRebalance.value != null ? sRebalance.value : null;
+    const rebByPolicy = rebActive === false;
+    const rebReason =
+      rebActive === true
+        ? "Bounded chunked rebalancing armed with owner-set targets (live read)."
+        : rebActive === false
+          ? VAULT_V2_REBALANCE_POLICY.reason
+          : "Rebalance flag unread (UNKNOWN).";
+
+    return {
+      vault,
+      chainId: this.chainId,
+      source: {
+        rpcUrl: this.rpcUrl,
+        blockNumber:
+          block.state === "live" && block.value != null && block.value.number != null
+            ? block.value.number.toString()
+            : null,
+        blockTimestampUnix:
+          block.state === "live" && block.value != null ? Number(block.value.timestamp) : null,
+      },
+      vaultReads: {
+        paused: vPaused,
+        totalSupply: mapBig(vSupply),
+        totalAssets: mapBig(vAssets),
+        usdgCash: mapBig(vCash),
+        queueActive: vQueueActive,
+        pendingRedeemCount: mapBig(vPendingRedeems),
+      },
+      queue: {
+        address: queue,
+        paused: qPaused,
+        pendingCount: mapBig(qPending),
+        pendingDepositUsdg: mapBig(qPendingDeposit),
+        pendingRedemptionShares: mapBig(qPendingRedemption),
+      },
+      keeper: {
+        state: keeperState,
+        keeperActive: sKeeper,
+        settlementActive: sSettlement,
+        reason: keeperReason,
+      },
+      rebalancing: { active: rebActive, byPolicy: rebByPolicy, reason: rebReason },
+      liveness,
+      capacity: {
+        immediateDepositCapacityUsdg: depositCapacity,
+        immediateUsdgRedemptionCapacityUsdg: redemptionCapacity ?? sellCapacity,
+        perAsset,
+      },
+      note: "Live chain reads on the canonical V2 vault. A failed leg is UNKNOWN (null/degraded) — never fabricated. Rebalancing inactive is owner-declared policy, not a fault state. Not a performance claim.",
+    };
   }
 
   /**
@@ -414,11 +804,31 @@ export class HissClient {
 
   /**
    * Read a vault's price-per-share. This is a point-in-time chain read, not a
-   * return, forecast, or performance claim.
+   * return, forecast, or performance claim. Defaults to the canonical V2
+   * vault, whose pricePerShare read carries a mark-availability flag.
    */
   async getVaultPerformance(
-    vault: `0x${string}` = ADDRESSES.flagshipVault,
-  ): Promise<{ vault: `0x${string}`; pricePerShare: ReadResult<string>; note: string }> {
+    vault: `0x${string}` = ADDRESSES.vaultV2,
+  ): Promise<{ vault: `0x${string}`; pricePerShare: ReadResult<string>; lifecycle?: string; note: string }> {
+    if (this.isVaultV2(vault)) {
+      const pps = await soft(
+        () =>
+          this.client.readContract({
+            address: vault,
+            abi: VAULT_V2_ABI,
+            functionName: "pricePerShare",
+          }) as Promise<readonly [bigint, number]>,
+      );
+      return {
+        vault,
+        pricePerShare:
+          pps.state === "live" && pps.value != null
+            ? { state: "live", value: pps.value[0].toString() }
+            : { state: "degraded", value: null, ...(pps.error ? { error: pps.error } : {}) },
+        lifecycle: "canonical_v2",
+        note: "Price-per-share is a live chain read on the canonical V2 vault, not a return or forecast. Not a performance claim.",
+      };
+    }
     const pps = mapBig(
       await soft<bigint>(
         () =>
@@ -429,15 +839,17 @@ export class HissClient {
           }) as Promise<bigint>,
       ),
     );
+    const isLegacyV1 = vault.toLowerCase() === ADDRESSES.flagshipVault.toLowerCase();
     return {
       vault,
       pricePerShare: pps,
+      ...(isLegacyV1 ? { lifecycle: "legacy_v1" } : {}),
       note: "Price-per-share is a live chain read, not a return or forecast. Not a performance claim.",
     };
   }
 
   /** Strategy detail lives in the off-chain manifest; on-chain only the hash is pinned. */
-  getVaultStrategy(vault: `0x${string}` = ADDRESSES.flagshipVault): { vault: `0x${string}`; note: string } {
+  getVaultStrategy(vault: `0x${string}` = ADDRESSES.vaultV2): { vault: `0x${string}`; note: string } {
     return {
       vault,
       note: "A vault's strategy detail is the off-chain manifest whose keccak256 is pinned on-chain as strategyHash. Fetch the manifest via the HISS vault API or supply a candidate.",
@@ -445,7 +857,7 @@ export class HissClient {
   }
 
   /** Fee configuration is per-vault; fetch specifics from the HISS vault API. */
-  getVaultFees(vault: `0x${string}` = ADDRESSES.flagshipVault): { vault: `0x${string}`; note: string } {
+  getVaultFees(vault: `0x${string}` = ADDRESSES.vaultV2): { vault: `0x${string}`; note: string } {
     return {
       vault,
       note: "Fee config (performance fee, referral) is set at creation. Read the vault's fee route on the HISS vault API for specifics. No guaranteed yield or APY.",

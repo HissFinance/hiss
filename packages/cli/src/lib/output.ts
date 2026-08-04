@@ -74,7 +74,7 @@ export const consolePrinter: Printer = {
   err: (line) => process.stderr.write(line + "\n"),
 };
 
-const DEFAULT_CLI_VERSION = "0.2.1";
+const DEFAULT_CLI_VERSION = "0.2.2";
 
 /** The stable JSON envelope (§2). Keys are canonicalized by the serializer. */
 export interface JsonEnvelope {

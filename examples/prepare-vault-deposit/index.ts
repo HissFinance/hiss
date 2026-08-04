@@ -1,6 +1,12 @@
 /**
  * prepare-vault-deposit — build an UNSIGNED deposit plan.
  *
+ * NOTE: this example targets the LEGACY V1 flagship builder and the plan will
+ * carry a legacy/closed warning — V1 is closed to new deposits. The canonical
+ * new-deposit vault is Vault V2 (24/7 request queue): use
+ * `prepareVaultDeposit` from `@hiss-finance/sdk` (queue enqueue, unsigned) or
+ * `hiss vault prepare-deposit` in the CLI. See docs/vaults/deposit.md.
+ *
  * The plan is data describing a transaction you MAY choose to sign in your own
  * wallet. This script never signs or sends anything. Deposit availability is a
  * live on-chain read; confirm the vault is open before signing.

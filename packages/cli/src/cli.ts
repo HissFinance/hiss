@@ -68,7 +68,7 @@ import {
   agenticReceiptsCommand,
 } from "./commands/agentic.js";
 
-export const CLI_VERSION = "0.2.1";
+export const CLI_VERSION = "0.2.2";
 
 interface GlobalOpts {
   output?: RenderMode;
@@ -186,13 +186,13 @@ export function buildProgram(build: BuildOptions = {}, sink: RunSink = {}): Comm
   const vault = program.command("vault").description("USDG Creator Vault commands");
   vault
     .command("list")
-    .description("list vaults with lifecycle state")
+    .description("list vaults (canonical V2 first; legacy V1 labeled separately)")
     .action(async function (this: Command) {
       await run(this, "vault list", vaultListCommand(client(this)));
     });
   vault
     .command("inspect <addressOrSlug>")
-    .description("inspect a vault")
+    .description("inspect a vault (canonical V2 attaches live queue/keeper/capacity state)")
     .action(async function (this: Command, ref: string) {
       await run(this, "vault inspect", vaultInspectCommand(client(this), ref));
     });
@@ -227,16 +227,51 @@ export function buildProgram(build: BuildOptions = {}, sink: RunSink = {}): Comm
       await run(this, "vault prepare-create", vaultPrepareCreateCommand(client(this), manifest));
     });
   vault
-    .command("prepare-deposit <vault> <amount>")
-    .description("prepare an unsigned USDG deposit transaction")
-    .action(async function (this: Command, v: string, amount: string) {
-      await run(this, "vault prepare-deposit", vaultPrepareDepositCommand(client(this), v, amount));
+    .command("prepare-deposit <vault> <amount> <receiver>")
+    .description(
+      "prepare an unsigned USDG deposit (canonical V2 routes via the request queue; legacy V1 is warned)",
+    )
+    .option("--nonce <n>", "V2 queue: request nonce for a reproducible plan")
+    .option("--deadline-unix <ts>", "V2 queue: request expiry (unix seconds)")
+    .option("--min-out-shares <amount>", "V2 queue: minimum shares out at settlement")
+    .action(async function (this: Command, v: string, amount: string, receiver: string) {
+      const o = this.opts<{ nonce?: string; deadlineUnix?: string; minOutShares?: string }>();
+      await run(
+        this,
+        "vault prepare-deposit",
+        vaultPrepareDepositCommand(client(this), v, amount, receiver, {
+          nonce: o.nonce,
+          deadlineUnix: o.deadlineUnix,
+          minOutShares: o.minOutShares,
+        }),
+      );
     });
   vault
-    .command("prepare-withdraw <vault> <shares>")
-    .description("prepare an unsigned withdrawal transaction")
-    .action(async function (this: Command, v: string, shares: string) {
-      await run(this, "vault prepare-withdraw", vaultPrepareWithdrawCommand(client(this), v, shares));
+    .command("prepare-withdraw <vault> <shares> <receiver>")
+    .description(
+      "prepare an unsigned withdrawal (canonical V2 defaults to pro-rata in-kind; --mode queue_usdg for USDG)",
+    )
+    .addOption(new Option("--mode <mode>", "V2 exit mode").choices(["in_kind", "queue_usdg"]))
+    .option("--min-out-usdg <amount>", "V2 queue_usdg: minimum USDG out at settlement")
+    .option("--nonce <n>", "V2 queue_usdg: request nonce")
+    .option("--deadline-unix <ts>", "V2 queue_usdg: request expiry (unix seconds)")
+    .action(async function (this: Command, v: string, shares: string, receiver: string) {
+      const o = this.opts<{
+        mode?: "in_kind" | "queue_usdg";
+        minOutUsdg?: string;
+        nonce?: string;
+        deadlineUnix?: string;
+      }>();
+      await run(
+        this,
+        "vault prepare-withdraw",
+        vaultPrepareWithdrawCommand(client(this), v, shares, receiver, {
+          mode: o.mode,
+          minOutUsdg: o.minOutUsdg,
+          nonce: o.nonce,
+          deadlineUnix: o.deadlineUnix,
+        }),
+      );
     });
 
   // -- stake ----------------------------------------------------------------
@@ -260,10 +295,10 @@ export function buildProgram(build: BuildOptions = {}, sink: RunSink = {}): Comm
       await run(this, "stake cooldown", stakeCooldownCommand(client(this), amount));
     });
   stake
-    .command("redeem")
-    .description("prepare an unsigned xHISS redeem transaction")
-    .action(async function (this: Command) {
-      await run(this, "stake redeem", stakeRedeemCommand(client(this)));
+    .command("redeem <xShares> <receiver>")
+    .description("prepare an unsigned xHISS redeem transaction (within your open redeem window)")
+    .action(async function (this: Command, xShares: string, receiver: string) {
+      await run(this, "stake redeem", stakeRedeemCommand(client(this), xShares, receiver));
     });
 
   // -- rewards --------------------------------------------------------------

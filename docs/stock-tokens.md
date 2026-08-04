@@ -60,23 +60,29 @@ reference price from what a specific size can actually transact (the same
 reference-vs-executable separation the HISS agent skills enforce). Venue and
 liquidity availability are **region-gated** like the tokens themselves.
 
-On-chain 24/7 stock-token liquidity is **real but thin and single-venue today**:
-proven per-asset USDG pools exist on the AMM, but depth is shallow and only one
-venue is code-verified (propAMM, RFQ, and orderbook venues remain discovered, not
-proven). The designed (undeployed, activation-gated)
-[24/7 vault architecture](./vaults/24-7-architecture.md) is staged to this measured
-reality — size-aware execution, dynamic safe-notional, and an in-kind exit — rather
-than assuming depth the pools do not have. Production 24/7 settlement is **not
-active**.
+On-chain 24/7 stock-token liquidity is **real but thin today**: proven per-asset
+USDG pools exist on the AMM, but depth is shallow and only one venue class is
+code-verified (propAMM, RFQ, and orderbook venues remain discovered, not
+proven). The **LIVE**
+[24/7 vault architecture](./vaults/24-7-architecture.md) on the canonical V2
+vault is staged to this measured reality — size-aware execution, dynamic
+capacity from a live Price Mesh read, and an always-available in-kind exit —
+rather than assuming depth the pools do not have. Rebalancing on the canonical
+V2 vault is **inactive by policy**: "AAPL is currently the only execution-grade
+Stock Token asset. Initial public operation uses settlement-driven allocation
+and preserves the current USDG cash reserve."
 
 Authoritative source: Robinhood's
 [Building with Stock Tokens — Trading Venues & Liquidity](https://docs.robinhood.com/chain/building-with-stock-tokens/#trading-venues--liquidity).
 
 ## Representative assets
 
-The flagship vault's allowed set includes mega-cap tech (AAPL, MSFT, NVDA, GOOGL, AMZN,
+A HISS vault's allowed set can span mega-cap tech (AAPL, MSFT, NVDA, GOOGL, AMZN,
 META), tokenized ETFs (SPY, QQQ, SGOV, SLV), and USDG cash. A vault may only hold assets
-in its manifest's `allowedAssetSymbols`, each resolvable to a canonical address.
+in its manifest's `allowedAssetSymbols`, each resolvable to a canonical address. On the
+canonical V2 vault, **AAPL is currently the only execution-grade Stock Token asset** —
+initial public operation uses settlement-driven allocation and preserves the current
+USDG cash reserve (rebalancing inactive by policy).
 
 ## Trading them via agents
 

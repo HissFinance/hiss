@@ -133,8 +133,12 @@ export async function stakeCooldownCommand(client: HissClient, xhissAmount: stri
   };
 }
 
-export async function stakeRedeemCommand(client: HissClient): Promise<CommandResult> {
-  const tx = await client.prepareXhissRedeem();
+export async function stakeRedeemCommand(
+  client: HissClient,
+  xShares?: string,
+  receiver?: string,
+): Promise<CommandResult> {
+  const tx = await client.prepareXhissRedeem(xShares, receiver);
   return {
     summary: "Prepared an UNSIGNED xHISS redeem within your open redeem window. Nothing was sent.",
     data: tx,

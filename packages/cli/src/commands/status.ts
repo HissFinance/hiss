@@ -37,9 +37,18 @@ function statusExitCode(status: JsonRecord): number {
 export async function statusCommand(client: HissClient): Promise<CommandResult> {
   const status = await client.getProtocolStatus();
   const chain = str(status.chain, status.chainId != null ? String(status.chainId) : "unknown");
-  const network = str(status.network);
-  const detail: string[] = [`Network: ${network}`, `Chain: ${chain}`];
+  // The chain id → network mapping is a static fact (4663 = Robinhood Chain
+  // mainnet, 46630 = testnet); reachability stays a live read.
+  const networkFallback =
+    chain === "4663" ? "robinhood-chain-mainnet" : chain === "46630" ? "robinhood-chain-testnet" : "unknown";
+  const network = str(status.network, networkFallback);
   const rpc = rpcToken(status);
+  const detail: string[] = [
+    `Network: ${network}`,
+    `Chain: ${chain}`,
+    `RPC: ${rpc.label}${typeof status.rpcUrl === "string" ? ` (${status.rpcUrl})` : ""}`,
+    `Block: ${typeof status.blockNumber === "string" ? status.blockNumber : "UNKNOWN"}`,
+  ];
 
   const rows: KVRow[] = [
     { label: "Network", value: network === "unknown" ? null : network, token: "value" },
@@ -66,10 +75,41 @@ export async function statusCommand(client: HissClient): Promise<CommandResult> 
     detail.push(`Treasury Safe: ${str(status.treasurySafe)}`);
     rows.push({ label: "Treasury Safe", value: str(status.treasurySafe), token: "address", full: true });
   }
+  // Vault lifecycle facts: the canonical V2 new-deposit vault + the legacy V1.
+  const vaults = status.vaults;
+  if (vaults && typeof vaults === "object") {
+    const v = vaults as JsonRecord;
+    if (typeof v.canonicalDepositVault === "string") {
+      detail.push(`Canonical vault (V2): ${v.canonicalDepositVault}`);
+      rows.push({
+        label: "Canonical vault (V2)",
+        value: v.canonicalDepositVault,
+        token: "address",
+        full: true,
+      });
+    }
+    if (typeof v.legacyV1Vault === "string") {
+      detail.push(`Legacy vault (V1): ${v.legacyV1Vault} — closed to new deposits`);
+      rows.push({ label: "Legacy vault (V1)", value: v.legacyV1Vault, token: "address", full: true });
+    }
+  }
 
   const view: ViewBlock[] = [
     { kind: "status", state: rpc.state, label: `RPC ${rpc.label}`, note: `chain ${chain}` },
     { kind: "keyValue", title: "HISS Finance status", rows },
+    ...(vaults && typeof vaults === "object"
+      ? [
+          {
+            kind: "panel",
+            variant: "info",
+            lines: [
+              "New deposits route to the canonical V2 vault (queue-routed epoch settlement).",
+              "The V1 flagship is legacy: closed to new deposits; existing balances withdraw/redeem there.",
+              "Queue/keeper/capacity state is a live read: hiss vault inspect <v2-address>.",
+            ],
+          } as ViewBlock,
+        ]
+      : []),
   ];
 
   return {
@@ -83,17 +123,38 @@ export async function statusCommand(client: HissClient): Promise<CommandResult> 
 
 export async function contractsCommand(client: HissClient): Promise<CommandResult> {
   const registry = await client.getContractRegistry();
-  const entries = Object.entries(registry).filter(([, v]) => typeof v === "string");
-  const detail = entries.map(([name, addr]) => `${name}: ${String(addr)}`);
-  const rows: TableCell[][] = entries.map(([name, addr]) => [
+  // Two supported shapes: the SDK's detailed object report
+  // `{ chainId, observedAt, entries: [{ name, address, status }] }`, or a flat
+  // `{ name: address }` record (mocks/older clients).
+  const reportEntries = Array.isArray(registry.entries)
+    ? (registry.entries as JsonRecord[]).filter(
+        (e) => typeof e.name === "string" && typeof e.address === "string",
+      )
+    : null;
+  const entries: Array<[string, string, string | null]> = reportEntries
+    ? reportEntries.map((e) => [
+        String(e.name),
+        String(e.address),
+        typeof e.status === "string" ? e.status : null,
+      ])
+    : Object.entries(registry)
+        .filter(([, v]) => typeof v === "string")
+        .map(([name, addr]) => [name, String(addr), null]);
+  const detail = entries.map(([name, addr, status]) => `${name}: ${addr}${status ? ` (${status})` : ""}`);
+  const rows: TableCell[][] = entries.map(([name, addr, status]) => [
     name,
-    { value: String(addr), token: "address" as const, full: true },
+    { value: addr, token: "address" as const, full: true },
+    ...(reportEntries ? [status === null ? null : status] : []),
   ]);
   const view: ViewBlock[] = [
     {
       kind: "table",
       title: "Contract registry",
-      columns: [{ header: "Contract" }, { header: "Address" }],
+      columns: [
+        { header: "Contract" },
+        { header: "Address" },
+        ...(reportEntries ? [{ header: "Status" }] : []),
+      ],
       rows,
     },
   ];

@@ -100,11 +100,31 @@ const CASES: [string, Make][] = [
   ["contracts", () => contractsCommand(mockClient())],
 
   ["vault.list", () => vaultListCommand(mockClient())],
-  ["vault.inspect", () => vaultInspectCommand(mockClient(), "flagship")],
-  ["vault.holdings", () => vaultHoldingsCommand(mockClient(), "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6")],
+  ["vault.inspect", () => vaultInspectCommand(mockClient(), "hiss-vault-v2")],
+  [
+    "vault.inspect.legacy",
+    () =>
+      vaultInspectCommand(
+        mockClient({
+          getVault: (ref: string) =>
+            Promise.resolve({
+              name: { state: "live", value: "HISS Vault" },
+              address: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+              lifecycle: "legacy_v1",
+              depositRoute: "erc4626_deposit",
+              baseAsset: "USDG",
+              totalSupply: { state: "live", value: "0" },
+              acceptingPublicDeposits: { state: "live", value: false },
+              requestedRef: ref,
+            }),
+        }),
+        "legacy",
+      ),
+  ],
+  ["vault.holdings", () => vaultHoldingsCommand(mockClient(), "0x432e90b1b35995ebe46ed93b4db369abfc230e69")],
   [
     "vault.performance",
-    () => vaultPerformanceCommand(mockClient(), "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6"),
+    () => vaultPerformanceCommand(mockClient(), "0x432e90b1b35995ebe46ed93b4db369abfc230e69"),
   ],
   ["vault.validate.valid", () => vaultValidateCommand(fixture("vault.valid.json"))],
   ["vault.validate.invalid", () => vaultValidateCommand(fixture("vault.invalid.json"))],
@@ -114,13 +134,34 @@ const CASES: [string, Make][] = [
     () => vaultPrepareCreateCommand(mockClient(), fixture("vault.invalid.json")),
   ],
   ["vault.prepare-create.ok", () => vaultPrepareCreateCommand(mockClient(), fixture("vault.valid.json"))],
-  ["vault.prepare-deposit", () => vaultPrepareDepositCommand(mockClient(), SAMPLE_TX.to, "1000")],
-  ["vault.prepare-withdraw", () => vaultPrepareWithdrawCommand(mockClient(), SAMPLE_TX.to, "50")],
+  [
+    "vault.prepare-deposit",
+    () =>
+      vaultPrepareDepositCommand(
+        mockClient(),
+        SAMPLE_TX.to,
+        "1000",
+        "0x1111111111111111111111111111111111111111",
+      ),
+  ],
+  [
+    "vault.prepare-withdraw",
+    () =>
+      vaultPrepareWithdrawCommand(
+        mockClient(),
+        SAMPLE_TX.to,
+        "50",
+        "0x1111111111111111111111111111111111111111",
+      ),
+  ],
 
   ["stake.status", () => stakeStatusCommand(mockClient())],
   ["stake.prepare", () => stakePrepareCommand(mockClient(), "1000")],
   ["stake.cooldown", () => stakeCooldownCommand(mockClient(), "500")],
-  ["stake.redeem", () => stakeRedeemCommand(mockClient())],
+  [
+    "stake.redeem",
+    () => stakeRedeemCommand(mockClient(), "500", "0x1111111111111111111111111111111111111111"),
+  ],
 
   ["rewards.status", () => rewardsStatusCommand(mockClient())],
   [

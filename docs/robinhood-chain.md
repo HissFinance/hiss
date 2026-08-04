@@ -84,14 +84,14 @@ from **execution** around the clock:
   display-only), or `MODEL_ACCRUAL` (accrual-like feeds such as SGOV's
   once-daily round). A carried close is **never** an execution basis — only
   `EXCHANGE_LIVE` pricing is execution-grade.
-- **Advertised deposits narrow beyond the contract.** The contract's oracle
-  staleness bound still governs execution (stale feeds make priced entry/exit
-  revert — fail closed). Additionally, deposits are **advertised** open only while
-  the tokenized-equity trading session is open **and** every required basket
-  asset's feed is within its per-basis bound (live-feed assets 3,600 s;
-  accrual-like assets such as SGOV 26 h) — stale-mark dilution protection,
-  policy P-DEP-2/P-NAV-2. Outside that window the UI reports the deposit entry
-  closed with the reason, even where the contract itself would still accept.
+- **Availability is evidence-driven on the canonical V2 vault.** The V2 request
+  queue accepts deposit and USDG-redemption requests around the clock; how much
+  can settle safely is a **live Price Mesh capacity read** decided by on-chain
+  market health (depth, corroboration, peg, sequencer) — never by the trading
+  calendar. The valuation-free in-kind exit stays open even when priced
+  settlement is constrained. (The legacy V1-style direct-deposit gate, with its
+  session-and-feed-freshness narrowing, applies only to V1-style vaults — the
+  V1 flagship is closed to new deposits.)
 
 See [Risk fuses — the effective deposit gate](./vaults/risk-fuses.md#the-effective-deposit-gate-advertised-availability)
 and [Data freshness](./status-and-data-freshness.md#display-continuity-vs-execution-strictness-247).

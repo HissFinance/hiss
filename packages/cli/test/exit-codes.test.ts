@@ -96,7 +96,13 @@ describe("§25 SUCCESS → 0", () => {
     ["vault validate VALID", ["vault", "validate", fixture("vault.valid.json")]],
     [
       "vault prepare-deposit",
-      ["vault", "prepare-deposit", "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6", "1000"],
+      [
+        "vault",
+        "prepare-deposit",
+        "0x432e90b1B35995EBE46eD93B4Db369abfc230E69",
+        "1000",
+        "0x1111111111111111111111111111111111111111",
+      ],
     ],
     ["coil validate VALID", ["coil", "validate", fixture("coil.valid.json")]],
     ["coil compile VALID", ["coil", "compile", fixture("coil.valid.json")]],

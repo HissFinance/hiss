@@ -31,7 +31,8 @@ export function App({ children }: { children: React.ReactNode }) {
 import { useVault, useStakingStatus, useRewardSplit } from "@hiss-finance/react";
 
 function VaultCard() {
-  const { data: vault, isLoading } = useVault("0x6d962604df1c6c5ef4b59d88863600fe71bb63e6");
+  // The canonical V2 new-deposit vault (the V1 flagship is LEGACY — closed to new deposits).
+  const { data: vault, isLoading } = useVault("0x432e90b1B35995EBE46eD93B4Db369abfc230E69");
   if (isLoading) return <p>Loading…</p>; // unknown while loading — never assume live
   return <p>Share price: {vault.sharePriceUsdg} USDG</p>;
 }

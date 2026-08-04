@@ -533,14 +533,22 @@ exports[`§24.4 golden — HUMAN (no color, Unicode components) > status.success
 "HISS Finance status read from robinhood-chain-mainnet.
 ● RPC LIVE • chain 4663
 HISS Finance status
-Network:        robinhood-chain-mainnet
-Chain:          4663
-RPC:            LIVE
-Block:          123456789
-RPC URL:        https://rpc.example.invalid
-Token:          HISS 0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3
-Vaults tracked: 2
-Treasury Safe:  0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+Network:              robinhood-chain-mainnet
+Chain:                4663
+RPC:                  LIVE
+Block:                123456789
+RPC URL:              https://rpc.example.invalid
+Token:                HISS 0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3
+Vaults tracked:       2
+Treasury Safe:        0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+Canonical vault (V2): 0x432e90b1b35995ebe46ed93b4db369abfc230e69
+Legacy vault (V1):    0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+┌───────────────────────────────────────────────────────────────────────────────
+│ New deposits route to the canonical V2 vault (queue-routed epoch settlement). 
+│ The V1 flagship is legacy: closed to new deposits; existing balances          
+│ withdraw/redeem there.                                                        
+│ Queue/keeper/capacity state is a live read: hiss vault inspect <v2-address>.  
+└───────────────────────────────────────────────────────────────────────────────
 "
 `;
 
@@ -550,8 +558,8 @@ exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.create 1
 `;
 
 exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.holdings 1`] = `
-"Holdings read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6.
-Vault:  0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+"Holdings read for vault 0x432e90b1b35995ebe46ed93b4db369abfc230e69.
+Vault:  0x432e90b1b35995ebe46ed93b4db369abfc230e69
 Source: onchain
 Holdings (live chain read)
 Asset        Symbol                         Balance
@@ -562,33 +570,74 @@ Asset        Symbol                         Balance
 `;
 
 exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.inspect 1`] = `
-"Vault flagship inspected.
-● Deposits ACTIVE • live chain read
-Vault flagship
-Name:       HISS Vault
-Address:    0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
-Base asset: USDG
-Deposits:   ACTIVE
+"Vault hiss-vault-v2 inspected (canonical V2 — live lane status attached).
+● CANONICAL (V2) • live chain read
+Vault hiss-vault-v2
+Name:             HISS Vault V2
+Address:          0x432e90b1b35995ebe46ed93b4db369abfc230e69
+Lifecycle:        CANONICAL (V2)
+Base asset:       USDG
+Total supply:     520655374841481296331
+NAV (USDG units): 481000000
+V2 live lane status
+Vault paused:            not paused
+Queue lane:              armed · queue open
+Queue pending:           0
+Pending deposits:        0
+Keeper:                  HEALTHY — Settler keeper authority active and liveness
+                          evidence fresh.
+Rebalancing:             INACTIVE BY POLICY — AAPL is currently the only
+                          execution-grade Stock Token asset. Initial public
+                          operation uses settlement-driven allocation and
+                          preserves the current USDG cash reserve.
+Deposit capacity:        2500 USDG (live mesh read)
+Instant USDG redemption: 120 USDG (cash-bounded)
+USDG cash:               120
+┌─ Read evidence ───────────────────────────────────────────────────────────────
+│ source: RPC https://rpc.example.invalid • block: 123456789                    
+│ Live chain reads; a failed leg is UNKNOWN, never fabricated. Not a performance
+│ claim.                                                                        
+└───────────────────────────────────────────────────────────────────────────────
+"
+`;
+
+exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.inspect.legacy 1`] = `
+"Vault legacy inspected.
+ℹ LEGACY (V1) • live chain read
+Vault legacy
+Name:             HISS Vault
+Address:          0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Lifecycle:        LEGACY (V1)
+Base asset:       USDG
+Total supply:     0
+NAV (USDG units): UNKNOWN
 ┌───────────────────────────────────────────────────────────────────────────────
-│ Deposit state is a live chain read: planned != open != funded.                
+│ LEGACY V1 flagship: closed to new deposits; existing balances withdraw/redeem 
+│ here.                                                                         
+│ New deposits route to the canonical V2 vault (queue-routed epoch settlement). 
 └───────────────────────────────────────────────────────────────────────────────
 "
 `;
 
 exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.list 1`] = `
-"2 vaults on Robinhood Chain.
+"2 vaults on Robinhood Chain (canonical V2 first; legacy labeled).
 Vaults on Robinhood Chain
-Vault      Address                                     State 
-─────────────────────────────────────────────────────────────
-flagship   0x6d962604df1c6c5ef4b59d88863600fe71bb63e6  ACTIVE
-usdg-demo  0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10  PAUSED
+Vault          Address                                     State         
+─────────────────────────────────────────────────────────────────────────
+HISS Vault V2  0x432e90b1b35995ebe46ed93b4db369abfc230e69  CANONICAL (V2)
+HISS Vault     0x6d962604df1c6c5ef4b59d88863600fe71bb63e6  LEGACY (V1)   
+┌───────────────────────────────────────────────────────────────────────────────
+│ New deposits route to the CANONICAL V2 vault (queue-routed epoch settlement). 
+│ The V1 flagship is LEGACY: closed to new deposits; existing balances          
+│ withdraw/redeem there.                                                        
+└───────────────────────────────────────────────────────────────────────────────
 "
 `;
 
 exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.performance 1`] = `
-"Historical performance read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Not a forecast; not a performance claim.
+"Historical performance read for vault 0x432e90b1b35995ebe46ed93b4db369abfc230e69. Not a forecast; not a performance claim.
 Vault performance (point-in-time read)
-Vault:           0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+Vault:           0x432e90b1b35995ebe46ed93b4db369abfc230e69
 Price per share: 1000000000000000000
 ┌───────────────────────────────────────────────────────────────────────────────
 │ Price-per-share is a live chain read, not a return or forecast.               
@@ -648,7 +697,7 @@ Message: rebalance.fuses is required.
 `;
 
 exports[`§24.4 golden — HUMAN (no color, Unicode components) > vault.prepare-deposit 1`] = `
-"Prepared an UNSIGNED deposit of 1000 USDG to 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent.
+"Prepared an UNSIGNED deposit of 1000 USDG toward 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent.
 Transaction review
 ○ UNSIGNED • review it, then submit with your own wallet — nothing was sent
 Chain:    4663
@@ -1484,7 +1533,14 @@ exports[`§24.4 golden — JSON envelope (stable, canonical) > status.success 1`
       "symbol": "HISS"
     },
     "treasurySafe": "0xF100Fc28dd1721C698046Dbd60408c523b69e36c",
-    "vaultCount": 2
+    "vaultCount": 2,
+    "vaults": {
+      "canonicalDepositVault": "0x432e90b1b35995ebe46ed93b4db369abfc230e69",
+      "canonicalLabel": "HISS Vault V2 — canonical new-deposit vault (queue-routed epoch settlement, 24/7 lanes)",
+      "legacyLabel": "HISS Vault (flagship V1) — LEGACY: closed to new deposits; existing balances withdraw/redeem here",
+      "legacyV1Vault": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+      "note": "Static lifecycle facts — queue/keeper/capacity/pause state is a live read (getVaultV2Status)."
+    }
   },
   "ok": true,
   "summary": "HISS Finance status read from robinhood-chain-mainnet."
@@ -1540,10 +1596,10 @@ exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.holdings 1`
       }
     ],
     "source": "onchain",
-    "vault": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6"
+    "vault": "0x432e90b1b35995ebe46ed93b4db369abfc230e69"
   },
   "ok": true,
-  "summary": "Holdings read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6."
+  "summary": "Holdings read for vault 0x432e90b1b35995ebe46ed93b4db369abfc230e69."
 }
 "
 `;
@@ -1554,15 +1610,138 @@ exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.inspect 1`]
   "code": 0,
   "command": "vault.inspect",
   "data": {
-    "acceptingPublicDeposits": true,
-    "address": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    "address": "0x432e90b1b35995ebe46ed93b4db369abfc230e69",
     "baseAsset": "USDG",
-    "name": "HISS Vault",
-    "ref": "flagship",
-    "slug": "flagship"
+    "depositRoute": "request_queue",
+    "lifecycle": "canonical_v2",
+    "name": {
+      "state": "live",
+      "value": "HISS Vault V2"
+    },
+    "requestedRef": "hiss-vault-v2",
+    "totalAssets": {
+      "state": "live",
+      "value": "481000000"
+    },
+    "totalSupply": {
+      "state": "live",
+      "value": "520655374841481296331"
+    },
+    "v2Status": {
+      "capacity": {
+        "immediateDepositCapacityUsdg": "2500000000",
+        "immediateUsdgRedemptionCapacityUsdg": "120000000",
+        "perAsset": []
+      },
+      "chainId": 4663,
+      "keeper": {
+        "keeperActive": {
+          "state": "live",
+          "value": true
+        },
+        "reason": "Settler keeper authority active and liveness evidence fresh.",
+        "settlementActive": {
+          "state": "live",
+          "value": true
+        },
+        "state": "HEALTHY"
+      },
+      "liveness": {
+        "ageSeconds": "42",
+        "executionAllowed": true,
+        "state": "OK"
+      },
+      "note": "Live chain reads on the canonical V2 vault. A failed leg is UNKNOWN (null/degraded) — never fabricated. Rebalancing inactive is owner-declared policy, not a fault state. Not a performance claim.",
+      "queue": {
+        "address": "0x317d1eec013a91a316858e80bf782496f231729a",
+        "paused": {
+          "state": "live",
+          "value": false
+        },
+        "pendingCount": {
+          "state": "live",
+          "value": "0"
+        },
+        "pendingDepositUsdg": {
+          "state": "live",
+          "value": "0"
+        },
+        "pendingRedemptionShares": {
+          "state": "live",
+          "value": "0"
+        }
+      },
+      "rebalancing": {
+        "active": false,
+        "byPolicy": true,
+        "reason": "AAPL is currently the only execution-grade Stock Token asset. Initial public operation uses settlement-driven allocation and preserves the current USDG cash reserve."
+      },
+      "source": {
+        "blockNumber": "123456789",
+        "blockTimestampUnix": 1767225600,
+        "rpcUrl": "https://rpc.example.invalid"
+      },
+      "vault": "0x432e90b1b35995ebe46ed93b4db369abfc230e69",
+      "vaultReads": {
+        "paused": {
+          "state": "live",
+          "value": false
+        },
+        "pendingRedeemCount": {
+          "state": "live",
+          "value": "0"
+        },
+        "queueActive": {
+          "state": "live",
+          "value": true
+        },
+        "totalAssets": {
+          "state": "live",
+          "value": "481000000"
+        },
+        "totalSupply": {
+          "state": "live",
+          "value": "520655374841481296331"
+        },
+        "usdgCash": {
+          "state": "live",
+          "value": "120000000"
+        }
+      }
+    }
   },
   "ok": true,
-  "summary": "Vault flagship inspected."
+  "summary": "Vault hiss-vault-v2 inspected (canonical V2 — live lane status attached)."
+}
+"
+`;
+
+exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.inspect.legacy 1`] = `
+"{
+  "cliVersion": "0.2.0",
+  "code": 0,
+  "command": "vault.inspect.legacy",
+  "data": {
+    "acceptingPublicDeposits": {
+      "state": "live",
+      "value": false
+    },
+    "address": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+    "baseAsset": "USDG",
+    "depositRoute": "erc4626_deposit",
+    "lifecycle": "legacy_v1",
+    "name": {
+      "state": "live",
+      "value": "HISS Vault"
+    },
+    "requestedRef": "legacy",
+    "totalSupply": {
+      "state": "live",
+      "value": "0"
+    }
+  },
+  "ok": true,
+  "summary": "Vault legacy inspected."
 }
 "
 `;
@@ -1574,20 +1753,30 @@ exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.list 1`] = 
   "command": "vault.list",
   "data": [
     {
-      "acceptingPublicDeposits": true,
-      "address": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
-      "name": "HISS Vault",
-      "slug": "flagship"
+      "address": "0x432e90b1b35995ebe46ed93b4db369abfc230e69",
+      "depositRoute": "request_queue",
+      "lifecycle": "canonical_v2",
+      "name": {
+        "state": "live",
+        "value": "HISS Vault V2"
+      }
     },
     {
-      "acceptingPublicDeposits": false,
-      "address": "0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10",
-      "name": "USDG Demo",
-      "slug": "usdg-demo"
+      "acceptingPublicDeposits": {
+        "state": "live",
+        "value": false
+      },
+      "address": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
+      "depositRoute": "erc4626_deposit",
+      "lifecycle": "legacy_v1",
+      "name": {
+        "state": "live",
+        "value": "HISS Vault"
+      }
     }
   ],
   "ok": true,
-  "summary": "2 vaults on Robinhood Chain."
+  "summary": "2 vaults on Robinhood Chain (canonical V2 first; legacy labeled)."
 }
 "
 `;
@@ -1602,10 +1791,10 @@ exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.performance
       "state": "live",
       "value": "1000000000000000000"
     },
-    "vault": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6"
+    "vault": "0x432e90b1b35995ebe46ed93b4db369abfc230e69"
   },
   "ok": true,
-  "summary": "Historical performance read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Not a forecast; not a performance claim."
+  "summary": "Historical performance read for vault 0x432e90b1b35995ebe46ed93b4db369abfc230e69. Not a forecast; not a performance claim."
 }
 "
 `;
@@ -1700,7 +1889,7 @@ exports[`§24.4 golden — JSON envelope (stable, canonical) > vault.prepare-dep
     "value": "0"
   },
   "ok": true,
-  "summary": "Prepared an UNSIGNED deposit of 1000 USDG to 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent."
+  "summary": "Prepared an UNSIGNED deposit of 1000 USDG toward 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent."
 }
 "
 `;
@@ -2058,6 +2247,8 @@ exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > status.degraded 1`
 "HISS Finance status read from robinhood-chain-mainnet.
   Network: robinhood-chain-mainnet
   Chain: 4663
+  RPC: DEGRADED
+  Block: UNKNOWN
 "
 `;
 
@@ -2065,9 +2256,13 @@ exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > status.success 1`]
 "HISS Finance status read from robinhood-chain-mainnet.
   Network: robinhood-chain-mainnet
   Chain: 4663
+  RPC: LIVE (https://rpc.example.invalid)
+  Block: 123456789
   Token: HISS at 0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3
   Vaults tracked: 2
   Treasury Safe: 0xF100Fc28dd1721C698046Dbd60408c523b69e36c
+  Canonical vault (V2): 0x432e90b1b35995ebe46ed93b4db369abfc230e69
+  Legacy vault (V1): 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6 - closed to new deposits
 "
 `;
 
@@ -2077,29 +2272,46 @@ exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.create 1`] =
 `;
 
 exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.holdings 1`] = `
-"Holdings read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6.
+"Holdings read for vault 0x432e90b1b35995ebe46ed93b4db369abfc230e69.
   Source: live chain read (onchain).
 "
 `;
 
 exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.inspect 1`] = `
-"Vault flagship inspected.
+"Vault hiss-vault-v2 inspected (canonical V2 - live lane status attached).
+  Name: HISS Vault V2
+  Address: 0x432e90b1b35995ebe46ed93b4db369abfc230e69
+  Lifecycle: CANONICAL (V2)
+  Base asset: USDG
+  Deposits: routed through the request queue (epoch batches) - state read live on chain.
+  Queue: armed - paused=false - pending=0
+  Keeper: HEALTHY
+  Rebalancing: INACTIVE BY POLICY - AAPL is currently the only execution-grade Stock Token asset. Initial public operation uses settlement-driven allocation and preserves the current USDG cash reserve.
+  Deposit capacity (USDG units): 2500000000
+  Instant USDG redemption (USDG units): 120000000
+  Source: https://rpc.example.invalid @ block 123456789
+"
+`;
+
+exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.inspect.legacy 1`] = `
+"Vault legacy inspected.
   Name: HISS Vault
   Address: 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
+  Lifecycle: LEGACY (V1)
   Base asset: USDG
   Deposits: read live on chain (planned != open != funded).
 "
 `;
 
 exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.list 1`] = `
-"2 vaults on Robinhood Chain.
-  flagship - 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
-  usdg-demo - 0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10
+"2 vaults on Robinhood Chain (canonical V2 first; legacy labeled).
+  HISS Vault V2 - 0x432e90b1b35995ebe46ed93b4db369abfc230e69 [CANONICAL (V2)]
+  HISS Vault - 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6 [LEGACY (V1)]
 "
 `;
 
 exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.performance 1`] = `
-"Historical performance read for vault 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Not a forecast; not a performance claim.
+"Historical performance read for vault 0x432e90b1b35995ebe46ed93b4db369abfc230e69. Not a forecast; not a performance claim.
   Historical figures are not forecasts and are not guaranteed.
 "
 `;
@@ -2128,7 +2340,7 @@ exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.prepare-crea
 `;
 
 exports[`§24.4 golden — PLAIN (ASCII-ish, stable labels) > vault.prepare-deposit 1`] = `
-"Prepared an UNSIGNED deposit of 1000 USDG to 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent.
+"Prepared an UNSIGNED deposit of 1000 USDG toward 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6. Nothing was sent.
   Chain: 4663
   To: 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6
   Value: 0 wei

@@ -101,5 +101,5 @@ routes. Tool names and counts can change; the server's own list is authoritative
 
 - "Using the HISS MCP tools, validate this Coil and write a receipt."
 - "Call hiss_get_staking_status and tell me if staking is live."
-- "Prepare a USDG vault deposit intent for the flagship vault."
+- "Prepare a USDG vault deposit for the canonical V2 vault (a request-queue enqueue — shares mint at epoch settlement)."
 - "Reconcile this Bankr stock-token trade by tx hash."

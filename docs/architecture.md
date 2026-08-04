@@ -20,8 +20,9 @@ user's wallet and the Treasury Safe sign; the audited contracts hold value.
 │  share-seconds · vesting · manifest schema · resolvers        │
 ├──────────────────────────────────────────────────────────────┤
 │  Contracts (Robinhood Chain 4663)                             │
-│  VaultFactory · HISS Vault · XHissVault · registries ·        │
-│  reward distributors · rebalance adapter · Treasury Safe      │
+│  HissUsdGVaultV2 + queue/settler/mesh (canonical) ·           │
+│  VaultFactory · V1 vault (legacy) · XHissVault · registries · │
+│  reward distributors · adapters · Treasury Safe               │
 └──────────────────────────────────────────────────────────────┘
                     ▲ on-chain state is the source of truth ▲
 ```
@@ -57,10 +58,17 @@ describes the chain; it never overrides it.
 
 ## Contracts
 
-The on-chain system centers on a `VaultFactory` that deploys vault instances,
-supporting registries (asset, receipt, access, readiness), reward distributors, a
-rebalance adapter, the `XHissVault` staking contract, and the $HISS token. Protocol
-authority is the 2-of-3 **Treasury Safe**. See [Contracts](./contracts.md).
+The canonical new-deposit vault is **`HissUsdGVaultV2`**
+(`0x432e90b1B35995EBE46eD93B4Db369abfc230E69`) with its 24/7 stack — request
+queue, constrained keeper settlement, liveness heartbeat, side-aware price mesh
+(dynamic capacity is a live read), risk policy, receipts, asset registry, and
+execution adapter. Around it: the `VaultFactory` that deploys V1-style vault
+instances, the **legacy** V1 flagship (closed to new deposits, empty),
+supporting registries (asset, receipt, access, readiness), reward distributors,
+a rebalance adapter, the `XHissVault` staking contract, and the $HISS token.
+Protocol authority is the 2-of-3 **Treasury Safe**. See
+[Contracts](./contracts.md) and
+[24/7 architecture](./vaults/24-7-architecture.md).
 
 ## Data flow: creating and funding a vault
 

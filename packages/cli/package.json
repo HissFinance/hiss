@@ -1,6 +1,6 @@
 {
   "name": "@hiss-finance/cli",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Command-line interface for the HISS agentic trading control plane on Robinhood Chain — public reads, strategy compilation, risk fuses, unsigned transaction preparation and receipt verification.",
   "license": "Apache-2.0",
   "type": "module",

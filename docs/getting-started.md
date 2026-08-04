@@ -75,16 +75,16 @@ cd contracts && forge build && forge test
 Read live protocol status straight from the chain (no keys required):
 
 ```ts
-import { HissClient } from "@hiss-finance/sdk";
+import { createHissClient } from "@hiss-finance/sdk";
 
-const hiss = new HissClient({
+const hiss = createHissClient({
   chainId: 4663,
   rpcUrl: "https://rpc.mainnet.chain.robinhood.com",
 });
 
-const status = await hiss.status.read();
-console.log(status.vaults.flagship.address); // 0x6d96...63e6
-console.log(status.staking.xhiss.address); // 0x6998...67Be
+const status = await hiss.getProtocolStatus();
+console.log(status.vaults?.canonicalDepositVault); // 0x432e90b1B35995EBE46eD93B4Db369abfc230E69 (V2 — canonical)
+console.log(status.vaults?.legacyV1Vault); // 0x6d962604df1c6c5ef4b59d88863600fe71bb63e6 (V1 — LEGACY, closed to new deposits)
 ```
 
 Or from the terminal with the published CLI:
@@ -96,15 +96,19 @@ hiss status
 
 ## Your first prepare
 
-Preparing a transaction returns unsigned calldata for **you** to sign and send:
+Preparing a transaction returns unsigned calldata for **you** to sign and send.
+Deposits target the **canonical V2 vault** and route through its 24/7 request
+queue — shares mint at epoch settlement, not at enqueue:
 
 ```ts
-const txs = await hiss.vaults.prepareDeposit({
-  vault: "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
-  depositor: "0xYourAddress",
-  amountUsdg: 1_000_000_000n, // 1,000 USDG (6 decimals)
+import { prepareVaultDeposit } from "@hiss-finance/sdk";
+
+const plan = prepareVaultDeposit({
+  amountUnits: 1_000_000_000n, // 1,000 USDG (6 decimals)
+  receiver: "0xYourAddress", // the queue-request owner — must be the signing wallet
 });
-// Sign and broadcast `txs` with your wallet. Deposit completes on the on-chain receipt.
+// Sign and broadcast the plan with your wallet. The deposit completes only at
+// on-chain epoch settlement (the settlement receipt) — never at enqueue.
 ```
 
 ## Examples

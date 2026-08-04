@@ -58,6 +58,14 @@ export interface ProtocolStatus {
   rpcUrl: string;
   reachable: boolean;
   blockNumber: string | null;
+  /** Static vault lifecycle facts: canonical V2 new-deposit vault + legacy V1. */
+  vaults?: {
+    canonicalDepositVault: string;
+    canonicalLabel: string;
+    legacyV1Vault: string;
+    legacyLabel: string;
+    note: string;
+  };
   note?: string;
 }
 
@@ -98,6 +106,9 @@ export interface ContractRegistryReport {
   entries: ContractRegistryReportEntry[];
 }
 
+/** Static lifecycle designation for a known HISS vault. */
+export type VaultLifecycle = "canonical_v2" | "legacy_v1" | "unknown";
+
 /** A vault's public read surface. */
 export interface VaultReads {
   address: `0x${string}`;
@@ -108,7 +119,89 @@ export interface VaultReads {
   totalAssets: ReadResult<string>;
   totalSupply: ReadResult<string>;
   pricePerShare: ReadResult<string>;
+  /** V1-style direct-deposit gate; absent/degraded on V2 (queue-routed). */
   acceptingPublicDeposits: ReadResult<boolean>;
+  /**
+   * Static lifecycle designation: `canonical_v2` = the canonical new-deposit
+   * vault; `legacy_v1` = the legacy flagship (closed to new deposits, returned
+   * separately, never the deposit default). Live numbers stay chain reads.
+   */
+  lifecycle?: VaultLifecycle;
+  /** How deposits route: "request_queue" (V2) or "erc4626_deposit" (V1-style). */
+  depositRoute?: "request_queue" | "erc4626_deposit";
+  /** V2 only: whether the vault's queue lane is owner-armed (live read). */
+  queueActive?: ReadResult<boolean>;
+  /** V2 only: whether the vault is paused (live read). */
+  paused?: ReadResult<boolean>;
+  /** Honest, static context for this entry (never a claim about live state). */
+  note?: string;
+}
+
+/** One asset's side-aware capacity answer from the V2 price mesh. */
+export interface VaultV2AssetCapacity {
+  token: `0x${string}`;
+  symbol: ReadResult<string>;
+  buyKnown: boolean | null;
+  /** maxSafeBuyNotionalUsdg in USDG base units (6 dec); null = unknown. */
+  buyNotionalUsdg: string | null;
+  buyZeroReason: number | null;
+  sellKnown: boolean | null;
+  sellNotionalUsdg: string | null;
+  sellZeroReason: number | null;
+}
+
+/**
+ * The canonical V2 vault's live lane/status snapshot. Every leg is fail-soft:
+ * a failed read is null/degraded (UNKNOWN) — never fabricated, never rendered
+ * as live or as "not deployed".
+ */
+export interface VaultV2Status {
+  vault: `0x${string}`;
+  chainId: number;
+  /** Where the reads came from (the RPC endpoint) — always disclosed. */
+  source: { rpcUrl: string; blockNumber: string | null; blockTimestampUnix: number | null };
+  vaultReads: {
+    paused: ReadResult<boolean>;
+    totalSupply: ReadResult<string>;
+    totalAssets: ReadResult<string>;
+    usdgCash: ReadResult<string>;
+    queueActive: ReadResult<boolean>;
+    pendingRedeemCount: ReadResult<string>;
+  };
+  queue: {
+    address: `0x${string}`;
+    paused: ReadResult<boolean>;
+    pendingCount: ReadResult<string>;
+    pendingDepositUsdg: ReadResult<string>;
+    pendingRedemptionShares: ReadResult<string>;
+  };
+  keeper: {
+    /** HEALTHY = keeperActive + fresh liveness; DEGRADED = active but stale evidence. */
+    state: "HEALTHY" | "DEGRADED" | "INACTIVE" | "UNKNOWN";
+    keeperActive: ReadResult<boolean>;
+    settlementActive: ReadResult<boolean>;
+    reason: string;
+  };
+  rebalancing: {
+    /** Live settler flag; null = unread. */
+    active: boolean | null;
+    /** True when inactive by the owner-declared policy (never a fault state). */
+    byPolicy: boolean;
+    reason: string;
+  };
+  liveness: {
+    state: "UNKNOWN" | "UNAVAILABLE" | "STALE" | "DEGRADED" | "OK" | null;
+    executionAllowed: boolean | null;
+    ageSeconds: string | null;
+  };
+  capacity: {
+    /** Min over held-asset buy sides, USDG base units; null = unknown. */
+    immediateDepositCapacityUsdg: string | null;
+    /** Min(sell side, USDG cash), USDG base units; null = unknown. */
+    immediateUsdgRedemptionCapacityUsdg: string | null;
+    perAsset: VaultV2AssetCapacity[];
+  };
+  note: string;
 }
 
 /** xHISS staking status reads. */

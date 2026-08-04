@@ -28,10 +28,16 @@ commands (manifest validation, coil compile, receipt verify, skill list/print,
 the `lp`/`agentic` informational reporters) work fully offline.
 
 ```bash
-hiss --version          # 0.2.0
+hiss --version          # 0.2.2
 hiss --help             # top-level help, grouped by intent
 hiss <group> --help     # per-group help
 ```
+
+Since **0.2.2** the vault commands are **V2-canonical**: `vault list` returns
+the canonical V2 new-deposit vault first with the V1 flagship as a separately
+labeled LEGACY entry, `vault inspect` attaches the live V2 queue/keeper/capacity
+snapshot for the canonical vault, `prepare-deposit` builds a V2 request-queue
+enqueue, and `prepare-withdraw` defaults to the V2 in-kind redemption.
 
 ## Output modes
 
@@ -77,7 +83,7 @@ into `jq`. There are two shapes.
 
 ```json
 {
-  "cliVersion": "0.2.0",
+  "cliVersion": "0.2.2",
   "code": 0,
   "command": "lp status",
   "data": { "...": "the command payload" },
@@ -95,7 +101,7 @@ into `jq`. There are two shapes.
 
 ```json
 {
-  "cliVersion": "0.2.0",
+  "cliVersion": "0.2.2",
   "code": 1,
   "error": { "code": 1, "kind": "general", "message": "…" },
   "ok": false
@@ -149,15 +155,24 @@ HISS MCP doctor: all 3 checks pass at https://mcp.hiss.finance.
 ### Vaults (USDG Creator Vaults)
 
 ```bash
-hiss vault list                                   # list vaults + lifecycle state (chain read)
-hiss vault inspect <addressOrSlug>                # inspect one vault (chain read)
-hiss vault holdings <address>                     # live holdings (chain read)
-hiss vault performance <address>                  # point-in-time performance — not a forecast (chain read)
-hiss vault validate <manifest>                    # · validate a manifest (VALID→0, INVALID→6)
-hiss vault prepare-create <manifest>              # prepare unsigned creation tx (refusal→5)
-hiss vault prepare-deposit <vault> <amount>       # prepare unsigned USDG deposit tx
-hiss vault prepare-withdraw <vault> <shares>      # prepare unsigned withdrawal tx
+hiss vault list                                        # canonical V2 first; legacy V1 labeled separately (chain read)
+hiss vault inspect <addressOrSlug>                     # inspect a vault — canonical V2 attaches live queue/keeper/capacity state (chain read)
+hiss vault holdings <address>                          # live holdings (chain read)
+hiss vault performance <address>                       # point-in-time performance — not a forecast (chain read)
+hiss vault validate <manifest>                         # · validate a manifest (VALID→0, INVALID→6)
+hiss vault prepare-create <manifest>                   # prepare unsigned creation tx (refusal→5)
+hiss vault prepare-deposit <vault> <amount> <receiver> # unsigned V2 queue enqueue (V1 target → legacy warning)
+  # V2 queue options: --nonce <n> --deadline-unix <ts> --min-out-shares <amount>
+hiss vault prepare-withdraw <vault> <shares> <receiver># unsigned withdrawal — V2 default: in-kind redemption
+  # V2 exit options: --mode in_kind|queue_usdg --min-out-usdg <amount> --nonce <n> --deadline-unix <ts>
 ```
+
+For the canonical V2 vault, deposits and `queue_usdg` redemptions settle in
+**epoch batches at the epoch clearing rate** — nothing is instant, and shares/
+USDG move at settlement, not at enqueue. The in-kind redemption pays the exact
+pro-rata basket (USDG cash + held tokens) and is available 24/7. The legacy V1
+flagship (`0x6d962604df1c6c5ef4b59d88863600fe71bb63e6`) is closed to new
+deposits — a V1-targeted deposit plan carries an explicit legacy warning.
 
 `vault validate` fails closed. A valid manifest prints its summary and exits 0;
 a manifest with a credential-shaped field is **refused** (exit 2):
@@ -169,11 +184,11 @@ hiss: HISS never accepts credentials. Remove these fields: privateKey. HISS read
 ### Staking (xHISS)
 
 ```bash
-hiss stake status                # read xHISS staking state (chain read)
-hiss stake prepare <amount>      # prepare unsigned HISS stake tx
-hiss stake cooldown <xhissAmt>   # prepare unsigned cooldown tx
+hiss stake status                    # read xHISS staking state (chain read)
+hiss stake prepare <amount>          # prepare unsigned HISS stake tx
+hiss stake cooldown <xhissAmount>    # prepare unsigned cooldown tx
 # HISS never sends: every stake command READs or PREPAREs an unsigned tx.
-hiss stake redeem                # prepare unsigned redeem tx
+hiss stake redeem <xShares> <receiver>   # prepare unsigned redeem tx (within your open redeem window)
 ```
 
 Staking output always renders the required framing verbatim: `Not a performance
