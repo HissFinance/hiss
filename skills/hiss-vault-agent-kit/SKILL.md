@@ -1,6 +1,6 @@
 ---
 name: hiss-vault-agent-kit
-description: Let your own AI agent discover, read, create, and help operate HISS USDG Creator Vaults on Robinhood Chain through the existing gated HISS APIs — nothing new on-chain. Covers vault discovery (/api/vaults/*), reading a vault's manifest / strategy hash / fees / source verification, creating a vault CANDIDATE from a validated manifest plus the 9-boolean VaultCreatorAck, preparing a USDG deposit intent with the 14-boolean VaultDepositorAck and the exact depositWithAcks ack hashes, checking the deposit-readiness gate, and previewing rebalances under fuses. Enforces the truth model — HISS prepares and verifies, never deploys, never custodies, never executes; planned ≠ funded ≠ claimable; a deposit completes only on the on-chain receipt. Use when a user wants their agent to work with HISS vaults.
+description: Let your own AI agent discover, read, create, and help operate HISS USDG Creator Vaults on Robinhood Chain through the existing gated HISS APIs — nothing new on-chain. The CANONICAL new-deposit vault is HISS Vault V2 (queue-routed epoch settlement, 24/7 lanes, in-kind exit); the V1 flagship is LEGACY (closed to new deposits, empty). Covers vault discovery (/api/vaults/*), reading a vault's manifest / strategy hash / fees / source verification, creating a vault CANDIDATE from a validated manifest plus the 9-boolean VaultCreatorAck, preparing V2 queue deposits and withdrawals (in-kind default, queue_usdg mode), the V1-style depositWithAcks ack hashes, and previewing rebalances under fuses. Enforces the truth model — HISS prepares and verifies, never deploys, never custodies, never executes; planned ≠ funded ≠ claimable; a deposit completes only on the on-chain settlement receipt. Use when a user wants their agent to work with HISS vaults.
 tags:
   [
     vaults,
@@ -14,7 +14,7 @@ tags:
     cross-rail,
     price-mesh,
   ]
-version: 3
+version: 4
 visibility: public
 metadata:
   clawdbot:
@@ -43,21 +43,52 @@ Base is never a vault chain — a manifest with any other `chainId` returns
 
 **Discover**
 
-| Route                            | Returns                                                                                                                                                                                                                                                                                     |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GET /api/vaults/schema`         | Machine-readable route list, chain/payment model, fee schedule, deposit-readiness gate, house-vault candidates, source verification.                                                                                                                                                        |
-| `GET /api/vaults`                | `deployedVaults[]` (the live, deposit-open vaults — deposit here) + `vaults[]` (saved candidates, not deployed).                                                                                                                                                                            |
-| `GET /api/vaults/marketplace`    | Marketplace rows; paid placement is disclosed (`paidPlacement`, and placement never implies safety or expected return).                                                                                                                                                                     |
-| `GET /api/vaults/asset-registry` | Source-verified Robinhood Chain assets + `USDG_ASSET_POLICY`. Live rebalancing is disabled on every asset today.                                                                                                                                                                            |
-| `GET /api/vaults/readiness`      | Live chain-health + canonical contract status, PLUS `flagshipVault` — the live deposit-open flagship with its DEPLOYED address, live `deposits.open`, `deposit` params, and a `doNotUse` implementation-address warning. Always authoritative for "are contracts live / are deposits open". |
+| Route                            | Returns                                                                                                                                                                                                                                                                                                  |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/vaults/schema`         | Machine-readable route list, chain/payment model, fee schedule, deposit-readiness gate, house-vault candidates, source verification.                                                                                                                                                                     |
+| `GET /api/vaults`                | `deployedVaults[]` (the live, deposit-open vaults — deposit here) + `vaults[]` (saved candidates, not deployed).                                                                                                                                                                                         |
+| `GET /api/vaults/marketplace`    | Marketplace rows; paid placement is disclosed (`paidPlacement`, and placement never implies safety or expected return).                                                                                                                                                                                  |
+| `GET /api/vaults/asset-registry` | Source-verified Robinhood Chain assets + `USDG_ASSET_POLICY`. Live rebalancing is disabled on every asset today.                                                                                                                                                                                         |
+| `GET /api/vaults/readiness`      | Live chain-health + canonical contract status. Always authoritative for "are contracts live / are deposits open". The canonical new-deposit vault is HISS Vault V2 (queue-routed); the V1 flagship appears as a LEGACY entry (closed to new deposits), with a `doNotUse` implementation-address warning. |
 
-**Deposit into the live flagship vault (READ THIS BEFORE ANY DEPOSIT)**
+**Deposit into the canonical V2 vault (READ THIS BEFORE ANY DEPOSIT)**
 
-The flagship **HISS Vault** is a deployed contract at **`0x6d962604df1c6c5ef4b59d88863600fe71bb63e6`** (slug `hiss-vault`). Resolve it via `GET /api/vaults/hiss-vault` or `readiness.flagshipVault`. Deposit only when `flagshipVault.deposits.open === true` (a live `acceptingPublicDeposits()` read). Then either compile an intent with `POST /api/vaults/hiss-vault/deposit-intent`, or call directly: approve USDG (`0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168`, 6 dec) for the vault, then `depositWithAcks(assets, receiver, riskAckHash, jurisdictionAckHash)` on the vault address, using the two ack hashes in `flagshipVault.deposit` / below.
+The **canonical new-deposit vault** is **HISS Vault V2** (`HissUsdGVaultV2`) at
+**`0x432e90b1B35995EBE46eD93B4Db369abfc230E69`**. A V2 deposit is
+**queue-routed**, not a direct ERC-4626 `deposit`:
 
-> ⚠️ **Never SEND a deposit to the `HissUsdGVault` address `0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10`.** The flagship is an EIP-1167 minimal proxy that _delegatecalls_ this logic contract — so it is the SOURCE you audit (it is source-verified on Blockscout, `sourceVerification.implementationExplorerUrl`), but depositing into it directly reverts. Deposit only into `flagshipVault.address`.
+1. Approve USDG (`0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168`, 6 dec) for the
+   **request queue** `0x317d1eEC013a91a316858e80BF782496F231729a`
+   (`HissRequestQueue`) — the queue escrows the USDG at enqueue.
+2. The user signs an `enqueue` transaction (owner = the signing wallet; carries
+   a nonce, an expiry, and an optional minimum-shares-out floor).
+3. Shares mint at **epoch settlement** at the epoch clearing rate — **not at
+   enqueue**. Nothing is instant by default. A request past its deadline can be
+   expired and the escrow refunded.
 
-**Verify before you sign (trustless):** `flagshipVault.deposit.ackTexts` gives the full canonical risk + source-disclosure texts. Compute `keccak256(bytes(text))` for each and confirm they equal `riskAckHash` / `jurisdictionAckHash` and the vault's on-chain required hashes before calling `depositWithAcks`. `flagshipVault.sourceVerification` shows the flagship is a clone of the verified `HissUsdGVault` logic (audit `depositWithAcks` there). `flagshipVault.factory.isVerifiedVault` is `false` — that is a create-time factory flag (the flagship predates the owner's pre-verified-create path, and there is no post-creation setter); it does NOT mean the source is unverified. `factory.isVault` is `true` (deployed through the official VaultFactory).
+Receipts distinguish **PREPARATION / SUBMISSION / SETTLEMENT** — only
+settlement completes the deposit. How much can settle safely right now is a
+**live Price Mesh capacity read — never a fixed promise**; availability is
+decided by on-chain market health evidence, never by the calendar. Rebalancing
+on the V2 vault is **inactive by policy** (an owner decision, not a fault
+state — never render it as degraded or "coming soon"): "AAPL is currently the
+only execution-grade Stock Token asset. Initial public operation uses
+settlement-driven allocation and preserves the current USDG cash reserve."
+
+> ⚠️ **The V1 flagship `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` is
+> LEGACY · EMPTY — closed to new deposits.** Never present it as a deposit
+> target; there is no migration flow (nothing to migrate). Also never SEND a
+> deposit to the `HissUsdGVault` logic address
+> `0xb3b6CE5b1C6605dBE897555DdaA191c2AF0A7D10` — it is the V1 SOURCE you audit
+> (source-verified on Blockscout), and depositing into it directly reverts.
+
+**V1-style direct-deposit vaults (ack hashes).** V1-style creator vaults use
+`depositWithAcks(assets, receiver, riskAckHash, jurisdictionAckHash)`; the ack
+texts are canonical and verifiable — compute `keccak256(bytes(text))` and
+confirm they equal the vault's on-chain required hashes before signing. A
+plain ERC-4626 `deposit()` reverts on ack-gated vaults. The on-chain
+identifiers (`VaultDepositorAck`, `depositWithAcks`,
+`hiss-vault-depositor-risk-ack-v1`) are unchanged.
 
 **Read one vault**
 
@@ -99,7 +130,12 @@ wallet signs and sends the transaction — HISS does not.
 **Prepare a withdraw intent**
 
 `POST /api/vaults/:slug/withdraw-intent` with `{manifest, amountUsdg,
-receiver}` → intent + receipt. Signing and sending stays with the wallet.
+receiver}` → intent + receipt. Signing and sending stays with the wallet. On
+the canonical V2 vault the default exit is the **in-kind redemption**
+(`inKindRedeem` — the always-available, valuation-free pro-rata basket of USDG
+cash + held tokens, 24/7); a **queued USDG redemption** (`queue_usdg`) settles
+to USDG at the epoch clearing rate instead, with an optional minimum-USDG-out
+floor.
 
 **Preview a rebalance under fuses**
 
@@ -169,10 +205,11 @@ on the receipt. A plain ERC-4626 `deposit()` reverts — depositors must use
    transaction. Deploying, depositing, withdrawing, and rebalancing are all
    signed by the relevant wallet, never by HISS.
 2. **Candidate ≠ deployed ≠ deposit-open.** `GET /api/vaults/readiness` is
-   the authority. Deposits open only after deployment, verification, and
-   every deposit-readiness check — AND each vault must be marked ready in the
-   on-chain `VaultDepositReadinessRegistry` (owner-only). Your agent cannot
-   mark a vault ready or flip any owner gate.
+   the authority. On the canonical V2 vault, queue/keeper/capacity/pause state
+   is a live chain read. V1-style direct-deposit vaults open only after
+   deployment, verification, and every deposit-readiness check — AND being
+   marked ready in the on-chain `VaultDepositReadinessRegistry` (owner-only).
+   Your agent cannot mark a vault ready or flip any owner gate.
 3. **planned ≠ funded ≠ claimable.** A manifest hash is data; a deposit
    completes only when the on-chain receipt confirms (a successful tx and a
    vault `Deposit` event). Job status, replies, and memory never count.
@@ -247,8 +284,9 @@ never implies a reward. See the `hiss-reward-split` pack.
 
 ## Example prompts
 
-- "List HISS vaults and tell me which are deposit-open per /api/vaults/readiness."
+- "List HISS vaults per /api/vaults/readiness — which is the canonical V2 new-deposit vault, and what does its live queue/capacity state say?"
 - "Read the hiss-vault manifest, strategy hash, and fee schedule."
 - "Build a vault candidate manifest for a USDG vault on chain 4663 with a full VaultCreatorAck, then validate it."
-- "Prepare a 250 USDG deposit intent into this vault with a complete VaultDepositorAck — show me the depositWithAcks calldata and ack hashes. Is the gate open?"
-- "Simulate a rebalance under these fuses (I know execution stays disabled)."
+- "Prepare a 250 USDG V2 queue deposit (enqueue) with a minimum-shares-out floor — show me the unsigned plan and explain that shares mint at epoch settlement."
+- "Prepare an in-kind redemption of my V2 shares — what basket would I receive?"
+- "Simulate a rebalance under these fuses (I know V2 rebalancing is inactive by policy)."

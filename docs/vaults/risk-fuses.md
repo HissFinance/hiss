@@ -55,6 +55,14 @@ assets are not treated as live-rebalanceable.
 
 ## The effective deposit gate (advertised availability)
 
+> **Scope: V1-style direct-deposit vaults only.** This gate governed the legacy
+> V1 flagship (now **LEGACY · EMPTY** — closed to new deposits) and applies to
+> any V1-style vault taking direct ERC-4626 deposits. The canonical V2 vault
+> does not use this gate: its queue accepts requests around the clock, and its
+> availability/safe size is a **live Price Mesh capacity read** decided by
+> on-chain market health evidence, never by a trading-session clock. See
+> [24/7 architecture](./24-7-architecture.md).
+
 The on-chain `acceptingPublicDeposits()` flag is a **price-blind policy switch** —
 it alone never means "deposits work". The hosted product derives an **effective
 deposit gate** as the strict AND of every provable condition, and fails closed on

@@ -16,7 +16,7 @@ tags:
     robinhood-chain,
     agents,
   ]
-version: 4
+version: 5
 visibility: public
 metadata:
   clawdbot:
@@ -98,9 +98,13 @@ model: [`schemas/robinhood-mcp/`](schemas/robinhood-mcp/) and
   4663).
 - `contracts/src/interfaces/*.sol` — Solidity interfaces for typed calls.
 
-Key addresses (chain 4663): VaultFactory
-`0x278d237c6890a5f7101296a9021ed9D26c821810` · flagship HISS Vault
-`0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` · xHISS vault
+Key addresses (chain 4663): HISS Vault V2 — the CANONICAL new-deposit vault
+(queue-routed epoch settlement, 24/7 lanes)
+`0x432e90b1B35995EBE46eD93B4Db369abfc230E69` · HissRequestQueue
+`0x317d1eEC013a91a316858e80BF782496F231729a` · V1 flagship HISS Vault
+`0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` (LEGACY · EMPTY — closed to new
+deposits; never a deposit target) · VaultFactory
+`0x278d237c6890a5f7101296a9021ed9D26c821810` · xHISS vault
 `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be` · $HISS token
 `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` · Treasury Safe (2-of-3)
 `0xF100Fc28dd1721C698046Dbd60408c523b69e36c`. Explorer:

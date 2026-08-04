@@ -46,10 +46,17 @@ Example client config (stdio):
 
 ### Read tools (21)
 
-- `hiss_get_protocol_status` — protocol status snapshot (network, token, Safe, vault count).
+- `hiss_get_protocol_status` — protocol status snapshot (network reachability, current
+  block, vault lifecycle facts: the canonical V2 new-deposit vault + the legacy V1 flagship).
 - `hiss_get_contract_registry` — deployed contract registry (name → address).
-- `hiss_get_vaults` — list USDG Creator Vaults. Factual listing only — never a recommendation.
-- `hiss_get_vault` — read a single vault by address or slug (deposit state is a live chain read).
+- `hiss_get_vaults` — list USDG vaults: the canonical V2 new-deposit vault first, then
+  the legacy V1 flagship as a separately labeled LEGACY entry (closed to new deposits —
+  never the deposit default). Factual listing only — never a recommendation.
+- `hiss_get_vault` — read a single vault by address or slug (a non-address ref resolves
+  to the canonical V2 vault). For the canonical V2 vault the result attaches the live
+  `v2Status` lane snapshot: queue, keeper, rebalancing (owner-declared inactive by
+  policy — not a fault state), and capacity (a live Price Mesh read). All state is a
+  live chain read, never assumed.
 - `hiss_get_vault_holdings` — a vault's current holdings from a live chain read.
 - `hiss_get_vault_performance` — historical performance (not a forecast, not a performance claim).
 - `hiss_get_staking_status` — xHISS staking status (not a performance claim).
@@ -85,8 +92,12 @@ Example client config (stdio):
 - `hiss_create_vault_candidate` — assemble a candidate VaultManifest (a draft — nothing is created).
 - `hiss_validate_vault_candidate` — validate a manifest fail-closed (chain, USDG, fee bounds, skin, fuses).
 - `hiss_prepare_vault_creation` — prepare an **unsigned** vault-creation transaction from a valid manifest.
-- `hiss_prepare_vault_deposit` — prepare an **unsigned** USDG deposit transaction.
-- `hiss_prepare_vault_withdrawal` — prepare an **unsigned** withdrawal transaction.
+- `hiss_prepare_vault_deposit` — prepare an **unsigned** USDG deposit. For the canonical
+  V2 vault this is a request-queue enqueue (epoch batch settlement — shares mint at
+  settlement, not at enqueue); a legacy-V1-targeted plan carries an explicit legacy warning.
+- `hiss_prepare_vault_withdrawal` — prepare an **unsigned** withdrawal. For the canonical
+  V2 vault the default is the pro-rata in-kind redemption (24/7); mode `queue_usdg`
+  prepares a queue-routed USDG redemption instead.
 - `hiss_prepare_hiss_stake` — prepare an **unsigned** stake into the xHISS vault.
 - `hiss_prepare_xhiss_cooldown` — prepare an **unsigned** cooldown (exits are user-initiated).
 - `hiss_prepare_xhiss_redeem` — prepare an **unsigned** redeem within your open window.

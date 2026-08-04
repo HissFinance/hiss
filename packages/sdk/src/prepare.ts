@@ -8,7 +8,7 @@
  * non-positive amount throws rather than producing a questionable plan.
  */
 
-import { encodeFunctionData, getAddress, keccak256, toBytes, type Hex } from "viem";
+import { encodeAbiParameters, encodeFunctionData, getAddress, keccak256, toBytes, type Hex } from "viem";
 import {
   buildAllocation,
   createVaultManifest as vaultKitCreateVaultManifest,
@@ -18,8 +18,8 @@ import {
   type VaultCandidate,
   type ReadinessResult,
 } from "@hiss-finance/vault-kit";
-import { ERC20_ABI, VAULT_ABI, VAULT_FACTORY_ABI, XHISS_ABI } from "./abi";
-import { ADDRESSES, ROBINHOOD_CHAIN_MAINNET } from "./constants";
+import { ERC20_ABI, VAULT_ABI, VAULT_FACTORY_ABI, VAULT_V2_ABI, VAULT_V2_QUEUE_ABI, XHISS_ABI } from "./abi";
+import { ADDRESSES, ROBINHOOD_CHAIN_MAINNET, VAULT_LIFECYCLE } from "./constants";
 import { buildActionPlan } from "./plan";
 import type { ActionPlan } from "./types";
 import { CREATOR_ACKS, DEPOSITOR_ACKS, OWNER_ACTION_ACKS, SIGNING_NOTICE, STAKING_ACKS } from "./copy";
@@ -48,33 +48,157 @@ function assertBps(name: string, bps: number, max = 10_000): number {
 // ---------------------------------------------------------------------------
 
 export interface PrepareVaultDepositInput {
-  /** Vault (proxy) address to deposit into. */
-  vault: string;
+  /** Vault (proxy) address to deposit into. Defaults to the canonical V2 vault. */
+  vault?: string;
   /** USDG amount in base units (6 decimals). */
   amountUnits: bigint;
-  /** Address that receives the vault shares. */
+  /**
+   * Address that receives the vault shares. For the canonical V2 vault this is
+   * the queue-request OWNER: it must be the signing wallet, and shares mint to
+   * it at epoch settlement (not at enqueue).
+   */
   receiver: string;
-  /** Provide both to route through `depositWithAcks`; omit for plain `deposit`. */
+  /** Provide both to route through `depositWithAcks`; omit for plain `deposit` (V1-style only). */
   acks?: { riskAckHash: Hex; jurisdictionAckHash: Hex };
+  /**
+   * V2 queue only: request nonce (per-owner namespace, idempotent by derived
+   * id). Defaults to the current epoch milliseconds. Supply explicitly for a
+   * reproducible plan.
+   */
+  nonce?: bigint;
+  /** V2 queue only: request expiry (unix seconds). Defaults to now + 7 days. */
+  deadlineUnix?: bigint;
+  /**
+   * V2 queue only: minimum shares out at settlement (18 decimals). Defaults to
+   * 0 (accepts any epoch clearing rate) — set a floor for slippage protection.
+   */
+  minOutShares?: bigint;
   chainId?: number;
 }
 
+/** True when `vault` is the canonical V2 vault (case-insensitive). */
+function isVaultV2Address(vault: string): boolean {
+  return vault.toLowerCase() === ADDRESSES.vaultV2.toLowerCase();
+}
+
+const V2_QUEUE_ENQUEUE_SIGNATURE =
+  "enqueue((bytes32,address,uint8,uint256,uint256,uint64,uint64,uint64,uint8,bytes32,uint256))";
+
+/** Derive the queue request id exactly as the deployed contract does. */
+function deriveQueueRequestId(owner: `0x${string}`, flow: 0 | 1, nonce: bigint): Hex {
+  return keccak256(
+    encodeAbiParameters(
+      [{ type: "string" }, { type: "address" }, { type: "address" }, { type: "uint8" }, { type: "uint256" }],
+      ["HISS_REQUEST_QUEUE_V1", addr(ADDRESSES.vaultV2), owner, flow, nonce],
+    ),
+  );
+}
+
+/** Build the V2 queue `enqueue` plan for a DEPOSIT (flow 0) or USDG_REDEMPTION (flow 1). */
+function buildV2QueueEnqueuePlan(params: {
+  chainId: number;
+  owner: `0x${string}`;
+  flow: 0 | 1;
+  amount: bigint;
+  minOut: bigint;
+  deadlineUnix: bigint;
+  nonce: bigint;
+  summary: string;
+  warnings: string[];
+}): ActionPlan {
+  const id = deriveQueueRequestId(params.owner, params.flow, params.nonce);
+  const request = {
+    id,
+    owner: params.owner,
+    flow: params.flow,
+    amount: params.amount,
+    minOut: params.minOut,
+    deadlineUnix: params.deadlineUnix,
+    seq: 0n,
+    epochId: 0n,
+    // The contract overwrites seq/epochId/status on enqueue; 1 (PENDING) mirrors
+    // the proven mainnet enqueue transactions.
+    status: 1,
+    evidenceHash: ZERO_HASH,
+    nonce: params.nonce,
+  } as const;
+  const calldata = encodeFunctionData({
+    abi: VAULT_V2_QUEUE_ABI,
+    functionName: "enqueue",
+    args: [request],
+  });
+  return buildActionPlan({
+    chainId: params.chainId,
+    target: addr(ADDRESSES.vaultV2RequestQueue),
+    function: V2_QUEUE_ENQUEUE_SIGNATURE,
+    decodedArgs: {
+      id,
+      owner: params.owner,
+      flow: params.flow === 0 ? "0 (DEPOSIT)" : "1 (USDG_REDEMPTION)",
+      amount: params.amount.toString(),
+      minOut: params.minOut.toString(),
+      deadlineUnix: params.deadlineUnix.toString(),
+      nonce: params.nonce.toString(),
+    },
+    calldata,
+    summary: params.summary,
+    warnings: params.warnings,
+    requiredAcknowledgments: [...DEPOSITOR_ACKS],
+  });
+}
+
 /**
- * Prepare a USDG deposit. A separate USDG `approve` for the vault must be
- * signed first (see {@link prepareErc20Approval}). Deposits succeed only when
- * the vault is accepting public deposits — always a live chain read.
+ * Prepare a USDG deposit. Defaults to the CANONICAL V2 vault, where deposits
+ * route through the request queue (`enqueue`, epoch batch settlement) — a
+ * separate USDG `approve` for the QUEUE must be signed first. For V1-style
+ * vaults this prepares the direct ERC-4626 `deposit`; the legacy V1 flagship
+ * is closed to new deposits and is warned as such.
  */
 export function prepareVaultDeposit(input: PrepareVaultDepositInput): ActionPlan {
   const chainId = input.chainId ?? ROBINHOOD_CHAIN_MAINNET;
-  const vault = addr(input.vault);
+  const vault = addr(input.vault ?? ADDRESSES.vaultV2);
   const receiver = addr(input.receiver);
   const amount = positive("amountUnits", input.amountUnits);
+
+  if (isVaultV2Address(vault)) {
+    const nonce = input.nonce ?? BigInt(Date.now());
+    const deadlineUnix = input.deadlineUnix ?? BigInt(Math.floor(Date.now() / 1000) + 7 * 86_400);
+    const minOut = input.minOutShares ?? 0n;
+    return buildV2QueueEnqueuePlan({
+      chainId,
+      owner: receiver,
+      flow: 0,
+      amount,
+      minOut,
+      deadlineUnix,
+      nonce,
+      summary: `Queue a deposit of ${amount} USDG units into the canonical V2 vault (${vault}) via the request queue; shares mint to ${receiver} at epoch settlement.`,
+      warnings: [
+        SIGNING_NOTICE,
+        "Approve USDG for the REQUEST QUEUE (not the vault) before enqueuing.",
+        "The request OWNER must be the signing wallet — the queue pulls the USDG escrow from the signer and only the owner (or the vault) may enqueue.",
+        "Deposits settle in epoch batches at the epoch clearing rate — shares mint at settlement, not at enqueue. Nothing is instant.",
+        ...(minOut === 0n
+          ? [
+              "minOut is 0: this accepts ANY epoch clearing rate. Set minOutShares to floor the settlement rate.",
+            ]
+          : []),
+        "Enqueue succeeds only while the queue is unpaused and the vault's queue lane is armed — verify with a live read first.",
+        "A request past its deadline can be expired and the escrow refunded; the deadline is chain time, never a market-hours gate.",
+      ],
+    });
+  }
 
   const warnings = [
     SIGNING_NOTICE,
     "Approve USDG for this vault before depositing.",
     "Deposit only into the vault (proxy) address, never a logic/implementation address.",
     "Deposits succeed only while the vault is accepting public deposits — verify with a live read first.",
+    ...(vault.toLowerCase() === ADDRESSES.flagshipVault.toLowerCase()
+      ? [
+          `${VAULT_LIFECYCLE.legacyLabel}. This deposit plan targets the LEGACY vault and can revert — the canonical new-deposit vault is ${ADDRESSES.vaultV2} (queue-routed epoch settlement).`,
+        ]
+      : []),
   ];
 
   if (input.acks) {
@@ -121,23 +245,93 @@ export function prepareVaultDeposit(input: PrepareVaultDepositInput): ActionPlan
 }
 
 export interface PrepareVaultWithdrawalInput {
-  vault: string;
+  /** Vault (proxy) address to withdraw from. Defaults to the canonical V2 vault. */
+  vault?: string;
   /** Vault shares to redeem, in base units (18 decimals). */
   sharesUnits: bigint;
-  /** Address that receives the withdrawn USDG. */
+  /** Address that receives the withdrawn assets. */
   receiver: string;
   /** Owner of the shares being redeemed (defaults to `receiver`). */
   sharesOwner?: string;
+  /**
+   * V2 only: exit mode. "in_kind" (default) burns shares for the exact
+   * pro-rata basket (USDG cash + held tokens) — valuation-free, available
+   * 24/7. "queue_usdg" escrows shares into the request queue for a USDG
+   * payout at epoch settlement.
+   */
+  mode?: "in_kind" | "queue_usdg";
+  /** V2 queue_usdg only: minimum USDG out at settlement (6 decimals; default 0). */
+  minOutUsdg?: bigint;
+  /** V2 queue_usdg only: request nonce (defaults to epoch milliseconds). */
+  nonce?: bigint;
+  /** V2 queue_usdg only: request expiry (unix seconds; default now + 7 days). */
+  deadlineUnix?: bigint;
   chainId?: number;
 }
 
-/** Prepare a share redemption (ERC-4626 `redeem`). */
+/**
+ * Prepare a share redemption. Defaults to the CANONICAL V2 vault: an
+ * unconditional pro-rata `inKindRedeem` (or, with `mode: "queue_usdg"`, a
+ * queue-routed USDG redemption). For V1-style vaults this prepares the
+ * ERC-4626 `redeem` — the path for LEGACY V1 flagship balances.
+ */
 export function prepareVaultWithdrawal(input: PrepareVaultWithdrawalInput): ActionPlan {
   const chainId = input.chainId ?? ROBINHOOD_CHAIN_MAINNET;
-  const vault = addr(input.vault);
+  const vault = addr(input.vault ?? ADDRESSES.vaultV2);
   const receiver = addr(input.receiver);
   const sharesOwner = addr(input.sharesOwner ?? input.receiver);
   const shares = positive("sharesUnits", input.sharesUnits);
+
+  if (isVaultV2Address(vault)) {
+    if (input.mode === "queue_usdg") {
+      const nonce = input.nonce ?? BigInt(Date.now());
+      const deadlineUnix = input.deadlineUnix ?? BigInt(Math.floor(Date.now() / 1000) + 7 * 86_400);
+      const minOut = input.minOutUsdg ?? 0n;
+      return buildV2QueueEnqueuePlan({
+        chainId,
+        owner: receiver,
+        flow: 1,
+        amount: shares,
+        minOut,
+        deadlineUnix,
+        nonce,
+        summary: `Queue a redemption of ${shares} V2 vault-share units for a USDG payout to ${receiver} at epoch settlement.`,
+        warnings: [
+          SIGNING_NOTICE,
+          "Approve the V2 vault share token for the REQUEST QUEUE before enqueuing — the queue escrows the shares.",
+          "The request OWNER must be the signing wallet; the USDG payout goes to the owner at settlement.",
+          "Redemptions settle in epoch batches at the epoch clearing rate — nothing is instant.",
+          ...(minOut === 0n
+            ? [
+                "minOut is 0: this accepts ANY epoch clearing rate. Set minOutUsdg to floor the settlement payout.",
+              ]
+            : []),
+          "A request past its deadline can be expired and the share escrow refunded.",
+        ],
+      });
+    }
+
+    const calldata = encodeFunctionData({
+      abi: VAULT_V2_ABI,
+      functionName: "inKindRedeem",
+      args: [shares, receiver, sharesOwner],
+    });
+    return buildActionPlan({
+      chainId,
+      target: vault,
+      function: "inKindRedeem(uint256,address,address)",
+      decodedArgs: { shares: shares.toString(), receiver, sharesOwner },
+      calldata,
+      summary: `Redeem ${shares} V2 vault-share units in kind: ${receiver} receives the exact pro-rata basket (USDG cash + held tokens).`,
+      warnings: [
+        SIGNING_NOTICE,
+        "In-kind redemption pays a PRO-RATA BASKET — USDG cash plus every held token (e.g. Stock Tokens), not USDG only.",
+        "Valuation-free and available 24/7; per-asset amounts floor to the vault's favor (dust stays in the vault).",
+        'For a USDG-only exit, use mode "queue_usdg" (epoch batch settlement at the clearing rate).',
+      ],
+      requiredAcknowledgments: [...DEPOSITOR_ACKS],
+    });
+  }
 
   const calldata = encodeFunctionData({
     abi: VAULT_ABI,

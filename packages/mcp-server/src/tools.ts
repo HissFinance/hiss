@@ -141,7 +141,8 @@ const READ_TOOLS: ToolDefinition[] = [
     name: "hiss_get_protocol_status",
     title: "Get protocol status",
     kind: "read",
-    description: "Read a HISS Finance protocol status snapshot (network, token, treasury Safe, vault count).",
+    description:
+      "Read a HISS Finance protocol status snapshot (network reachability, current block, vault lifecycle facts: the canonical V2 new-deposit vault and the legacy V1 flagship).",
     inputSchema: { type: "object", properties: {} },
     handler: async (_args, ctx) => {
       const status = await ctx.client.getProtocolStatus();
@@ -167,11 +168,14 @@ const READ_TOOLS: ToolDefinition[] = [
     title: "List vaults",
     kind: "read",
     description:
-      "List USDG Creator Vaults on Robinhood Chain. Factual listing only — never a recommendation.",
+      "List USDG vaults on Robinhood Chain: the canonical V2 new-deposit vault first, then the legacy V1 flagship as a separately labeled LEGACY entry (closed to new deposits — never the deposit default). Factual listing only — never a recommendation.",
     inputSchema: { type: "object", properties: {} },
     handler: async (_args, ctx) => {
       const vaults = await ctx.client.listVaults();
-      return { summary: `${vaults.length} vault(s) listed.`, structured: { vaults } };
+      return {
+        summary: `${vaults.length} vault(s) listed (canonical V2 first; legacy V1 labeled separately).`,
+        structured: { vaults },
+      };
     },
   },
   {
@@ -179,7 +183,7 @@ const READ_TOOLS: ToolDefinition[] = [
     title: "Get vault",
     kind: "read",
     description:
-      "Read a single vault by address or slug. Deposit state is always a live chain read, never assumed.",
+      'Read a single vault by address or slug (a non-address ref resolves to the canonical V2 vault; "legacy"/"v1"/"flagship" resolves the legacy V1). For the canonical V2 vault the result includes the live lane status: queue, keeper, rebalancing (owner-declared inactive by policy — not a fault state), capacity, and the read\'s block + source. All state is a live chain read, never assumed.',
     inputSchema: {
       type: "object",
       required: ["ref"],
@@ -188,6 +192,14 @@ const READ_TOOLS: ToolDefinition[] = [
     handler: async (args, ctx) => {
       const ref = requireString(args, "ref");
       const vault = await ctx.client.getVault(ref);
+      // Attach the live V2 lane snapshot when the resolved vault is canonical.
+      if (vault.lifecycle === "canonical_v2" && typeof ctx.client.getVaultV2Status === "function") {
+        const v2Status = await ctx.client.getVaultV2Status();
+        return {
+          summary: `Vault ${ref} read (canonical V2 — live queue/keeper/capacity status attached).`,
+          structured: { ...vault, v2Status },
+        };
+      }
       return { summary: `Vault ${ref} read.`, structured: vault };
     },
   },
@@ -195,7 +207,8 @@ const READ_TOOLS: ToolDefinition[] = [
     name: "hiss_get_vault_holdings",
     title: "Get vault holdings",
     kind: "read",
-    description: "Read a vault's current holdings from a live chain read.",
+    description:
+      "Read a vault's current holdings from a live chain read (canonical V2 vault or the legacy V1 flagship by address).",
     inputSchema: {
       type: "object",
       required: ["vault"],
@@ -212,7 +225,7 @@ const READ_TOOLS: ToolDefinition[] = [
     title: "Get vault performance",
     kind: "read",
     description:
-      "Read a vault's historical performance. Historical figures are not forecasts and not a performance claim.",
+      "Read a vault's price-per-share (point-in-time live chain read; canonical V2 vault or legacy V1 by address). Historical figures are not forecasts and not a performance claim.",
     inputSchema: {
       type: "object",
       required: ["vault"],
@@ -435,23 +448,48 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     name: "hiss_prepare_vault_deposit",
     title: "Prepare vault deposit",
     kind: "prepare",
-    description: "Prepare an UNSIGNED USDG deposit transaction to a vault.",
+    description:
+      "Prepare an UNSIGNED USDG deposit transaction. For the CANONICAL V2 vault this prepares a request-queue enqueue (epoch batch settlement — shares mint at settlement, not at enqueue; approve USDG for the queue first). The legacy V1 flagship is closed to new deposits and a V1-targeted plan carries an explicit legacy warning. Nothing is signed or sent.",
     inputSchema: {
       type: "object",
       required: ["vault", "amount", "receiver"],
       properties: {
-        vault: { type: "string", description: "Vault address." },
+        vault: {
+          type: "string",
+          description: "Vault address. The canonical V2 vault routes via the request queue.",
+        },
         amount: { type: "string", description: "USDG amount (decimal string)." },
-        receiver: { type: "string", description: "Address that receives the minted vault shares." },
+        receiver: {
+          type: "string",
+          description:
+            "Address that receives the vault shares. On V2 this is the queue-request owner and must be the signing wallet.",
+        },
+        nonce: {
+          type: "string",
+          description: "V2 only (optional): request nonce for a reproducible plan (default: epoch ms).",
+        },
+        deadlineUnix: {
+          type: "string",
+          description: "V2 only (optional): request expiry, unix seconds (default: now + 7 days).",
+        },
+        minOutShares: {
+          type: "string",
+          description:
+            "V2 only (optional): minimum shares out at settlement (decimal string; default 0 accepts any clearing rate).",
+        },
       },
     },
     handler: async (args, ctx) => {
       const vault = requireAddress(args, "vault");
       const amount = requireString(args, "amount");
       const receiver = requireAddress(args, "receiver");
-      const tx = await ctx.client.prepareVaultDeposit(vault, amount, receiver);
+      const tx = await ctx.client.prepareVaultDeposit(vault, amount, receiver, {
+        ...(typeof args.nonce === "string" ? { nonce: args.nonce } : {}),
+        ...(typeof args.deadlineUnix === "string" ? { deadlineUnix: args.deadlineUnix } : {}),
+        ...(typeof args.minOutShares === "string" ? { minOutShares: args.minOutShares } : {}),
+      });
       return {
-        summary: `Prepared an unsigned deposit of ${amount} USDG to ${vault}. Nothing was sent.`,
+        summary: `Prepared an unsigned deposit of ${amount} USDG toward ${vault}. Nothing was sent.`,
         structured: unsignedStructured(tx),
       };
     },
@@ -460,21 +498,41 @@ const PREPARE_TOOLS: ToolDefinition[] = [
     name: "hiss_prepare_vault_withdrawal",
     title: "Prepare vault withdrawal",
     kind: "prepare",
-    description: "Prepare an UNSIGNED withdrawal transaction from a vault.",
+    description:
+      'Prepare an UNSIGNED withdrawal transaction. For the CANONICAL V2 vault the default is the unconditional pro-rata in-kind redemption (USDG cash + held tokens, 24/7); mode "queue_usdg" prepares a queue-routed USDG redemption instead. V1-style vaults (including the legacy V1 flagship, where existing balances exit) use ERC-4626 redeem. Nothing is signed or sent.',
     inputSchema: {
       type: "object",
       required: ["vault", "shares", "receiver"],
       properties: {
         vault: { type: "string", description: "Vault address." },
         shares: { type: "string", description: "Share amount (decimal string)." },
-        receiver: { type: "string", description: "Address that receives the withdrawn USDG." },
+        receiver: { type: "string", description: "Address that receives the withdrawn assets." },
+        mode: {
+          type: "string",
+          enum: ["in_kind", "queue_usdg"],
+          description: 'V2 only (optional): "in_kind" (default) or "queue_usdg" (epoch batch settlement).',
+        },
+        minOutUsdg: {
+          type: "string",
+          description: "V2 queue_usdg only (optional): minimum USDG out at settlement (decimal string).",
+        },
+        nonce: { type: "string", description: "V2 queue_usdg only (optional): request nonce." },
+        deadlineUnix: {
+          type: "string",
+          description: "V2 queue_usdg only (optional): request expiry, unix seconds.",
+        },
       },
     },
     handler: async (args, ctx) => {
       const vault = requireAddress(args, "vault");
       const shares = requireString(args, "shares");
       const receiver = requireAddress(args, "receiver");
-      const tx = await ctx.client.prepareVaultWithdrawal(vault, shares, receiver);
+      const tx = await ctx.client.prepareVaultWithdrawal(vault, shares, receiver, {
+        ...(typeof args.mode === "string" ? { mode: args.mode } : {}),
+        ...(typeof args.minOutUsdg === "string" ? { minOutUsdg: args.minOutUsdg } : {}),
+        ...(typeof args.nonce === "string" ? { nonce: args.nonce } : {}),
+        ...(typeof args.deadlineUnix === "string" ? { deadlineUnix: args.deadlineUnix } : {}),
+      });
       return {
         summary: `Prepared an unsigned withdrawal of ${shares} shares from ${vault}. Nothing was sent.`,
         structured: unsignedStructured(tx),

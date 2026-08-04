@@ -139,7 +139,12 @@ export function createHissClient(opts: ClientOptions = {}): HissClient {
 
     getVault: async (ref) => {
       const isAddr = ADDRESS_RE.test(ref);
-      const address = isAddr ? (ref as `0x${string}`) : ADDRESSES.flagshipVault;
+      const wantsLegacy = !isAddr && /legacy|v1|flagship/i.test(ref);
+      const address = isAddr
+        ? (ref as `0x${string}`)
+        : wantsLegacy
+          ? ADDRESSES.flagshipVault
+          : ADDRESSES.vaultV2;
       const reads = (await read.getVault(address)) as unknown as JsonRecord;
       return {
         ...reads,
@@ -147,10 +152,14 @@ export function createHissClient(opts: ClientOptions = {}): HissClient {
         ...(isAddr
           ? {}
           : {
-              note: `Resolved to the flagship vault (${ADDRESSES.flagshipVault}). This public SDK build resolves only the flagship vault by slug — pass a 0x vault address to read a specific vault.`,
+              resolutionNote: wantsLegacy
+                ? `Resolved "${ref}" to the LEGACY V1 flagship vault (${ADDRESSES.flagshipVault}) — closed to new deposits; existing balances withdraw/redeem here.`
+                : `Resolved "${ref}" to the canonical V2 vault (${ADDRESSES.vaultV2}). Pass a 0x vault address to read a specific vault; "legacy"/"v1"/"flagship" resolves the legacy V1 flagship.`,
             }),
       };
     },
+
+    getVaultV2Status: async () => (await read.getVaultV2Status()) as unknown as JsonRecord,
 
     getVaultHoldings: (vault) =>
       read.getVaultHoldings(asAddress(vault, "vault")) as unknown as Promise<JsonRecord>,
@@ -223,7 +232,7 @@ export function createHissClient(opts: ClientOptions = {}): HissClient {
       return planToUnsigned(plan);
     },
 
-    prepareVaultDeposit: async (vault, amount, receiver) => {
+    prepareVaultDeposit: async (vault, amount, receiver, opts) => {
       if (!receiver) {
         throw new Error("prepareVaultDeposit requires a `receiver` address to mint the vault shares to.");
       }
@@ -232,21 +241,39 @@ export function createHissClient(opts: ClientOptions = {}): HissClient {
         amountUnits: toBaseUnits(amount, DECIMALS.usdg),
         receiver: asAddress(receiver, "receiver"),
         chainId,
+        // V2 queue options (ignored by the SDK on V1-style vaults).
+        ...(typeof opts?.nonce === "string" && opts.nonce ? { nonce: BigInt(opts.nonce) } : {}),
+        ...(typeof opts?.deadlineUnix === "string" && opts.deadlineUnix
+          ? { deadlineUnix: BigInt(opts.deadlineUnix) }
+          : {}),
+        ...(typeof opts?.minOutShares === "string" && opts.minOutShares
+          ? { minOutShares: toBaseUnits(opts.minOutShares, DECIMALS.shares) }
+          : {}),
       });
       return planToUnsigned(plan);
     },
 
-    prepareVaultWithdrawal: async (vault, shares, receiver) => {
+    prepareVaultWithdrawal: async (vault, shares, receiver, opts) => {
       if (!receiver) {
         throw new Error(
           "prepareVaultWithdrawal requires a `receiver` address to send the withdrawn USDG to.",
         );
       }
+      const mode = opts?.mode === "queue_usdg" ? ("queue_usdg" as const) : undefined;
       const plan = sdkPrepareVaultWithdrawal({
         vault: asAddress(vault, "vault"),
         sharesUnits: toBaseUnits(shares, DECIMALS.shares),
         receiver: asAddress(receiver, "receiver"),
         chainId,
+        // V2 exit options (ignored by the SDK on V1-style vaults).
+        ...(mode ? { mode } : {}),
+        ...(typeof opts?.minOutUsdg === "string" && opts.minOutUsdg
+          ? { minOutUsdg: toBaseUnits(opts.minOutUsdg, DECIMALS.usdg) }
+          : {}),
+        ...(typeof opts?.nonce === "string" && opts.nonce ? { nonce: BigInt(opts.nonce) } : {}),
+        ...(typeof opts?.deadlineUnix === "string" && opts.deadlineUnix
+          ? { deadlineUnix: BigInt(opts.deadlineUnix) }
+          : {}),
       });
       return planToUnsigned(plan);
     },

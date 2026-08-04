@@ -1,6 +1,6 @@
 # Current status (snapshot)
 
-> **Generated at:** 2026-07-16 (UTC)
+> **Generated at:** 2026-08-04 (UTC)
 > **Source:** committed, chain-verified artifacts + `@hiss-finance/core` resolvers.
 > **Chain:** Robinhood Chain mainnet, chain ID **4663**.
 > **Freshness limitations:** This is a **point-in-time snapshot**, not a live read.
@@ -10,9 +10,14 @@
 
 ## Contracts
 
-- **Vault system** — VaultFactory, flagship HISS Vault, registries, oracle adapter, and
-  rebalance adapter are **deployed** on chain 4663. See
+- **V2 vault system (canonical)** — HissUsdGVaultV2
+  (`0x432e90b1B35995EBE46eD93B4Db369abfc230E69`), the request queue, batch
+  settler, liveness heartbeat, price mesh, risk policy, receipt registry,
+  asset registry, and execution adapter are **deployed** on chain 4663
+  (bytecode-verified reads at this stamp). See
   [current deployments](./current-deployments.md).
+- **V1 vault system** — VaultFactory, the V1 flagship HISS Vault (LEGACY),
+  registries, oracle adapter, and rebalance adapter are **deployed** on chain 4663.
 - **xHISS staking vault** — **deployed** at
   `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be`.
 - **Treasury Safe** — 2-of-3 multisig at `0xF100Fc28dd1721C698046Dbd60408c523b69e36c`,
@@ -20,10 +25,18 @@
 
 ## Vaults
 
-- The flagship vault is **live** and denominated in USDG.
-- **Live routing is disabled protocol-wide** — vaults hold their base asset (USDG) until
-  per-asset live-rebalance readiness passes. Declared target weights are **not** current
-  holdings; read live state.
+- The **canonical new-deposit vault is HISS Vault V2** (USDG-denominated,
+  queue-routed epoch settlement, 24/7 lanes, always-available in-kind exit).
+  Queue/keeper/capacity/pause state is a **live chain read**.
+- The **V1 flagship is LEGACY · EMPTY** — closed to new deposits
+  (`totalSupply == 0` at this stamp); no migration flow.
+- **V2 rebalancing is inactive by policy** (an owner decision, not a fault
+  state): "AAPL is currently the only execution-grade Stock Token asset.
+  Initial public operation uses settlement-driven allocation and preserves the
+  current USDG cash reserve."
+- **Live routing for V1-style vaults is disabled protocol-wide** — they hold
+  their base asset (USDG) until per-asset live-rebalance readiness passes.
+  Declared target weights are **not** current holdings; read live state.
 
 ## Staking
 
@@ -45,12 +58,14 @@
 
 ## What is NOT live
 
-| Item                                  | State                             |
-| ------------------------------------- | --------------------------------- |
-| Vault-contributor vesting distributor | not deployed (`null` recipient)   |
-| Vault-provider rewards distributor    | not deployed (`null` recipient)   |
-| Live rebalance routing                | disabled protocol-wide            |
-| Packages on npm                       | not published (build from source) |
+| Item                                  | State                                   |
+| ------------------------------------- | --------------------------------------- |
+| Vault-contributor vesting distributor | not deployed (`null` recipient)         |
+| Vault-provider rewards distributor    | not deployed (`null` recipient)         |
+| V2 rebalancing                        | inactive by policy (owner decision)     |
+| Live rebalance routing (V1-style)     | disabled protocol-wide                  |
+| V1 flagship deposits                  | closed (LEGACY · EMPTY)                 |
+| Packages on npm                       | CLI published; others build from source |
 
 ## How to check anything here
 

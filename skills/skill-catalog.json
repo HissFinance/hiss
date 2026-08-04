@@ -123,7 +123,7 @@
     },
     {
       "name": "hiss-price-mesh",
-      "version": 2,
+      "version": 3,
       "visibility": "public",
       "description": "Instructions for reconciling prices across the user's two rails while strictly separating a REFERENCE QUOTE (informational, may be stale, never executable) from EXECUTABLE LIQUIDITY (what a specific venue could actually fill for a specific size, session-discovered). Combines Robinhood MCP equity/index quotes (schema-unknown) and Robinhood Chain reads under per-source freshness budgets; never presents a reference quote as a fill, never claims a cross-rail parity. This is a set of instructions, not a price oracle service. Use when a user needs a cross-rail price view or asks \"what can I actually get\".",
       "required_hiss_skills": ["hiss-robinhood-market-intelligence"],
@@ -315,9 +315,9 @@
     },
     {
       "name": "hiss-vault-agent-kit",
-      "version": 3,
+      "version": 4,
       "visibility": "public",
-      "description": "Let your own AI agent discover, read, create, and help operate HISS USDG Creator Vaults on Robinhood Chain through the existing gated HISS APIs — nothing new on-chain. Covers vault discovery (/api/vaults/*), reading a vault's manifest / strategy hash / fees / source verification, creating a vault CANDIDATE from a validated manifest plus the 9-boolean VaultCreatorAck, preparing a USDG deposit intent with the 14-boolean VaultDepositorAck and the exact depositWithAcks ack hashes, checking the deposit-readiness gate, and previewing rebalances under fuses. Enforces the truth model — HISS prepares and verifies, never deploys, never custodies, never executes; planned ≠ funded ≠ claimable; a deposit completes only on the on-chain receipt. Use when a user wants their agent to work with HISS vaults.",
+      "description": "Let your own AI agent discover, read, create, and help operate HISS USDG Creator Vaults on Robinhood Chain through the existing gated HISS APIs — nothing new on-chain. The CANONICAL new-deposit vault is HISS Vault V2 (queue-routed epoch settlement, 24/7 lanes, in-kind exit); the V1 flagship is LEGACY (closed to new deposits, empty). Covers vault discovery (/api/vaults/*), reading a vault's manifest / strategy hash / fees / source verification, creating a vault CANDIDATE from a validated manifest plus the 9-boolean VaultCreatorAck, preparing V2 queue deposits and withdrawals (in-kind default, queue_usdg mode), the V1-style depositWithAcks ack hashes, and previewing rebalances under fuses. Enforces the truth model — HISS prepares and verifies, never deploys, never custodies, never executes; planned ≠ funded ≠ claimable; a deposit completes only on the on-chain settlement receipt. Use when a user wants their agent to work with HISS vaults.",
       "required_hiss_skills": [],
       "required_mcp_servers": [],
       "required_mcp_tools": [],

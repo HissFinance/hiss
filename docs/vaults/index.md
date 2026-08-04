@@ -24,8 +24,8 @@ strategy updates (7-day notice) ──▶ performance fees at high-water mark
 - **[Verified history & USDG accounting](./verified-history-and-usdg-accounting.md)** —
   block-pinned history (gaps never bridged) and the USDG accounting identity vs
   market-peg separation.
-- **[24/7 architecture](./24-7-architecture.md)** — the designed (undeployed,
-  activation-gated) continuous valuation + settlement model.
+- **[24/7 architecture](./24-7-architecture.md)** — the LIVE continuous
+  valuation + settlement model the canonical V2 vault runs.
 
 ## Key properties
 
@@ -41,21 +41,36 @@ strategy updates (7-day notice) ──▶ performance fees at high-water mark
   network gas and contract-enforced protocol fees apply — those are on-chain, not HISS
   charges. You keep signing control; HISS never signs, submits, or takes custody.
 - **Change notice.** Strategy changes require a disclosed **7-day** notice.
-- **Routing disabled today.** Protocol-wide, live routing is off; a vault holds its
-  base asset until per-asset live-rebalance readiness passes.
-- **24/7 settlement is designed, not active.** A continuous, around-the-clock
-  valuation + settlement architecture (five execution modes, three settlement
-  lanes, side-aware pricing, in-kind exit) is **designed and tested but undeployed**;
-  production 24/7 settlement is **not active** and is separately gated behind
-  independent audits and owner authorization. See
+- **24/7 settlement is LIVE on the canonical V2 vault.** Deposits and USDG
+  redemptions settle through a 24/7 request queue in epoch batches; a
+  valuation-free **in-kind redemption** is the always-available exit; capacity is
+  a **live Price Mesh read**, never a fixed promise. Availability is decided by
+  on-chain market health evidence — never by the calendar. See
   [24/7 architecture](./24-7-architecture.md).
+- **Rebalancing on the canonical V2 vault is inactive by policy** (an owner
+  decision, not a fault state): "AAPL is currently the only execution-grade
+  Stock Token asset. Initial public operation uses settlement-driven allocation
+  and preserves the current USDG cash reserve." For V1-style factory vaults,
+  protocol-wide live routing remains off until per-asset live-rebalance
+  readiness passes.
 
-## The flagship vault
+## The canonical V2 vault
 
-The reference vault (HISS Vault) at
-`0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` declares a target-weight basket of
-mega-cap tech Stock Tokens, tokenized ETFs, and a USDG cash reserve. **Declared target
-weights are not current holdings** — always read live state; do not copy a snapshot.
+New deposits go to the canonical **HISS Vault V2** (`HissUsdGVaultV2`) at
+`0x432e90b1B35995EBE46eD93B4Db369abfc230E69`. It settles queued flow in epoch
+batches via `HissRequestQueue` (`0x317d1eEC013a91a316858e80BF782496F231729a`)
+with constrained keeper settlement, a liveness heartbeat, side-aware Price Mesh
+pricing, and an unconditional in-kind exit. Queue, keeper, capacity, and pause
+state are **always live chain reads** — do not copy a snapshot. See
+[24/7 architecture](./24-7-architecture.md) for the full contract stack.
+
+## The legacy V1 flagship
+
+The V1 flagship HISS Vault at `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` is
+**LEGACY · EMPTY** — closed to new deposits, holding no depositor value. Its
+address and [verified history](./verified-history-and-usdg-accounting.md) remain
+documented; there is **no migration flow** (nothing to migrate). Never present
+the V1 address as a deposit target.
 
 ## Not investment advice
 

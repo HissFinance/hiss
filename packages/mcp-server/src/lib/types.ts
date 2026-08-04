@@ -47,6 +47,12 @@ export interface HissClient {
   getContractRegistry(observedAt?: string): Promise<JsonRecord>;
   listVaults(): Promise<JsonRecord[]>;
   getVault(ref: string): Promise<JsonRecord>;
+  /**
+   * OPTIONAL: live lane/status snapshot for the canonical V2 vault (queue,
+   * keeper, rebalancing-by-policy, capacity, block + source). Absent on
+   * clients that predate V2.
+   */
+  getVaultV2Status?(): Promise<JsonRecord>;
   getVaultHoldings(vault: string): Promise<JsonRecord>;
   getVaultPerformance(vault: string): Promise<JsonRecord>;
   getStakingStatus(): Promise<JsonRecord>;
@@ -58,8 +64,26 @@ export interface HissClient {
   getFeeSchedule(): Promise<JsonRecord>;
   // ---- prepares (unsigned only) ----
   prepareVaultCreation(manifest: JsonRecord): Promise<UnsignedTx>;
-  prepareVaultDeposit(vault: string, amount: string, receiver?: string): Promise<UnsignedTx>;
-  prepareVaultWithdrawal(vault: string, shares: string, receiver?: string): Promise<UnsignedTx>;
+  /**
+   * `opts` (all optional, V2 queue routing only): `nonce`, `deadlineUnix`,
+   * `minOutShares` (decimal shares string). Ignored on V1-style vaults.
+   */
+  prepareVaultDeposit(
+    vault: string,
+    amount: string,
+    receiver?: string,
+    opts?: JsonRecord,
+  ): Promise<UnsignedTx>;
+  /**
+   * `opts` (all optional, V2 only): `mode` ("in_kind" default | "queue_usdg"),
+   * `minOutUsdg` (decimal USDG string), `nonce`, `deadlineUnix`.
+   */
+  prepareVaultWithdrawal(
+    vault: string,
+    shares: string,
+    receiver?: string,
+    opts?: JsonRecord,
+  ): Promise<UnsignedTx>;
   prepareHissStake(amount: string): Promise<UnsignedTx>;
   prepareXhissCooldown(xhissAmount: string): Promise<UnsignedTx>;
   prepareXhissRedeem(xShares?: string, receiver?: string): Promise<UnsignedTx>;

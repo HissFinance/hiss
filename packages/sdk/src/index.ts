@@ -25,7 +25,18 @@ export * from "./constants";
 export { robinhoodChainMainnet, robinhoodChainTestnet, chainForId } from "./chains";
 
 // ABIs
-export { ERC20_ABI, VAULT_ABI, VAULT_FACTORY_ABI, VAULT_ASSET_REGISTRY_ABI, XHISS_ABI } from "./abi";
+export {
+  ERC20_ABI,
+  VAULT_ABI,
+  VAULT_FACTORY_ABI,
+  VAULT_ASSET_REGISTRY_ABI,
+  VAULT_V2_ABI,
+  VAULT_V2_QUEUE_ABI,
+  VAULT_V2_SETTLER_ABI,
+  VAULT_V2_LIVENESS_ABI,
+  VAULT_V2_PRICE_MESH_ABI,
+  XHISS_ABI,
+} from "./abi";
 
 // Types
 export type {
@@ -38,6 +49,9 @@ export type {
   ContractRegistryReportEntry,
   ContractDeploymentStatus,
   VaultReads,
+  VaultLifecycle,
+  VaultV2AssetCapacity,
+  VaultV2Status,
   StakingStatus,
   StakingPosition,
 } from "./types";

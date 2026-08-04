@@ -1,17 +1,39 @@
 # Deposit
 
 Depositing puts USDG into a vault in exchange for **shares**. You prepare the
-transactions with the SDK and **sign them yourself** — HISS never holds your keys and
-never deposits on your behalf. A deposit is complete only on its **on-chain receipt**.
+transactions with the SDK/CLI and **sign them yourself** — HISS never holds your keys
+and never deposits on your behalf. A deposit is complete only on its **on-chain
+settlement receipt**.
+
+## Where deposits go: the canonical V2 vault
+
+New deposits target the canonical **HISS Vault V2**
+(`0x432e90b1B35995EBE46eD93B4Db369abfc230E69`). A V2 deposit is **queue-routed**:
+
+1. You approve USDG for the request queue
+   (`HissRequestQueue`, `0x317d1eEC013a91a316858e80BF782496F231729a`).
+2. You sign an `enqueue` transaction. The queue escrows your USDG immediately.
+3. Your request settles in an **epoch batch** at the epoch clearing rate —
+   **shares mint at settlement, not at enqueue**. Nothing is instant by default.
+
+Requests carry an owner (must be the signing wallet), a nonce, an expiry, and an
+optional **minimum-shares-out** floor for slippage protection. The queue is open
+around the clock; how much can settle safely right now is a **live capacity read
+from the Price Mesh — never a fixed promise**. See
+[24/7 architecture](./24-7-architecture.md).
+
+The legacy V1 flagship (`0x6d962604df1c6c5ef4b59d88863600fe71bb63e6`) is
+**closed to new deposits** (LEGACY · EMPTY). Preparing a V1-targeted deposit
+produces an explicit legacy warning — never deposit there.
 
 ## Before you deposit
 
-- The vault must have **public deposits open** (creator skin-in-game ≥5% met, legal/
-  deposit readiness satisfied, not paused).
 - You may need to acknowledge the vault's **risk** and **jurisdiction** terms
-  (`riskAckRequired`, `jurisdictionAckRequired` in the manifest).
+  where the vault requires them.
 - Understand that **you share profits and losses**. There is no guaranteed yield and
   no floor.
+- Shares mint at the epoch clearing rate at settlement — set `minOutShares` if you
+  want a floor.
 
 ## Amounts and decimals
 
@@ -25,80 +47,67 @@ USDG has **6 decimals**. Always use base units:
 ## Prepare and sign
 
 ```ts
-import { HissClient } from "@hiss-finance/sdk";
-const hiss = new HissClient({ chainId: 4663 });
+import { createHissClient, prepareVaultDeposit, ADDRESSES } from "@hiss-finance/sdk";
 
-// Live read first (share price is always live — never copy a snapshot).
-const vault = await hiss.vaults.read("0x6d962604df1c6c5ef4b59d88863600fe71bb63e6");
+// Live read first (queue/capacity/pause state is always live — never copy a snapshot).
+const hiss = createHissClient({ chainId: 4663 });
+const vault = await hiss.getVault(); // defaults to the canonical V2 vault
+const v2 = await hiss.getVaultV2Status(); // live queue / keeper / capacity snapshot
 
-// Prepare: returns [approve USDG, deposit] as unsigned transactions + a fee disclosure.
-const { transactions, disclosure } = await hiss.vaults.prepareDeposit({
-  vault: vault.address,
-  depositor: "0xYou",
-  amountUsdg: 1_000_000_000n, // 1,000 USDG
+// Prepare: an unsigned queue `enqueue` plan (approve USDG for the queue first —
+// see prepareErc20Approval and the plan's warnings). Nothing is signed or sent.
+const plan = prepareVaultDeposit({
+  amountUnits: 1_000_000_000n, // 1,000 USDG
+  receiver: "0xYou", // the queue-request OWNER — must be the signing wallet
+  minOutShares: 0n, // set a floor for slippage protection
 });
-console.log(disclosure); // every fee and effect, no hidden lines
 
-// Sign and send with your wallet.
-for (const tx of transactions) {
-  // wallet.sendTransaction({ account: "0xYou", ...tx })
-}
+// Sign and send `{ to: plan.target, data: plan.calldata }` with your own wallet.
+```
+
+Or from the terminal:
+
+```bash
+hiss vault prepare-deposit 0x432e90b1B35995EBE46eD93B4Db369abfc230E69 1000 0xYou \
+  --min-out-shares 0 --rpc-url https://rpc.mainnet.chain.robinhood.com
 ```
 
 ## Shares and share price
 
-You receive ERC-4626 shares priced at the **live share price** at execution. Shares
-represent a pro-rata claim on vault assets; their USDG value moves with the vault's
-holdings. See [Performance](./performance.md).
+You receive ERC-4626 shares priced at the **epoch clearing rate** at settlement.
+Shares represent a pro-rata claim on vault assets; their USDG value moves with the
+vault's holdings. See [Performance](./performance.md).
 
 ## Fees on deposit
 
 - **Deposit fee: 0.** There is no protocol deposit fee.
 - **No performance fee on deposit.** Performance fees apply only to new profit above
   the high-water mark, at crystallization — never on your way in.
-- **Chain gas** is yours to pay; **slippage/liquidity costs** (if any, once routing is
-  live) are disclosed separately — no hidden spread. See [Fees](../fees/vault-fees.md).
+- **Chain gas** is yours to pay. Entry pricing is side-aware (an ask-side mark —
+  the real cost to acquire exposure, retained by the vault for all holders as
+  anti-dilution, never a HISS fee). See [Fees](../fees/vault-fees.md) and
+  [24/7 architecture](./24-7-architecture.md#price-mesh-v2--side-aware-pricing).
 - **No HISS subscription.** The website and app tools that prepare this deposit are free
   (no subscription, credits, or paywall). The only costs are on-chain: network gas and
   any contract-enforced protocol fee — never a HISS charge.
 
-## Completion = on-chain receipt
+## Completion = on-chain settlement receipt
 
-A deposit is settled only when the on-chain deposit transaction confirms and its
-[receipt](./receipts.md) exists. A prepared-but-unsigned or pending transaction is
-**not** a completed deposit. If a status read fails, treat it as **unknown** — re-read
-the chain.
+Receipts distinguish **PREPARATION** (an unsigned plan), **SUBMISSION** (a sent
+enqueue transaction), and **SETTLEMENT** (the epoch settled and shares minted).
+A deposit is complete only at **settlement** — an enqueued-but-unsettled request
+is escrowed, not deposited. If a status read fails, treat it as **unknown** —
+re-read the chain. See [Receipts](./receipts.md).
 
-## Deposit availability (when deposits are advertised open)
+## Availability is evidence-driven, 24/7
 
-Deposits are advertised open only when every provable condition holds — the
-contract's deposit switch, the on-chain readiness registry, usable live pricing,
-not-paused, and the per-basis feed-freshness policy (trading session open, every
-required basket feed within its bound). Outside those windows the deposit entry
-reports the honest reason (for example market-closed or oracle-unavailable) and
-reopens when feeds resume. See
-[the effective deposit gate](./risk-fuses.md#the-effective-deposit-gate-advertised-availability).
-
-A separate, broader **24/7 settlement** architecture — side-aware deposit pricing
-(entry valued at the ask plus the real cost to acquire, retained by the vault for
-all holders), execution-coupled minting from realized value, dynamic safe-notional
-caps, and batch/in-kind lanes — is designed and tested but **undeployed**. It does
-not change the deployed vault's fail-closed off-hours behavior above. Production
-24/7 settlement is **not active**. See
-[24/7 architecture](./24-7-architecture.md).
-
-## Deposit-anytime intents (pending activation — NOT live)
-
-A forward-priced "deposit anytime" path is **designed and fork-tested but not
-active**: the user would sign **once** at intent time (a USDG permit that is
-itself the intent — amount, vault, acknowledgments, and expiry pinned), and a
-keeper would submit the strike at the next fresh-price window, with shares
-minting directly to the user's wallet at that window's NAV and the intent
-cancellable any time before the strike. The executor contract
-(`HissDepositIntentExecutor`) is **not deployed** — deployment remains
-owner-gated behind the audit gate. Until it is deployed and activated, this
-path does not exist on-chain and nothing here should be read as an available
-action: deposits open when feeds resume publishing.
+The queue accepts requests around the clock. Availability and safe size are
+decided by **on-chain market health evidence** — executable depth, price
+corroboration, peg and sequencer health — never by the calendar or an exchange
+session. Dynamic capacity is a **live Price Mesh read**. When priced settlement
+is constrained, requests wait for a settling epoch and the
+[in-kind exit](./withdraw.md#in-kind-redemption-the-always-available-exit)
+remains open. A failed read is **unknown**, never "open" and never "closed".
 
 ## Via Bankr (optional, region-dependent)
 
@@ -109,3 +118,4 @@ and only complete on the on-chain receipt. HISS never executes the deposit for y
 ## Next
 
 - [Withdraw](./withdraw.md) · [Performance](./performance.md) · [Receipts](../receipts.md)
+  · [24/7 architecture](./24-7-architecture.md)

@@ -1,42 +1,79 @@
 # Withdraw
 
-Withdrawing redeems your **shares** for their USDG value. You prepare the transaction
-with the SDK and **sign it yourself**. Like deposits, a withdrawal is complete only on
-its **on-chain receipt**.
+Withdrawing redeems your **shares**. You prepare the transaction with the SDK/CLI and
+**sign it yourself**. Like deposits, a withdrawal is complete only on its **on-chain
+settlement receipt**.
+
+## The canonical V2 vault: two exits, both 24/7
+
+The canonical V2 vault (`0x432e90b1B35995EBE46eD93B4Db369abfc230E69`) offers two
+user-signed exit paths:
+
+1. **In-kind redemption (the default — the always-available exit).** You redeem
+   shares directly on the vault (`inKindRedeem`) and receive your **pro-rata
+   basket** of held tokens plus USDG. This path is **valuation-free** — it needs
+   no sell into thin liquidity and no fresh oracle mark — so it stays open
+   around the clock even when priced settlement is constrained.
+2. **Queued USDG redemption.** You enqueue shares in the request queue
+   (`0x317d1eEC013a91a316858e80BF782496F231729a`); they settle to **USDG** in an
+   epoch batch at the epoch clearing rate, with an optional minimum-USDG-out
+   floor. Settlement, not enqueue, completes the redemption.
 
 ## What you receive
 
-Redeeming shares returns the **current USDG value** of those shares at the live share
-price — which reflects the vault's gains and losses since you deposited. Because
-depositors share profit and loss, you may receive **more or less** than you deposited.
-There is no guaranteed return.
+Redeeming returns the current value of your shares — in-kind as the pro-rata
+basket, or queued as USDG at the epoch clearing rate — which reflects the vault's
+gains and losses since you deposited. Because depositors share profit and loss,
+you may receive **more or less** than you deposited. There is no guaranteed
+return. Queued USDG exit pricing is side-aware (a bid-side mark — your pro-rata
+value less the realistic cost to liquidate your slice, retained by the vault for
+all holders as anti-dilution). See
+[24/7 architecture](./24-7-architecture.md#price-mesh-v2--side-aware-pricing).
 
 ## Prepare and sign
 
 ```ts
-import { HissClient } from "@hiss-finance/sdk";
-const hiss = new HissClient({ chainId: 4663 });
+import { createHissClient, prepareVaultWithdrawal } from "@hiss-finance/sdk";
 
-const vault = await hiss.vaults.read("0x6d962604df1c6c5ef4b59d88863600fe71bb63e6");
+const hiss = createHissClient({ chainId: 4663 });
+const vault = await hiss.getVault(); // canonical V2 by default
 
-// Prepare a redemption of shares (18-decimal share units).
-const { transactions, disclosure } = await hiss.vaults.prepareWithdraw({
-  vault: vault.address,
-  owner: "0xYou",
-  shares: 500n * 10n ** 18n,
+// Default: an unsigned in-kind redemption (pro-rata basket, 24/7).
+const inKind = prepareVaultWithdrawal({
+  sharesUnits: 500n * 10n ** 18n, // 18-decimal share units
+  receiver: "0xYou",
 });
-console.log(disclosure);
-// Sign and send `transactions` with your wallet.
+
+// Or: a queued USDG redemption (epoch settlement, optional USDG floor).
+const queued = prepareVaultWithdrawal({
+  sharesUnits: 500n * 10n ** 18n,
+  receiver: "0xYou",
+  mode: "queue_usdg",
+  minOutUsdg: 0n,
+});
+// Sign and send `{ to: plan.target, data: plan.calldata }` with your own wallet.
+// (For queue_usdg, approve the V2 share token for the queue first — the plan's
+// warnings say so.)
 ```
 
-You can redeem a specific share amount, or prepare a full exit of your balance.
+Or from the terminal:
+
+```bash
+# In-kind (default)
+hiss vault prepare-withdraw 0x432e90b1B35995EBE46eD93B4Db369abfc230E69 500 0xYou \
+  --rpc-url https://rpc.mainnet.chain.robinhood.com
+
+# Queued USDG redemption
+hiss vault prepare-withdraw 0x432e90b1B35995EBE46eD93B4Db369abfc230E69 500 0xYou \
+  --mode queue_usdg --min-out-usdg 0
+```
 
 ## Fees on withdrawal
 
 - **Withdrawal fee: 0.** There is no protocol withdrawal fee.
-- **Chain gas, liquidity-unwind, and slippage** are disclosed separately and are not a
-  HISS fee — **no hidden spread**. Once routing is live, unwinding non-USDG holdings may
-  incur venue slippage, always disclosed.
+- **Chain gas** is yours to pay; queued-exit pricing discloses its bid-side basis —
+  **no hidden spread** (the anti-dilution differential is retained by the vault for
+  all holders, never a HISS fee).
 - Any **performance fee** is a matter of vault-level crystallization above the
   high-water mark; it is never an extra charge on your principal at exit. See
   [Fees](../fees/vault-fees.md).
@@ -44,16 +81,32 @@ You can redeem a specific share amount, or prepare a full exit of your balance.
   website and app tools is free; the only costs are on-chain (gas and any
   contract-enforced protocol fee), never a HISS charge.
 
+## In-kind redemption (the always-available exit)
+
+The in-kind path is first-class, not a fallback: a redeemer receives their
+pro-rata basket of held tokens plus USDG directly, valuation-free, as the honest
+unconditional around-the-clock exit — including while priced settlement is
+constrained. It is jurisdiction-gated where required, not permissionless
+everywhere. See [24/7 architecture](./24-7-architecture.md#the-live-lanes).
+
+## The legacy V1 flagship
+
+The V1 flagship (`0x6d962604df1c6c5ef4b59d88863600fe71bb63e6`) is
+**LEGACY · EMPTY** — closed to new deposits with no depositor value remaining,
+so there is nothing to withdraw and **no migration flow**. V1-style vaults use
+plain ERC-4626 `redeem` for any remaining balances; the address and history stay
+documented.
+
 ## Lockups
 
-The flagship vault uses `lockupSeconds: 0` (no lockup). A specific vault may declare a
-lockup in its manifest's `depositorPolicy` — check the manifest before depositing. Any
-lockup is disclosed up front, never hidden.
+A vault may declare a lockup in its manifest's `depositorPolicy` — check the
+manifest before depositing. Any lockup is disclosed up front, never hidden.
 
-## Completion = on-chain receipt
+## Completion = on-chain settlement receipt
 
-A withdrawal is settled only when its on-chain transaction confirms and its
-[receipt](../receipts.md) exists. A pending or unsigned transaction is not a completed
+Receipts distinguish **PREPARATION**, **SUBMISSION**, and **SETTLEMENT**. A
+withdrawal is settled only when its on-chain transaction confirms (in-kind) or
+its epoch settles (queued). A pending or unsigned transaction is not a completed
 withdrawal. A failed status read is **unknown** — re-read the chain.
 
 ## Emergency conditions
@@ -62,17 +115,6 @@ If a vault's `emergencyPauseEnabled` fuse is active, an owner may pause deposits
 rebalances in an emergency. Pause is a safety control, not a way to trap funds; it is
 disclosed and bounded by the vault's policy. (On the staking side, xHISS exits are
 **never** pausable — see [Cooldown and redeem](../staking/cooldown-and-redeem.md).)
-
-## In-kind exit (designed, activation-gated)
-
-The [24/7 vault architecture](./24-7-architecture.md) designs a first-class
-**in-kind redemption** — a redeemer would receive their pro-rata basket of Stock
-Tokens plus USDG directly, valuation-free (needing no sell into thin liquidity and
-no fresh oracle mark), as an unconditional around-the-clock exit. It is
-jurisdiction-gated, not permissionless. This path is **designed and tested but
-undeployed**; it is not active on the deployed vault today, where the honest exit is
-the priced USDG redemption above plus the owner-controlled `emergencyExit` safety
-path. Production 24/7 settlement is **not active**.
 
 ## Next
 

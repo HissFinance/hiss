@@ -8,10 +8,10 @@
 import { readFile } from "node:fs/promises";
 import { EXIT } from "../lib/exit.js";
 import type { CommandResult } from "../lib/output.js";
-import type { HissClient, JsonRecord, UnsignedTx } from "../lib/types.js";
+import type { HissClient, JsonRecord, PrepareVaultOpts, UnsignedTx } from "../lib/types.js";
 import { assertNoCredentials } from "../lib/credentials.js";
 import { validateVaultManifest } from "../lib/validate.js";
-import type { StateToken, TableCell, ViewBlock } from "../lib/view.js";
+import type { KVRow, StateToken, TableCell, ViewBlock } from "../lib/view.js";
 
 function str(v: unknown, fallback = "unknown"): string {
   return typeof v === "string" && v.length > 0 ? v : fallback;
@@ -19,11 +19,15 @@ function str(v: unknown, fallback = "unknown"): string {
 
 /**
  * Lifecycle token for a vault, derived facts-only from whatever the read
- * surfaced. Deposit acceptance is a LIVE read (planned ≠ open ≠ funded); an
+ * surfaced. The SDK labels the canonical V2 vault `canonical_v2` and the
+ * legacy V1 flagship `legacy_v1` (closed to new deposits — never the deposit
+ * default). Deposit acceptance is a LIVE read (planned ≠ open ≠ funded); an
  * absent field is UNKNOWN, never assumed open or closed.
  */
 function vaultLifecycle(vault: JsonRecord): { state: StateToken; label: string } {
   const explicit = typeof vault.lifecycle === "string" ? vault.lifecycle.toUpperCase() : undefined;
+  if (explicit === "CANONICAL_V2") return { state: "active", label: "CANONICAL (V2)" };
+  if (explicit === "LEGACY_V1") return { state: "info", label: "LEGACY (V1)" };
   if (explicit === "LEGACY") return { state: "info", label: "LEGACY" };
   if (explicit === "CANARY") return { state: "warning", label: "CANARY" };
   if (explicit === "V2") return { state: "active", label: "V2" };
@@ -36,13 +40,26 @@ function vaultLifecycle(vault: JsonRecord): { state: StateToken; label: string }
   return { state: "unknown", label: "UNKNOWN" };
 }
 
+/** Unwrap a fail-soft SDK ReadResult to a display value; UNKNOWN when degraded. */
+function readVal(v: unknown): string | null {
+  if (v && typeof v === "object" && !Array.isArray(v)) {
+    const r = v as JsonRecord;
+    if (r.state === "live" && r.value != null) return String(r.value);
+    return null;
+  }
+  return v == null ? null : String(v);
+}
+
 export async function vaultListCommand(client: HissClient): Promise<CommandResult> {
   const vaults = await client.listVaults();
-  const detail = vaults.map((v) => `${str(v.slug, str(v.name))} — ${str(v.address)}`);
+  const detail = vaults.map((v) => {
+    const lc = vaultLifecycle(v);
+    return `${str(v.slug, str(readVal(v.name), str(v.address)))} — ${str(v.address)} [${lc.label}]`;
+  });
   const rows: TableCell[][] = vaults.map((v) => {
     const lc = vaultLifecycle(v);
     return [
-      str(v.slug, str(v.name)),
+      str(v.slug, str(readVal(v.name), str(v.address))),
       { value: str(v.address), token: "address" as const, full: true },
       { value: lc.label, token: lc.state },
     ];
@@ -54,9 +71,17 @@ export async function vaultListCommand(client: HissClient): Promise<CommandResul
       columns: [{ header: "Vault" }, { header: "Address" }, { header: "State" }],
       rows,
     },
+    {
+      kind: "panel",
+      variant: "info",
+      lines: [
+        "New deposits route to the CANONICAL V2 vault (queue-routed epoch settlement).",
+        "The V1 flagship is LEGACY: closed to new deposits; existing balances withdraw/redeem there.",
+      ],
+    },
   ];
   return {
-    summary: `${vaults.length} vault${vaults.length === 1 ? "" : "s"} on Robinhood Chain.`,
+    summary: `${vaults.length} vault${vaults.length === 1 ? "" : "s"} on Robinhood Chain (canonical V2 first; legacy labeled).`,
     data: vaults,
     detail,
     view,
@@ -64,36 +89,179 @@ export async function vaultListCommand(client: HissClient): Promise<CommandResul
   };
 }
 
+/** Format a USDG base-unit (6-dec) string as a decimal USDG amount. */
+function usdg6(baseUnits: string | null): string | null {
+  if (baseUnits === null || !/^\d+$/.test(baseUnits)) return null;
+  const padded = baseUnits.padStart(7, "0");
+  const whole = padded.slice(0, -6);
+  const frac = padded.slice(-6).replace(/0+$/, "");
+  return frac ? `${whole}.${frac}` : whole;
+}
+
+/** Declarative blocks for the canonical V2 vault's live lane status. */
+function v2StatusBlocks(s: JsonRecord): ViewBlock[] {
+  const source = (s.source ?? {}) as JsonRecord;
+  const vaultReads = (s.vaultReads ?? {}) as JsonRecord;
+  const queue = (s.queue ?? {}) as JsonRecord;
+  const keeper = (s.keeper ?? {}) as JsonRecord;
+  const rebalancing = (s.rebalancing ?? {}) as JsonRecord;
+  const capacity = (s.capacity ?? {}) as JsonRecord;
+
+  const paused = readVal(vaultReads.paused);
+  const queuePaused = readVal(queue.paused);
+  const queueActive = readVal(vaultReads.queueActive);
+  const keeperState = typeof keeper.state === "string" ? keeper.state : "UNKNOWN";
+  const rebActive = rebalancing.active;
+  const rebByPolicy = rebalancing.byPolicy === true;
+
+  const depCap =
+    typeof capacity.immediateDepositCapacityUsdg === "string" ? capacity.immediateDepositCapacityUsdg : null;
+  const redCap =
+    typeof capacity.immediateUsdgRedemptionCapacityUsdg === "string"
+      ? capacity.immediateUsdgRedemptionCapacityUsdg
+      : null;
+
+  const rows: KVRow[] = [
+    {
+      label: "Vault paused",
+      value: paused === null ? null : paused === "true" ? "PAUSED" : "not paused",
+      token: paused === "true" ? "paused" : paused === null ? "muted" : "active",
+    },
+    {
+      label: "Queue lane",
+      value:
+        queueActive === null && queuePaused === null
+          ? null
+          : `${queueActive === "true" ? "armed" : queueActive === "false" ? "not armed" : "UNKNOWN"} · ${
+              queuePaused === "true"
+                ? "queue PAUSED"
+                : queuePaused === "false"
+                  ? "queue open"
+                  : "queue UNKNOWN"
+            }`,
+      token: queuePaused === "true" ? "paused" : "value",
+    },
+    { label: "Queue pending", value: readVal(queue.pendingCount), token: "value" },
+    {
+      label: "Pending deposits",
+      value: usdg6(readVal(queue.pendingDepositUsdg)) ?? null,
+      token: "value",
+    },
+    { label: "Keeper", value: `${keeperState} — ${str(keeper.reason, "")}`.trim(), token: "value" },
+    {
+      label: "Rebalancing",
+      value:
+        rebActive === true
+          ? `ACTIVE — ${str(rebalancing.reason, "")}`
+          : rebByPolicy
+            ? `INACTIVE BY POLICY — ${str(rebalancing.reason, "")}`
+            : rebActive === null || rebActive === undefined
+              ? null
+              : `INACTIVE — ${str(rebalancing.reason, "")}`,
+      // Owner-declared policy state, never a fault: render as info, not degraded.
+      token: rebActive === true ? "active" : rebByPolicy ? "info" : "muted",
+    },
+    {
+      label: "Deposit capacity",
+      value: depCap === null ? null : `${usdg6(depCap) ?? depCap} USDG (live mesh read)`,
+      token: "value",
+    },
+    {
+      label: "Instant USDG redemption",
+      value: redCap === null ? null : `${usdg6(redCap) ?? redCap} USDG (cash-bounded)`,
+      token: "value",
+    },
+    { label: "USDG cash", value: usdg6(readVal(vaultReads.usdgCash)), token: "value" },
+  ];
+
+  return [
+    { kind: "keyValue", title: "V2 live lane status", rows },
+    {
+      kind: "evidence",
+      title: "Read evidence",
+      refs: [
+        {
+          source: typeof source.rpcUrl === "string" ? `RPC ${source.rpcUrl}` : "RPC (unknown)",
+          block: typeof source.blockNumber === "string" ? source.blockNumber : null,
+          note: "Live chain reads; a failed leg is UNKNOWN, never fabricated. Not a performance claim.",
+        },
+      ],
+    },
+  ];
+}
+
 export async function vaultInspectCommand(client: HissClient, ref: string): Promise<CommandResult> {
   const vault = await client.getVault(ref);
   const lc = vaultLifecycle(vault);
+  const isCanonicalV2 = vault.lifecycle === "canonical_v2";
   const detail = [
-    `Name: ${str(vault.name)}`,
+    `Name: ${str(readVal(vault.name), str(vault.name))}`,
     `Address: ${str(vault.address)}`,
+    `Lifecycle: ${lc.label}`,
     `Base asset: ${str(vault.baseAsset, "USDG")}`,
-    `Deposits: read live on chain (planned ≠ open ≠ funded).`,
+    isCanonicalV2
+      ? "Deposits: routed through the request queue (epoch batches) — state read live on chain."
+      : `Deposits: read live on chain (planned ≠ open ≠ funded).`,
   ];
   const view: ViewBlock[] = [
-    { kind: "status", state: lc.state, label: `Deposits ${lc.label}`, note: "live chain read" },
+    { kind: "status", state: lc.state, label: lc.label, note: "live chain read" },
     {
       kind: "keyValue",
       title: `Vault ${str(vault.slug, ref)}`,
       rows: [
-        { label: "Name", value: str(vault.name), token: "value" },
+        { label: "Name", value: str(readVal(vault.name), str(vault.name)), token: "value" },
         { label: "Address", value: str(vault.address), token: "address", full: true },
+        { label: "Lifecycle", value: lc.label, token: lc.state },
         { label: "Base asset", value: str(vault.baseAsset, "USDG"), token: "value" },
-        { label: "Deposits", value: lc.label, token: lc.state },
+        { label: "Total supply", value: readVal(vault.totalSupply), token: "value" },
+        { label: "NAV (USDG units)", value: readVal(vault.totalAssets), token: "value" },
       ],
     },
-    {
+  ];
+
+  // Canonical V2: attach the live lane status (queue/keeper/rebalancing/capacity).
+  let data: JsonRecord = vault;
+  if (isCanonicalV2 && typeof client.getVaultV2Status === "function") {
+    const v2Status = await client.getVaultV2Status();
+    data = { ...vault, v2Status };
+    view.push(...v2StatusBlocks(v2Status));
+    // Plain/quiet surfaces render `detail` — mirror the lane facts there too.
+    const q = (v2Status.queue ?? {}) as JsonRecord;
+    const vr = (v2Status.vaultReads ?? {}) as JsonRecord;
+    const kp = (v2Status.keeper ?? {}) as JsonRecord;
+    const rb = (v2Status.rebalancing ?? {}) as JsonRecord;
+    const cap = (v2Status.capacity ?? {}) as JsonRecord;
+    const src = (v2Status.source ?? {}) as JsonRecord;
+    const u = (x: unknown): string => str(readVal(x), "UNKNOWN");
+    detail.push(
+      `Queue: ${u(vr.queueActive) === "true" ? "armed" : u(vr.queueActive) === "false" ? "not armed" : "UNKNOWN"} · paused=${u(q.paused)} · pending=${u(q.pendingCount)}`,
+      `Keeper: ${str(kp.state, "UNKNOWN")}`,
+      rb.active === true
+        ? `Rebalancing: ACTIVE (live read)`
+        : rb.byPolicy === true
+          ? `Rebalancing: INACTIVE BY POLICY — ${str(rb.reason, "")}`
+          : `Rebalancing: UNKNOWN`,
+      `Deposit capacity (USDG units): ${typeof cap.immediateDepositCapacityUsdg === "string" ? cap.immediateDepositCapacityUsdg : "UNKNOWN"}`,
+      `Instant USDG redemption (USDG units): ${typeof cap.immediateUsdgRedemptionCapacityUsdg === "string" ? cap.immediateUsdgRedemptionCapacityUsdg : "UNKNOWN"}`,
+      `Source: ${str(src.rpcUrl, "unknown RPC")} @ block ${typeof src.blockNumber === "string" ? src.blockNumber : "UNKNOWN"}`,
+    );
+  } else {
+    view.push({
       kind: "panel",
       variant: "info",
-      lines: ["Deposit state is a live chain read: planned != open != funded."],
-    },
-  ];
+      lines:
+        vault.lifecycle === "legacy_v1"
+          ? [
+              "LEGACY V1 flagship: closed to new deposits; existing balances withdraw/redeem here.",
+              "New deposits route to the canonical V2 vault (queue-routed epoch settlement).",
+            ]
+          : ["Deposit state is a live chain read: planned != open != funded."],
+    });
+  }
+
   return {
-    summary: `Vault ${str(vault.slug, ref)} inspected.`,
-    data: vault,
+    summary: `Vault ${str(vault.slug, ref)} inspected${isCanonicalV2 ? " (canonical V2 — live lane status attached)" : ""}.`,
+    data,
     detail,
     view,
     exitCode: EXIT.SUCCESS,
@@ -231,24 +399,29 @@ function unsignedDetail(tx: UnsignedTx): string[] {
     `To: ${tx.to}`,
     `Value: ${tx.value} wei`,
     `Calldata: ${tx.data}`,
+    ...(tx.warnings ?? []).map((w) => `Warning: ${w}`),
     `This transaction is UNSIGNED. Review it and submit it with your own wallet.`,
   ];
 }
 
 /** A data-only transaction-review block for an unsigned tx (signed:false, always). */
 function unsignedView(tx: UnsignedTx, functionName: string): ViewBlock[] {
-  return [
+  const blocks: ViewBlock[] = [
     {
       kind: "transaction",
       chainId: tx.chainId,
       to: tx.to,
       // Pass the raw wei value only — the transaction component renders the unit.
       value: tx.value,
-      functionName,
+      functionName: tx.function ?? functionName,
       signed: false,
       note: "UNSIGNED — review and submit with your own wallet. Nothing was sent.",
     },
   ];
+  if (tx.warnings && tx.warnings.length > 0) {
+    blocks.push({ kind: "panel", variant: "review", title: "Before signing", lines: tx.warnings });
+  }
+  return blocks;
 }
 
 export async function vaultCreateCommand(): Promise<CommandResult> {
@@ -307,10 +480,12 @@ export async function vaultPrepareDepositCommand(
   client: HissClient,
   vault: string,
   amount: string,
+  receiver?: string,
+  opts?: PrepareVaultOpts,
 ): Promise<CommandResult> {
-  const tx = await client.prepareVaultDeposit(vault, amount);
+  const tx = await client.prepareVaultDeposit(vault, amount, receiver, opts);
   return {
-    summary: `Prepared an UNSIGNED deposit of ${amount} USDG to ${vault}. Nothing was sent.`,
+    summary: `Prepared an UNSIGNED deposit of ${amount} USDG toward ${vault}. Nothing was sent.`,
     data: tx,
     detail: unsignedDetail(tx),
     view: unsignedView(tx, "deposit"),
@@ -322,8 +497,10 @@ export async function vaultPrepareWithdrawCommand(
   client: HissClient,
   vault: string,
   shares: string,
+  receiver?: string,
+  opts?: PrepareVaultOpts,
 ): Promise<CommandResult> {
-  const tx = await client.prepareVaultWithdrawal(vault, shares);
+  const tx = await client.prepareVaultWithdrawal(vault, shares, receiver, opts);
   return {
     summary: `Prepared an UNSIGNED withdrawal of ${shares} shares from ${vault}. Nothing was sent.`,
     data: tx,

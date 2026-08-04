@@ -140,6 +140,244 @@ export const VAULT_ABI = [
   },
 ] as const;
 
+/**
+ * HISS Vault V2 (HissUsdGVaultV2) fragments — the canonical new-deposit vault.
+ * V2 has NO public ERC-4626 `deposit`: deposits settle through the request
+ * queue. `pricePerShare` returns (pps, availability); exits are the
+ * unconditional pro-rata `inKindRedeem` or the vault-side redeem FIFO.
+ * Re-authored from the verified frozen-RC read surface.
+ */
+export const VAULT_V2_ABI = [
+  { type: "function", name: "name", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },
+  { type: "function", name: "symbol", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },
+  { type: "function", name: "asset", stateMutability: "view", inputs: [], outputs: [{ type: "address" }] },
+  { type: "function", name: "paused", stateMutability: "view", inputs: [], outputs: [{ type: "bool" }] },
+  {
+    type: "function",
+    name: "totalAssets",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "navUsdg", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "totalSupply",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "usdgCash",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "queueActive",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "heldAssetCount",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "heldAssets",
+    stateMutability: "view",
+    inputs: [{ name: "index", type: "uint256" }],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "pricePerShare",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      { name: "pps", type: "uint256" },
+      { name: "agg", type: "uint8" },
+    ],
+  },
+  {
+    type: "function",
+    name: "pendingRedeemCount",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "inKindRedeem",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "shares", type: "uint256" },
+      { name: "receiver", type: "address" },
+      { name: "sharesOwner", type: "address" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "requestRedeem",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "shares", type: "uint256" },
+      { name: "deadlineUnix", type: "uint64" },
+    ],
+    outputs: [{ name: "id", type: "bytes32" }],
+  },
+] as const;
+
+/**
+ * HissRequestQueue fragments — the V2 deposit / USDG-redemption escrow queue.
+ * `enqueue` takes the full QueuedRequest struct; the id MUST equal
+ * keccak256(abi.encode("HISS_REQUEST_QUEUE_V1", vault, owner, flow, nonce))
+ * (the contract re-derives and rejects a mismatch). Enqueue is idempotent by
+ * id — a replayed request never escrows twice.
+ */
+export const VAULT_V2_QUEUE_ABI = [
+  { type: "function", name: "paused", stateMutability: "view", inputs: [], outputs: [{ type: "bool" }] },
+  {
+    type: "function",
+    name: "pendingCount",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "pendingDepositUsdg",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "pendingRedemptionShares",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "deriveId",
+    stateMutability: "pure",
+    inputs: [
+      { name: "vault", type: "address" },
+      { name: "owner", type: "address" },
+      { name: "flow", type: "uint8" },
+      { name: "nonce", type: "uint256" },
+    ],
+    outputs: [{ name: "id", type: "bytes32" }],
+  },
+  {
+    type: "function",
+    name: "enqueue",
+    stateMutability: "nonpayable",
+    inputs: [
+      {
+        name: "req",
+        type: "tuple",
+        components: [
+          { name: "id", type: "bytes32" },
+          { name: "owner", type: "address" },
+          { name: "flow", type: "uint8" },
+          { name: "amount", type: "uint256" },
+          { name: "minOut", type: "uint256" },
+          { name: "deadlineUnix", type: "uint64" },
+          { name: "seq", type: "uint64" },
+          { name: "epochId", type: "uint64" },
+          { name: "status", type: "uint8" },
+          { name: "evidenceHash", type: "bytes32" },
+          { name: "nonce", type: "uint256" },
+        ],
+      },
+    ],
+    outputs: [{ name: "seq", type: "uint64" }],
+  },
+] as const;
+
+/** HissBatchSettler authority flags (settlement / keeper / rebalance lanes). */
+export const VAULT_V2_SETTLER_ABI = [
+  {
+    type: "function",
+    name: "settlementActive",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "keeperActive",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "rebalanceActive",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bool" }],
+  },
+] as const;
+
+/** HissLiveness — permissionless chain-liveness evidence report. */
+export const VAULT_V2_LIVENESS_ABI = [
+  {
+    type: "function",
+    name: "liveness",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "state", type: "uint8" },
+          { name: "executionAllowed", type: "bool" },
+          { name: "displayAllowed", type: "bool" },
+          { name: "observedChainId", type: "uint256" },
+          { name: "ageSeconds", type: "uint256" },
+          { name: "producedBlocks", type: "uint256" },
+          { name: "reason", type: "string" },
+        ],
+      },
+    ],
+  },
+] as const;
+
+/** HissPriceMeshV2 — side-aware safe-notional capacity reads (USDG 6-dec). */
+export const VAULT_V2_PRICE_MESH_ABI = [
+  {
+    type: "function",
+    name: "maxSafeBuyNotionalUsdg",
+    stateMutability: "view",
+    inputs: [{ name: "token", type: "address" }],
+    outputs: [
+      { name: "known", type: "bool" },
+      { name: "notionalUsdg", type: "uint256" },
+      { name: "zeroReason", type: "uint8" },
+    ],
+  },
+  {
+    type: "function",
+    name: "maxSafeSellNotionalUsdg",
+    stateMutability: "view",
+    inputs: [{ name: "token", type: "address" }],
+    outputs: [
+      { name: "known", type: "bool" },
+      { name: "notionalUsdg", type: "uint256" },
+      { name: "zeroReason", type: "uint8" },
+    ],
+  },
+] as const;
+
 /** VaultFactory create fragment (CreateVaultParams tuple). */
 export const VAULT_FACTORY_ABI = [
   {

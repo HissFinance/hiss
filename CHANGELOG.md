@@ -13,6 +13,92 @@ this repository. Pin to an npm version or a tag for stability.
 
 Tracks work on `main` ahead of the next tagged release. See [ROADMAP.md](./ROADMAP.md).
 
+### Vault V2 public launch — the 24/7 architecture is LIVE (MAJOR)
+
+The continuous valuation + settlement architecture previously documented as
+designed-and-undeployed is now **deployed and live on Robinhood Chain mainnet
+(4663)**. **HissUsdGVaultV2** (`0x432e90b1B35995EBE46eD93B4Db369abfc230E69`) is
+the **canonical new-deposit vault**; the V1 flagship
+(`0x6d962604df1c6c5ef4b59d88863600fe71bb63e6`) is **LEGACY · EMPTY** — closed
+to new deposits (nothing to migrate; the address and its verified history stay
+documented). Review state: **Internally verified · not externally audited.**
+
+#### Added
+
+- **The V2 contract stack (chain 4663).** HissRequestQueue
+  (`0x317d1eEC013a91a316858e80BF782496F231729a` — 24/7 deposit/USDG-redemption
+  escrow + epoch queue), HissBatchSettler
+  (`0x32A60abB48235b158dd515B84C5B039F6Dc4f7dD` — constrained keeper
+  settlement), HissLiveness (`0x424b634AA340832Cf548bB501204a6cf8A6d9136` —
+  liveness heartbeat), HissPriceMeshV2
+  (`0xd57E9fC8fF8b1aCe73a7D6c32F1101879fDeF3c6` — side-aware pricing + dynamic
+  capacity), HissV2RiskPolicy (`0x9aDE5804ad1b4F6231E46b1E806dFc7464069BB4`),
+  HissReceiptRegistry (`0x0A6232fD54C8e4B3eCBd0df261706001dfAF55Da` — receipts
+  distinguish PREPARATION / SUBMISSION / SETTLEMENT), HissV2AssetRegistry
+  (`0xC2619B2Bf3f075A73FF29f9e6cc2a8C532c0395F`), and
+  HissV2UniswapExecutionAdapter
+  (`0x306A800226CAF794238CBB0BdE9A49bAb7156d31`).
+- **The live lanes.** Queued USDG deposits and queued USDG redemptions (epoch
+  batch settlement at the epoch clearing rate — shares/USDG move at settlement,
+  never at enqueue), the valuation-free **in-kind redemption** as the
+  always-available exit, and instant bounded lanes. Dynamic capacity is a
+  **live Price Mesh read — never a fixed promise**; availability is decided by
+  on-chain market health evidence, never by the calendar.
+- **SDK V2 surface (`@hiss-finance/sdk`).** Vault-lifecycle constants
+  (`VAULT_LIFECYCLE`, canonical V2 / legacy V1), `getVault()` defaulting to the
+  canonical V2 vault, `getVaultV2Status()` (live queue/keeper/capacity/pause
+  snapshot), V2 ABI fragments (`VAULT_V2_ABI`, `VAULT_V2_QUEUE_ABI`, settler /
+  liveness / price-mesh), `prepareVaultDeposit` building the V2 queue
+  `enqueue` plan (nonce, deadline, `minOutShares`), and
+  `prepareVaultWithdrawal` defaulting to `inKindRedeem` with a `queue_usdg`
+  mode. All plans stay unsigned (`signed: false`) — the user signs.
+
+#### Changed
+
+- **`@hiss-finance/cli` 0.2.2 — V2-canonical vault commands.** `hiss vault
+list` returns the canonical V2 vault first with the V1 flagship as a
+  separately labeled LEGACY entry; `hiss vault inspect` attaches the live V2
+  queue/keeper/capacity snapshot for the canonical vault;
+  `hiss vault prepare-deposit <vault> <amount> <receiver>` prepares a V2 queue
+  enqueue (`--nonce`, `--deadline-unix`, `--min-out-shares`), warning on a
+  legacy V1 target; `hiss vault prepare-withdraw <vault> <shares> <receiver>`
+  defaults to the in-kind redemption with `--mode queue_usdg`
+  (`--min-out-usdg`); `hiss stake redeem <xShares> <receiver>` prepares (and
+  never sends) the windowed xHISS redeem plan. Reads and prepares only —
+  nothing is signed or sent.
+- **MCP tools (39, read/prepare-only) are V2-canonical.** `hiss_get_vaults`
+  lists canonical-V2-first with V1 labeled LEGACY; `hiss_get_vault` resolves
+  non-address refs to the canonical V2 vault and attaches the live `v2Status`
+  lane snapshot; the vault prepare tools build the queue-enqueue / in-kind
+  plans described above.
+- **Rebalancing on the canonical V2 vault is INACTIVE BY POLICY** — an owner
+  decision, never a fault state and never rendered as degraded: "AAPL is
+  currently the only execution-grade Stock Token asset. Initial public
+  operation uses settlement-driven allocation and preserves the current USDG
+  cash reserve." A live on-chain `rebalanceActive == true` read would win over
+  this declaration.
+- **Docs updated across the vault surfaces.**
+  `docs/vaults/24-7-architecture.md` (designed → LIVE, with the V2 stack),
+  `docs/vaults/{index,deposit,withdraw,risk-fuses,performance}.md`,
+  `docs/contracts.md`, `docs/architecture.md`, `docs/sdk.md`, `docs/cli.md`,
+  `docs/mcp.md`, `docs/getting-started.md`, `docs/react.md`,
+  `docs/status-and-data-freshness.md`, `docs/stock-tokens.md`,
+  `docs/robinhood-chain.md`, the generated deployments snapshot, `llms.txt` /
+  `llms-full.txt`, and the vault-facing skill packs
+  (`hiss-vault-agent-kit`, `hiss-price-mesh`, `hiss-mcp`). The
+  previously documented `HissDepositIntentExecutor` is recorded as
+  **superseded by the V2 request queue** (it was never deployed).
+
+#### Unchanged (explicitly)
+
+- The trust boundary: users sign their own transactions; HISS never holds
+  keys and never executes; SDK/MCP/CLI remain read/prepare-only
+  (`signed: false`, `liveTransactionSent: false`). Completion is proven only
+  by an on-chain settlement receipt.
+- xHISS staking, the reward split (V2 50/15/15/10/10; planned ≠ funded ≠
+  claimable), fees (zero deposit/withdraw fee; high-water-mark performance
+  fee), and the 2-of-3 Treasury Safe authority model.
+
 ### `@hiss-finance/cli` 0.2.0 — world-class terminal
 
 A ground-up terminal-experience overhaul for the `hiss` CLI. **Two behavior

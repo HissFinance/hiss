@@ -60,8 +60,10 @@ accounting so subsequent gains are measured from the crystallized peak.
 ## Reading performance
 
 ```ts
-const vault = await hiss.vaults.read("0x6d962604df1c6c5ef4b59d88863600fe71bb63e6");
-console.log(vault.sharePriceUsdg, vault.highWaterMarkUsdg, vault.totalShares);
+// Canonical V2 vault (default). Pass the legacy V1 address explicitly to read
+// its (empty) legacy state.
+const vault = await hiss.getVault();
+console.log(vault.pricePerShare, vault.totalAssets, vault.totalSupply);
 ```
 
 You can also preview fee math with `calculatePerformanceFee` / `splitPerformanceFee`

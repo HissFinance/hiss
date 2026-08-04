@@ -50,8 +50,11 @@ Protocol-level actions are governed by a 2-of-3 [Treasury Safe](./docs/trust-bou
   risk fuses, and publish the manifest to the on-chain registry. See
   [Create a vault](./docs/vaults/create-a-vault.md).
 - **Prepare deposits and withdrawals** — build the transactions a depositor signs
-  from their own wallet, with full fee and slippage disclosure. See
-  [Deposit](./docs/vaults/deposit.md) / [Withdraw](./docs/vaults/withdraw.md).
+  from their own wallet, with full fee and slippage disclosure. New deposits
+  route through the canonical V2 vault's **24/7 request queue** (epoch batch
+  settlement); exits include an always-available **in-kind redemption**. See
+  [Deposit](./docs/vaults/deposit.md) / [Withdraw](./docs/vaults/withdraw.md) /
+  [24/7 architecture](./docs/vaults/24-7-architecture.md).
 - **Stake $HISS** — enter the [xHISS](./docs/staking/xhiss.md) single-asset staking
   vault, manage cooldown and redeem windows.
 - **Read live protocol state** — deployments, fees, vault readiness, staking and
@@ -335,14 +338,16 @@ Addresses are load-bearing — never abbreviate them. On-chain state is always t
 source of truth; see [`docs/generated/current-deployments.md`](./docs/generated/current-deployments.md)
 for the stamped snapshot.
 
-| Contract / account          | Address                                      |
-| --------------------------- | -------------------------------------------- |
-| USDG (base asset, 6dp)      | `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` |
-| $HISS token (18dp)          | `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` |
-| VaultFactory                | `0x278d237c6890a5f7101296a9021ed9D26c821810` |
-| HISS Vault (flagship)       | `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` |
-| xHISS staking vault         | `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be` |
-| HISS Treasury Safe (2-of-3) | `0xF100Fc28dd1721C698046Dbd60408c523b69e36c` |
+| Contract / account                        | Address                                      |
+| ----------------------------------------- | -------------------------------------------- |
+| USDG (base asset, 6dp)                    | `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` |
+| $HISS token (18dp)                        | `0x47162135cc8fb253f939Bd70e3D2B83075eaeBa3` |
+| VaultFactory                              | `0x278d237c6890a5f7101296a9021ed9D26c821810` |
+| **HISS Vault V2 (canonical new-deposit)** | `0x432e90b1B35995EBE46eD93B4Db369abfc230E69` |
+| HissRequestQueue (V2 deposit queue)       | `0x317d1eEC013a91a316858e80BF782496F231729a` |
+| HISS Vault V1 (LEGACY — closed, empty)    | `0x6d962604df1c6c5ef4b59d88863600fe71bb63e6` |
+| xHISS staking vault                       | `0x699861D2C546ab86a7f2AE97ffc7aF89f3FF67Be` |
+| HISS Treasury Safe (2-of-3)               | `0xF100Fc28dd1721C698046Dbd60408c523b69e36c` |
 
 The full address book (registries, distributors, adapters) is in
 [`docs/contracts.md`](./docs/contracts.md).
@@ -378,23 +383,28 @@ See [Create a vault](./docs/vaults/create-a-vault.md) and
 
 ## Example: prepare a deposit
 
+New deposits target the **canonical V2 vault** and route through its 24/7
+request queue — shares mint at **epoch settlement**, not at enqueue. The V1
+flagship is legacy (closed to new deposits).
+
 ```ts
-import { HissClient } from "@hiss-finance/sdk";
+import { createHissClient, prepareVaultDeposit } from "@hiss-finance/sdk";
 
-const hiss = new HissClient({ chainId: 4663, rpcUrl: "https://rpc.mainnet.chain.robinhood.com" });
+const hiss = createHissClient({ chainId: 4663, rpcUrl: "https://rpc.mainnet.chain.robinhood.com" });
 
-// A read: current share price and readiness (always a live chain read).
-const vault = await hiss.vaults.read("0x6d962604df1c6c5ef4b59d88863600fe71bb63e6");
+// A read: the canonical V2 vault + its live queue/capacity state (always live chain reads).
+const vault = await hiss.getVault();
+const v2 = await hiss.getVaultV2Status();
 
-// A prepare: returns the approve + deposit transactions for the USER to sign.
-const txs = await hiss.vaults.prepareDeposit({
-  vault: vault.address,
-  depositor: "0xDepositor",
-  amountUsdg: 1_000_000_000n, // 1,000 USDG (6 decimals)
+// A prepare: an unsigned request-queue enqueue plan for the USER to sign.
+const plan = prepareVaultDeposit({
+  amountUnits: 1_000_000_000n, // 1,000 USDG (6 decimals)
+  receiver: "0xDepositor", // the queue-request owner — must be the signing wallet
+  minOutShares: 0n, // set a floor for slippage protection
 });
 
-// You sign and send `txs` with your own wallet. The deposit is complete only
-// on the on-chain receipt — never before.
+// You sign and send the plan with your own wallet. The deposit is complete only
+// on the on-chain settlement receipt — never at enqueue, never before.
 ```
 
 See [Deposit](./docs/vaults/deposit.md).
@@ -402,19 +412,14 @@ See [Deposit](./docs/vaults/deposit.md).
 ## Example: stake $HISS
 
 ```ts
-import { HissClient } from "@hiss-finance/sdk";
-
-const hiss = new HissClient({ chainId: 4663 });
+import { prepareHissStake, prepareXhissCooldown } from "@hiss-finance/sdk";
 
 // Prepare a stake into the xHISS vault (single-asset staking over $HISS).
-const stakeTxs = await hiss.staking.prepareStake({ staker: "0xStaker", amountHiss: 500n * 10n ** 18n });
+const stakePlan = prepareHissStake({ amountUnits: 500n * 10n ** 18n });
 
 // Exiting is a two-step, non-pausable flow: start a 72h cooldown, then redeem
 // within the 2-day window.
-const cooldownTx = await hiss.staking.prepareStartCooldown({
-  staker: "0xStaker",
-  xShares: 250n * 10n ** 18n,
-});
+const cooldownPlan = prepareXhissCooldown({ action: "start", xShares: 250n * 10n ** 18n });
 ```
 
 See [xHISS staking](./docs/staking/xhiss.md) and
