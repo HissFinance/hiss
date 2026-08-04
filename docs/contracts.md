@@ -143,8 +143,12 @@ distributors, `HissOracleAdapter`, and `UniswapV4RebalanceAdapter`. Use them wit
 viem/ethers/`cast`, or the typed reads in `@hiss-finance/sdk`. The V2
 call-surface fragments used by the SDK (`VAULT_V2_ABI`, `VAULT_V2_QUEUE_ABI` —
 `inKindRedeem`, `enqueue`, and the V2 status reads) ship in
-`@hiss-finance/sdk`; full standalone V2 ABI files follow in a subsequent
-contracts-registry update.
+`@hiss-finance/sdk`. The contracts registry
+(`contracts/deployments/robinhood-chain-mainnet.json`) is complete for the V2
+system: all nine V2 contracts are recorded with their live runtime-bytecode
+keccak hashes, creation transactions, and verification state, and
+`pnpm check:contract-registry-live` re-verifies every recorded hash against
+live chain code.
 
 ## Verifying state
 

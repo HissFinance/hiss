@@ -1,9 +1,11 @@
 /**
- * prepare-vault-deposit — build an UNSIGNED deposit plan.
+ * prepare-vault-deposit — LEGACY EXAMPLE — for existing V1 integrations only.
+ * New deposits should target Vault V2.
  *
- * NOTE: this example targets the LEGACY V1 flagship builder and the plan will
+ * This example targets the LEGACY V1 flagship builder and the plan will
  * carry a legacy/closed warning — V1 is closed to new deposits. The canonical
- * new-deposit vault is Vault V2 (24/7 request queue): use
+ * new-deposit vault is Vault V2 (24/7 request queue): see
+ * `examples/prepare-vault-deposit-v2/` (the canonical example), or use
  * `prepareVaultDeposit` from `@hiss-finance/sdk` (queue enqueue, unsigned) or
  * `hiss vault prepare-deposit` in the CLI. See docs/vaults/deposit.md.
  *

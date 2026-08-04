@@ -4,20 +4,21 @@ Small, self-contained examples for the public HISS Finance packages. Each
 example is its own workspace package with a README, runnable code, and expected
 output.
 
-| Example                                              | What it shows                                     | Packages              |
-| ---------------------------------------------------- | ------------------------------------------------- | --------------------- |
-| [read-protocol-status](./read-protocol-status)       | Read chain + contract directory                   | `@hiss-finance/sdk`   |
-| [read-flagship-vault](./read-flagship-vault)         | Read one vault's summary/holdings                 | `@hiss-finance/sdk`   |
-| [read-vault-performance](./read-vault-performance)   | Read observed performance (honest empty handling) | `@hiss-finance/sdk`   |
-| [read-reward-status](./read-reward-status)           | Read reward-split legs + lifecycle state          | `@hiss-finance/sdk`   |
-| [validate-vault-manifest](./validate-vault-manifest) | Validate a basket manifest                        | `@hiss-finance/core`  |
-| [create-vault-candidate](./create-vault-candidate)   | Build a candidate manifest + slug                 | `@hiss-finance/core`  |
-| [prepare-vault-deposit](./prepare-vault-deposit)     | Build an unsigned deposit plan                    | `@hiss-finance/react` |
-| [prepare-vault-creation](./prepare-vault-creation)   | Build an unsigned vault-creation plan             | `@hiss-finance/react` |
-| [stake-hiss](./stake-hiss)                           | Build an unsigned stake plan + xHISS timing       | `@hiss-finance/react` |
-| [verify-receipt](./verify-receipt)                   | Recompute + verify a paper receipt hash           | `@hiss-finance/core`  |
-| [react-vault-dashboard](./react-vault-dashboard)     | A React dashboard with hooks + components         | `@hiss-finance/react` |
-| [mcp-agent](./mcp-agent)                             | A read-only MCP server exposing HISS tools        | `@hiss-finance/sdk`   |
+| Example                                                | What it shows                                                                               | Packages              |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------- | --------------------- |
+| [read-protocol-status](./read-protocol-status)         | Read chain + contract directory                                                             | `@hiss-finance/sdk`   |
+| [read-flagship-vault](./read-flagship-vault)           | Read one vault's summary/holdings                                                           | `@hiss-finance/sdk`   |
+| [read-vault-performance](./read-vault-performance)     | Read observed performance (honest empty handling)                                           | `@hiss-finance/sdk`   |
+| [read-reward-status](./read-reward-status)             | Read reward-split legs + lifecycle state                                                    | `@hiss-finance/sdk`   |
+| [validate-vault-manifest](./validate-vault-manifest)   | Validate a basket manifest                                                                  | `@hiss-finance/core`  |
+| [create-vault-candidate](./create-vault-candidate)     | Build a candidate manifest + slug                                                           | `@hiss-finance/core`  |
+| [prepare-vault-deposit-v2](./prepare-vault-deposit-v2) | **Canonical deposit example** — live V2 status + unsigned queue-deposit plan + in-kind exit | `@hiss-finance/sdk`   |
+| [prepare-vault-deposit](./prepare-vault-deposit)       | LEGACY — V1 deposit plan (existing V1 integrations only; new deposits target Vault V2)      | `@hiss-finance/react` |
+| [prepare-vault-creation](./prepare-vault-creation)     | Build an unsigned vault-creation plan                                                       | `@hiss-finance/react` |
+| [stake-hiss](./stake-hiss)                             | Build an unsigned stake plan + xHISS timing                                                 | `@hiss-finance/react` |
+| [verify-receipt](./verify-receipt)                     | Recompute + verify a paper receipt hash                                                     | `@hiss-finance/core`  |
+| [react-vault-dashboard](./react-vault-dashboard)       | A React dashboard with hooks + components                                                   | `@hiss-finance/react` |
+| [mcp-agent](./mcp-agent)                               | A read-only MCP server exposing HISS tools                                                  | `@hiss-finance/sdk`   |
 
 ## Honesty rules these examples follow
 

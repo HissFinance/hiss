@@ -29,8 +29,9 @@
     "check:mcp-public-safe": "tsx scripts/check-mcp-public-safe.ts",
     "check:fee-docs": "tsx scripts/check-fee-docs.ts",
     "check:secrets": "tsx scripts/check-secrets.ts",
+    "check:contract-registry-live": "tsx scripts/check-contract-registry-live.ts",
     "licenses:check": "tsx scripts/check-licenses.ts",
-    "check:all": "pnpm schemas:validate && pnpm docs:check && pnpm check:nav && pnpm check:private-boundary && pnpm check:execution-claims && pnpm check:skill-tool-refs && pnpm check:skill-catalog && pnpm check:mcp-public-safe && pnpm check:fee-docs && pnpm check:secrets && pnpm licenses:check"
+    "check:all": "pnpm schemas:validate && pnpm docs:check && pnpm check:nav && pnpm check:private-boundary && pnpm check:execution-claims && pnpm check:skill-tool-refs && pnpm check:skill-catalog && pnpm check:mcp-public-safe && pnpm check:fee-docs && pnpm check:secrets && pnpm check:contract-registry-live && pnpm licenses:check"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
