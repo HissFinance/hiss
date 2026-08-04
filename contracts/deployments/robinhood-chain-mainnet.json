@@ -15,7 +15,9 @@
     "bytecodeHash values are keccak256 of the on-chain deployed bytecode, re-checked on chain 4663.",
     "VaultLegalReadinessRegistry is a predecessor deposit gate, SUPERSEDED as the factory's active gate by VaultDepositReadinessRegistry; it remains live on-chain but is no longer consulted.",
     "VaultDepositReadinessRegistry is the active deposit-readiness gate and ships CLOSED (defaultReady=false, zero vaults marked ready).",
-    "HissLpManagerV1 (Stock-Premium LP manager) LAUNCHED PAUSED as its immutable initial state; the owner-gated Safe unpause has since executed on-chain, so its pause state is never assumed — current paused()/feeBps()/owner()/treasury() are always live chain reads (unknown on a failed read, never inferred). Its management fee applies to realized LP fees only (feeBps 500, immutable MAX_FEE_BPS 500). Unpaused alone opens nothing: enrollment and every managed action stay owner/beneficiary-gated."
+    "HissLpManagerV1 (Stock-Premium LP manager) LAUNCHED PAUSED as its immutable initial state; the owner-gated Safe unpause has since executed on-chain, so its pause state is never assumed — current paused()/feeBps()/owner()/treasury() are always live chain reads (unknown on a failed read, never inferred). Its management fee applies to realized LP fees only (feeBps 500, immutable MAX_FEE_BPS 500). Unpaused alone opens nothing: enrollment and every managed action stay owner/beneficiary-gated.",
+    "V2 (24/7 request-queue) contracts: HissUsdGVaultV2 is the CANONICAL new-deposit vault; deposits and USDG redemptions route through HissRequestQueue and settle in epoch batches via HissBatchSettler. The V2 contracts are not yet source-verified on Blockscout; their sourceVerification is 'source-matched: frozen RC v2-rc-frozen-1d5299f' (live runtime bytecode keccak-checked against the frozen release candidate build). deploymentTx/block values are the creation transactions indexed by Blockscout, re-confirmed via eth_getTransactionReceipt on the public RPC.",
+    "Vault capacity is computed from current onchain liveness evidence. When liveness evidence expires, execution capacity fails closed until refreshed."
   ],
   "contracts": [
     {
@@ -97,6 +99,7 @@
       "symbol": "hVAULT",
       "address": "0x6d962604df1c6c5ef4b59d88863600fe71bb63e6",
       "kind": "HissUsdGVault instance",
+      "status": "legacy — closed to new deposits (deposit readiness revoked on-chain 2026-08-04)",
       "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x6d962604df1c6c5ef4b59d88863600fe71bb63e6"
     },
     {
@@ -133,6 +136,114 @@
       "address": "0xF100Fc28dd1721C698046Dbd60408c523b69e36c",
       "kind": "Safe v1.4.1 proxy; protocol admin / treasury",
       "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xF100Fc28dd1721C698046Dbd60408c523b69e36c"
+    },
+    {
+      "name": "HissLiveness",
+      "chainId": 4663,
+      "address": "0x424b634AA340832Cf548bB501204a6cf8A6d9136",
+      "bytecodeHash": "0xee2c9a95b71006b5968723f52c55b65d690469b7ff402ab605d7b618fd9d4966",
+      "sourceVerification": "source-matched: frozen RC v2-rc-frozen-1d5299f",
+      "deploymentTx": "0xbec521d3f067e10812a3e34b30684f6f08154cf1874081d93ee699fa43710918",
+      "block": 19977964,
+      "kind": "V2 permissionless chain-liveness evidence gating execution capacity",
+      "status": "live",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x424b634AA340832Cf548bB501204a6cf8A6d9136"
+    },
+    {
+      "name": "HissV2AssetRegistry",
+      "chainId": 4663,
+      "address": "0xC2619B2Bf3f075A73FF29f9e6cc2a8C532c0395F",
+      "bytecodeHash": "0xa909756610c290bbf47452a3e353de5167499620dee8b22f3810484a47c12610",
+      "sourceVerification": "source-matched: frozen RC v2-rc-frozen-1d5299f",
+      "deploymentTx": "0xcab1d8d2fe407d26b08ba959bd395724de9414a62bf2f6a8ca018ad888ef3d07",
+      "block": 19978718,
+      "kind": "V2 canonical-address asset registry (allow-listed vault-holdable assets)",
+      "status": "live",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xC2619B2Bf3f075A73FF29f9e6cc2a8C532c0395F"
+    },
+    {
+      "name": "HissReceiptRegistry",
+      "chainId": 4663,
+      "address": "0x0A6232fD54C8e4B3eCBd0df261706001dfAF55Da",
+      "bytecodeHash": "0xcfd68e9261d08346a2e6660b6e03bbd33d8ef55591100ae6008ef151c2e73c83",
+      "sourceVerification": "source-matched: frozen RC v2-rc-frozen-1d5299f",
+      "deploymentTx": "0xd063aa1aaadb0cc5d5258f4dc438e29a411843821df599a5d6068db1f060a3c2",
+      "block": 19981711,
+      "kind": "V2 on-chain receipts, distinguishing preparation / submission / settlement",
+      "status": "live",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x0A6232fD54C8e4B3eCBd0df261706001dfAF55Da"
+    },
+    {
+      "name": "HissV2RiskPolicy",
+      "chainId": 4663,
+      "address": "0x9aDE5804ad1b4F6231E46b1E806dFc7464069BB4",
+      "bytecodeHash": "0x84fe119d96c9bd7df0688eeca86affe574c6b29ce0c0c394f15d21c06c330db4",
+      "sourceVerification": "source-matched: frozen RC v2-rc-frozen-1d5299f",
+      "deploymentTx": "0x114b75d3368d20a5e1cc2d5da3723c3e36e400a0e70c21482ff3c973f8c21a02",
+      "block": 19982943,
+      "kind": "V2 binding risk-policy bounds consulted at settlement",
+      "status": "live",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x9aDE5804ad1b4F6231E46b1E806dFc7464069BB4"
+    },
+    {
+      "name": "HissPriceMeshV2",
+      "chainId": 4663,
+      "address": "0xd57E9fC8fF8b1aCe73a7D6c32F1101879fDeF3c6",
+      "bytecodeHash": "0x0c42cd9726b601590487fd2270553a2d68e738ebb7230921a4f7b8fb88e5732a",
+      "sourceVerification": "source-matched: frozen RC v2-rc-frozen-1d5299f",
+      "deploymentTx": "0x602b0baaf52a27c63b5e31efc28021694d485a5b96badeb8a290b77556069722",
+      "block": 19986176,
+      "kind": "V2 side-aware price mesh + dynamic safe-notional capacity evidence",
+      "status": "live",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0xd57E9fC8fF8b1aCe73a7D6c32F1101879fDeF3c6"
+    },
+    {
+      "name": "HissUsdGVaultV2",
+      "chainId": 4663,
+      "address": "0x432e90b1B35995EBE46eD93B4Db369abfc230E69",
+      "bytecodeHash": "0x4a9a29b07beb2e7cbc3479f3dfa1e02b04ca8b1caf06691eba66f362b6c7fc8d",
+      "sourceVerification": "source-matched: frozen RC v2-rc-frozen-1d5299f",
+      "deploymentTx": "0x05dd69fa76174e0bde3b4fdfaea129fbb253e9825490ca4423faa79b15af2763",
+      "block": 19997345,
+      "kind": "CANONICAL new-deposit vault — queue-routed epoch settlement; valuation-free in-kind redemption exit",
+      "status": "live (active)",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x432e90b1B35995EBE46eD93B4Db369abfc230E69"
+    },
+    {
+      "name": "HissRequestQueue",
+      "chainId": 4663,
+      "address": "0x317d1eEC013a91a316858e80BF782496F231729a",
+      "bytecodeHash": "0x1771e8ef04241c8b792c91f7e3baeebf1d3e923bc356231dfdea1fef25fdc8a1",
+      "sourceVerification": "source-matched: frozen RC v2-rc-frozen-1d5299f",
+      "deploymentTx": "0x4f2f843368088793667639b68ef50b3f7dfe0525a2f922be0004d73b18aa1109",
+      "block": 19999702,
+      "kind": "V2 deposit / USDG-redemption escrow + epoch request queue",
+      "status": "live",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x317d1eEC013a91a316858e80BF782496F231729a"
+    },
+    {
+      "name": "HissBatchSettler",
+      "chainId": 4663,
+      "address": "0x32A60abB48235b158dd515B84C5B039F6Dc4f7dD",
+      "bytecodeHash": "0x01b4bdbfcbfb1689d0e27424b4761b3035102e0608c5141d4abfc049940d0209",
+      "sourceVerification": "source-matched: frozen RC v2-rc-frozen-1d5299f",
+      "deploymentTx": "0x8f2b44d1fe753bb214d878d895a803ad81b6c9bf262ab3dc077eb463ea92c410",
+      "block": 20004980,
+      "kind": "V2 constrained keeper settlement authority (settlement/keeper/rebalance flags)",
+      "status": "live; rebalancing lane inactive by policy",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x32A60abB48235b158dd515B84C5B039F6Dc4f7dD"
+    },
+    {
+      "name": "HissV2UniswapExecutionAdapter",
+      "chainId": 4663,
+      "address": "0x306A800226CAF794238CBB0BdE9A49bAb7156d31",
+      "bytecodeHash": "0x340c76a852422fab3e1bea0fef1e8fb7ccad818b94b7d32bafb2ab29946de6bf",
+      "sourceVerification": "source-matched: frozen RC v2-rc-frozen-1d5299f",
+      "deploymentTx": "0x21204c88e5afc380db8a2192906df5e0a12e6bcf16ca80538374627564e5cd4f",
+      "block": 20007547,
+      "kind": "V2 Uniswap execution adapter used by the constrained settlement path",
+      "status": "live",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x306A800226CAF794238CBB0BdE9A49bAb7156d31"
     }
   ]
 }

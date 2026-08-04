@@ -1,7 +1,14 @@
 # prepare-vault-deposit
 
-Builds an **unsigned** vault deposit plan with `@hiss-finance/react`'s pure
-`buildVaultDepositPlan`. No wallet, no network, no execution.
+**LEGACY EXAMPLE — for existing V1 integrations only. New deposits should
+target Vault V2.** The canonical deposit example is
+[prepare-vault-deposit-v2](../prepare-vault-deposit-v2) (queue-routed V2
+deposits via `@hiss-finance/sdk`).
+
+Builds an **unsigned** V1-style vault deposit plan with `@hiss-finance/react`'s
+pure `buildVaultDepositPlan`. No wallet, no network, no execution. The V1
+flagship vault is **closed to new deposits**, so the plan carries a
+legacy/closed warning and would revert if signed and submitted.
 
 ## Run
 
