@@ -6,9 +6,12 @@ import { STOCK_PREMIUM_ARGS } from "./helpers/stockPremiumArgs.js";
 import { lighterFixtureClient } from "./helpers/lighterFixtureClient.js";
 import type { JsonRecord } from "../src/lib/types.js";
 
+/** The frozen clock every tool call in this file runs against. */
+const NOW_ISO = "2026-07-16T00:00:00.000Z";
+
 const deps = {
   client: mockClient(),
-  nowIso: () => "2026-07-16T00:00:00.000Z",
+  nowIso: () => NOW_ISO,
   // Deterministic, offline Lighter READ client (fixture-backed, no network, no key).
   lighter: lighterFixtureClient(),
 };
@@ -26,8 +29,9 @@ const LIGHTER_ARGS: Record<string, JsonRecord> = {
     orderType: "LIMIT",
     timeInForce: "GOOD_TILL_TIME",
     clientOrderIndex: 1,
-    // 1 day ahead of the real clock — inside the [5min, 30d] GTT window.
-    expiryMs: Date.now() + 24 * 60 * 60 * 1000,
+    // 1 day ahead of the tools' clock (deps.nowIso, not the wall clock) — inside the
+    // [5min, 30d] GTT window whatever day the suite runs.
+    expiryMs: Date.parse(NOW_ISO) + 24 * 60 * 60 * 1000,
   },
   hiss_lighter_prepare_cancel: { ticker: "AAPL", orderIndex: "12345" },
   hiss_lighter_prepare_modify: { ticker: "AAPL", orderIndex: "12345", newPrice: "339.40" },
