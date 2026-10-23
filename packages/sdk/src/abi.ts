@@ -131,13 +131,8 @@ export const VAULT_ABI = [
     ],
     outputs: [{ name: "assets", type: "uint256" }],
   },
-  {
-    type: "function",
-    name: "setPaused",
-    stateMutability: "nonpayable",
-    inputs: [{ name: "paused", type: "bool" }],
-    outputs: [],
-  },
+  { type: "function", name: "pause", stateMutability: "nonpayable", inputs: [], outputs: [] },
+  { type: "function", name: "unpause", stateMutability: "nonpayable", inputs: [], outputs: [] },
 ] as const;
 
 /**

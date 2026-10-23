@@ -458,7 +458,7 @@ export function prepareVaultCreation(input: PrepareVaultCreationInput): ActionPl
 
 export interface PrepareVaultManagementInput {
   vault: string;
-  /** Currently supported: pause / unpause via setPaused(bool). */
+  /** Currently supported: pause / unpause, encoded as the vault's pause() / unpause(). */
   action: "setPaused";
   paused: boolean;
   chainId?: number;
@@ -469,17 +469,15 @@ export function prepareVaultManagementAction(input: PrepareVaultManagementInput)
   const chainId = input.chainId ?? ROBINHOOD_CHAIN_MAINNET;
   const vault = addr(input.vault);
 
-  const calldata = encodeFunctionData({
-    abi: VAULT_ABI,
-    functionName: "setPaused",
-    args: [input.paused],
-  });
+  // The vault exposes pause() and unpause(); it has no setPaused(bool).
+  const functionName = input.paused ? "pause" : "unpause";
+  const calldata = encodeFunctionData({ abi: VAULT_ABI, functionName });
 
   return buildActionPlan({
     chainId,
     target: vault,
-    function: "setPaused(bool)",
-    decodedArgs: { paused: String(input.paused) },
+    function: `${functionName}()`,
+    decodedArgs: {},
     calldata,
     summary: `Set vault ${vault} paused = ${input.paused}.`,
     warnings: [SIGNING_NOTICE],
