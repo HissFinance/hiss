@@ -1,9 +1,11 @@
+import { readFileSync } from "node:fs";
 import { describe, it, expect } from "vitest";
-import { decodeFunctionData, getAddress } from "viem";
+import { decodeFunctionData, getAddress, type Abi } from "viem";
 import {
   prepareVaultDeposit,
   prepareVaultWithdrawal,
   prepareVaultCreation,
+  prepareVaultManagementAction,
   prepareHissApproval,
   prepareHissStake,
   prepareXhissCooldown,
@@ -130,6 +132,38 @@ describe("prepareVaultCreation", () => {
     expect(() => prepareVaultCreation({ candidate: bad, feeRecipient: RECEIVER })).toThrow(
       /not deployment-ready/i,
     );
+  });
+});
+
+describe("prepareVaultManagementAction", () => {
+  // The published ABI of the deployed vault implementation (HissUsdGVault).
+  const VAULT_CONTRACT_ABI = JSON.parse(
+    readFileSync(new URL("../../../contracts/abi/HissUsdGVault.json", import.meta.url), "utf8"),
+  ) as Abi;
+
+  it("pauses through the vault's pause()", () => {
+    const plan = prepareVaultManagementAction({
+      vault: ADDRESSES.flagshipVault,
+      action: "setPaused",
+      paused: true,
+    });
+    const decoded = decodeFunctionData({ abi: VAULT_CONTRACT_ABI, data: plan.calldata });
+    expect(decoded.functionName).toBe("pause");
+    expect(plan.function).toBe("pause()");
+    expect(plan.target).toBe(getAddress(ADDRESSES.flagshipVault));
+    assertUnsigned(plan);
+  });
+
+  it("unpauses through the vault's unpause()", () => {
+    const plan = prepareVaultManagementAction({
+      vault: ADDRESSES.flagshipVault,
+      action: "setPaused",
+      paused: false,
+    });
+    const decoded = decodeFunctionData({ abi: VAULT_CONTRACT_ABI, data: plan.calldata });
+    expect(decoded.functionName).toBe("unpause");
+    expect(plan.function).toBe("unpause()");
+    assertUnsigned(plan);
   });
 });
 
